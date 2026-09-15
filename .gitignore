@@ -1,0 +1,39 @@
+# Python & Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment Variables & Secrets
+.env
+*.env.local
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# LLM Models & Weights (GGUF, safetensors, etc.)
+models/
+*.gguf
+*.bin
+
+# Storage & Temporary Database Files
+*.duckdb
+*.duckdb.tmp
+minio-data/
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs & Testing
+*.log
+.pytest_cache/
+.coverage
+htmlcov/

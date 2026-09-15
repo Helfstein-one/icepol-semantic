@@ -1,0 +1,95 @@
+domain: corporate_credit
+entities:
+  - name: counterpart
+    table: corporate_credit.counterparts
+    primary_key: counterpart_id
+    description: "Empresas e grupos econômicos tomadores de crédito corporativo."
+    dimensions:
+      - name: economic_group
+        type: string
+        column: nm_economic_group
+      - name: sector
+        type: string
+        column: ds_cnae_sector
+      - name: internal_rating
+        type: string
+        column: cd_rating_agency
+
+  - name: credit_facility
+    table: corporate_credit.facilities
+    primary_key: facility_id
+    foreign_keys:
+      - counterpart_id: counterpart.counterpart_id
+    dimensions:
+      - name: operation_type
+        type: string
+        column: tp_operation  # CCB, Debêntures, Capital de Giro, Trade Finance
+      - name: status
+        type: string
+        column: st_operation
+
+  - name: collateral
+    table: corporate_credit.collaterals
+    primary_key: collateral_id
+    foreign_keys:
+      - facility_id: credit_facility.facility_id
+      - counterpart_id: counterpart.counterpart_id
+    dimensions:
+      - name: collateral_type
+        type: string
+        column: tp_collateral  # Imóveis, Fiança, Recebíveis, Equipamentos
+      - name: collateral_status
+        type: string
+        column: st_collateral  # Ativa, Em Liquidação, Baixada
+
+  - name: credit_proposal
+    table: corporate_credit.proposals
+    primary_key: proposal_id
+    foreign_keys:
+      - counterpart_id: counterpart.counterpart_id
+    dimensions:
+      - name: decision_status
+        type: string
+        column: st_decision  # Aprovada, Recusada, Em Análise
+      - name: risk_committee
+        type: string
+        column: nm_committee  # Comitê Local, Comitê Executivo, Diretoria
+
+  - name: financial_statement
+    table: corporate_credit.financial_statements
+    primary_key: statement_id
+    foreign_keys:
+      - counterpart_id: counterpart.counterpart_id
+    dimensions:
+      - name: fiscal_year
+        type: string
+        column: nr_fiscal_year
+      - name: audited_status
+        type: string
+        column: st_audited  # Auditado, Não Auditado
+
+  - name: credit_limit
+    table: corporate_credit.credit_limits
+    primary_key: limit_id
+    foreign_keys:
+      - counterpart_id: counterpart.counterpart_id
+    dimensions:
+      - name: limit_type
+        type: string
+        column: tp_limit  # Rotativo, Guarda-Chuva, Específico
+      - name: limit_status
+        type: string
+        column: st_limit  # Ativo, Suspenso, Vencido
+
+  - name: covenant
+    table: corporate_credit.covenants
+    primary_key: covenant_id
+    foreign_keys:
+      - facility_id: credit_facility.facility_id
+    dimensions:
+      - name: covenant_type
+        type: string
+        column: tp_covenant  # Dívida Líquida/EBITDA, Cobertura de Juros, Capex Máximo
+      - name: compliance_status
+        type: string
+        column: st_compliance  # Em Cumpirmento, Desenquadrado, Dispensado (Waiver)

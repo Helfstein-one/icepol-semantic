@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "icepol-semantic": {
+      "command": "python",
+      "args": [
+        "-m",
+        "core.mcp_server"
+      ],
+      "env": {
+        "LLAMA_SERVER_URL": "http://localhost:8080",
+        "MINIO_ENDPOINT": "localhost:9000"
+      }
+    }
+  }
+}

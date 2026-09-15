@@ -1,0 +1,72 @@
+metrics:
+  - name: total_exposure
+    entity: credit_facility
+    type: sum
+    sql: "SUM(vl_outstanding_balance)"
+    description: "Saldo devedor total em aberto (EAD - Exposure at Default)."
+
+  - name: overdue_ratio_90d
+    entity: credit_facility
+    type: derived
+    sql: "SUM(CASE WHEN nr_days_overdue > 90 THEN vl_outstanding_balance ELSE 0 END) / NULLIF(SUM(vl_outstanding_balance), 0)"
+    description: "Índice de inadimplência superior a 90 dias (NPL Ratio)."
+
+  - name: total_provision
+    entity: credit_facility
+    type: sum
+    sql: "SUM(vl_provision)"
+    description: "Valor total de provisão para devedores duvidosos."
+
+  - name: provision_coverage_ratio
+    entity: credit_facility
+    type: derived
+    sql: "SUM(vl_provision) / NULLIF(SUM(CASE WHEN nr_days_overdue > 90 THEN vl_outstanding_balance ELSE 0 END), 0)"
+    description: "Índice de cobertura de provisão sobre inadimplência > 90 dias."
+
+  - name: total_collateral_value
+    entity: collateral
+    type: sum
+    sql: "SUM(vl_appraised_value)"
+    description: "Valor total avaliado das garantias e colaterais vinculados."
+
+  - name: ltv_ratio
+    entity: credit_facility
+    type: derived
+    sql: "SUM(vl_outstanding_balance) / NULLIF(SUM(vl_collateral_allocated), 0)"
+    description: "Razão Loan-to-Value (LTV) da carteira de crédito."
+
+  - name: total_proposed_amount
+    entity: credit_proposal
+    type: sum
+    sql: "SUM(vl_requested)"
+    description: "Volume total de crédito solicitado em propostas."
+
+  - name: proposal_approval_rate
+    entity: credit_proposal
+    type: derived
+    sql: "SUM(CASE WHEN st_decision = 'Aprovada' THEN vl_requested ELSE 0 END) / NULLIF(SUM(vl_requested), 0)"
+    description: "Taxa de aprovação de volume financeiro de crédito."
+
+  - name: avg_net_debt_ebitda
+    entity: financial_statement
+    type: avg
+    sql: "AVG(vl_net_debt / NULLIF(vl_ebitda, 0))"
+    description: "Alavancagem financeira média (Dívida Líquida / EBITDA)."
+
+  - name: total_approved_credit_limit
+    entity: credit_limit
+    type: sum
+    sql: "SUM(vl_approved_limit)"
+    description: "Valor total de limite de crédito global aprovado."
+
+  - name: credit_limit_utilization_rate
+    entity: credit_limit
+    type: derived
+    sql: "SUM(vl_used_limit) / NULLIF(SUM(vl_approved_limit), 0)"
+    description: "Taxa de utilização do limite de crédito corporativo."
+
+  - name: covenant_breach_rate
+    entity: covenant
+    type: derived
+    sql: "COUNT(CASE WHEN st_compliance = 'Desenquadrado' THEN 1 END) * 1.0 / NULLIF(COUNT(*), 0)"
+    description: "Percentual de contratos com descumprimento de clausulas contratuais (Covenants)."
