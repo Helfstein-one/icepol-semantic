@@ -15,11 +15,11 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
   - Download e integração via Ollama do `deepseek-r1:1.5b` (1.1 GB) com suporte a Chain-of-Thought determinístico.
 - **Painel de Telemetria e Traces no Frontend**:
   - Novo botão e popover interativo `Métricas & Traces` no cabeçalho do Icepol com status ao vivo de Langfuse, MinIO e MySQL.
-- **Produção de Vídeos Demonstrativos em Full HD 1080p com Trilha Sonora Synthwave 80s**:
-  - `video/icepol_user_journey_langfuse_tokens.mp4` (60s): **Vídeo Master de Jornada do Usuário** — Acessando repositório no GitHub, clonando via terminal, executando `make seed` e `podman compose up -d`, interagindo com o chat Icepol, compilando SQL e visualizando o diagrama relacional Mermaid com cardinalidade Crow's foot, navegando para o Langfuse (`:3001`), detalhando a árvore de decisão, waterfall de spans e análise detalhada de onde o modelo gasta tokens (input context vs reasoning CoT vs SQL output).
-  - `video/icepol_journey_complete.mp4` (36s): Jornada do usuário com build de terminal, troca de modelos, busca semântica e ERD Mermaid.
-  - `video/langfuse_metrics_decision_tree.mp4` (36s): Dashboard de telemetria do Langfuse, decomposição de waterfall de spans e visualização da árvore de decisão (DAG).
-  - Trilha sonora original sintetizada estilo eletrônica anos 80 Depeche Mode.
+- **Produção de Vídeos Demonstrativos em Full HD 1080p e Novas Trilhas Sonoras**:
+  - `video/icepol_chat_ui_journey_cyberpunk.mp4` (60s): **Gravação Focada 100% na UI de Chat do Usuário** — Tela inicial, digitação interativa, retorno da resposta com tabela analítica DuckDB, aba do diagrama relacional Mermaid com notação Crow's foot, popover de observabilidade aberto no chat com status ao vivo, transição para o Langfuse (`:3001`), waterfall de spans e análise detalhada de consumo de tokens.
+  - `video/soundtrack_cyberpunk_synthwave_60s.wav`: **Nova sugestão de trilha sonora** — Arranjo estilo **Cyberpunk / Dark Synthwave (Kavinsky, Perturbator e Tron)** em Lá menor (126 BPM), com bateria 909 eletrônica pesada, sub-bass saturado, arpeggios rápidos e pads espaciais em estéreo.
+  - `video/icepol_user_journey_langfuse_tokens.mp4` (60s): Jornada completa com navegação e clone no GitHub, build de terminal, chat e Langfuse (trilha estilo Depeche Mode).
+  - `video/icepol_journey_complete.mp4` (36s) e `video/langfuse_metrics_decision_tree.mp4` (36s).
 
 ---
 

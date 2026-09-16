@@ -296,27 +296,27 @@ flowchart LR
 
 O projeto conta com vídeos demonstrativos de alta definição gravados com trilha sonora original estilo **synthwave anos 80 (Depeche Mode style)**:
 
-### 1. 🌟 Vídeo Master: Jornada Completa do Usuário (GitHub, Clone, Chat & Gastos de Tokens no Langfuse)
-* **Arquivo**: [`video/icepol_user_journey_langfuse_tokens.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_langfuse_tokens.mp4)
+### 1. ⚡ Vídeo da Jornada 100% na UI de Chat (Cyberpunk Dark Synthwave)
+* **Arquivo**: [`video/icepol_chat_ui_journey_cyberpunk.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_cyberpunk.mp4)
+* **Trilha Sonora Original**: [`video/soundtrack_cyberpunk_synthwave_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_cyberpunk_synthwave_60s.wav) — Nova sugestão de áudio inspirada em **Cyberpunk / Dark Synthwave (Kavinsky, Perturbator e Daft Punk Tron)** com bateria 909 eletrônica pesada, baixo dente-de-serra saturado em Lá menor (126 BPM) e pads neon espaciais em estéreo.
 * **Duração**: 60 segundos | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
-* **Roteiro Passo a Passo**:
-  1. **Navegação no GitHub**: Usuário acessando `https://github.com/Helfstein-one/icepol-semantic`, explorando arquivos e copiando o comando `git clone`.
-  2. **Instalação no Terminal**: Clonagem, `make seed` gerando os 7 Parquets sintéticos de crédito, e subida dos containers (`podman compose up -d`).
-  3. **Interface Icepol Web**: Apresentação com logo do urso polar, saudação, seletor de modelos, botão de anexo `+` e microfone de voz.
-  4. **Pipeline Semântico**: Resolução de métricas (`total_exposure`, `avg_net_debt_ebitda`) e compilação do SQL determinístico sem alucinações.
-  5. **Retorno do Chat com Mermaid**: Tabela analítica agregada pelo DuckDB e visualização do diagrama relacional ERD com notação *Crow's foot*.
-  6. **Transição para o Langfuse**: Conectando a experiência do usuário à auditoria em `http://localhost:3001`.
-  7. **Waterfall de Spans**: Decomposição da latência (parsing ontológico, inferência DeepSeek-R1, consulta DuckDB e persistência MySQL).
-  8. **Onde o Modelo Gasta Tokens?**: Análise transparente do consumo de 342 tokens (63.7% no contexto ontológico, 21.0% no raciocínio CoT e 15.3% na geração do SQL).
-  9. **Recapitulativo da Arquitetura**: Visão geral da jornada completa pronta para governança corporativa.
+* **Foco Total na Experiência do Chat**:
+  1. **UI Inicial do Chat**: Apresentação da tela inicial com logo do urso polar, saudação, chips de sugestões, microfone e upload.
+  2. **Digitação ao Vivo na Barra de Prompt**: Usuário digitando em tempo real com seleção do modelo `deepseek-r1:1.5b`.
+  3. **Célula de Resposta com Tabela DuckDB**: Visualização do resultado tabular analítico de crédito por setor e tags de auditoria.
+  4. **Aba do Diagrama Conceitual Mermaid**: Renderização do modelo de dados relacional completo em SVG com cardinalidade Crow's foot (`||--o{`).
+  5. **Popover de Observabilidade Aberto no Chat**: Usuário clicando no botão do cabeçalho e inspecionando os links ao vivo do Langfuse, MinIO e MySQL.
+  6. **Dashboard de Métricas do Langfuse**: Monitoramento de traces (1.482), P95 SLA (1.88s) e integridade dos sinks.
+  7. **Waterfall de Spans**: Detalhamento visual da latência de cada etapa da execução.
+  8. **Distribuição de Gastos de Tokens**: Gráfico analítico evidenciando o consumo em Input Ontológico (218 tokens), Raciocínio CoT (72 tokens) e SQL Output (52 tokens).
 
-### 2. Vídeo da Jornada Rápida do Usuário (`video/icepol_journey_complete.mp4`)
-* **Duração**: 36 segundos | **Resolução**: 1920x1080 Full HD
-* **Conteúdo**: Build rápido no terminal, seleção do modelo `deepseek-r1:1.5b`, execução de query e diagrama ERD.
+### 2. 🌟 Vídeo Master: Jornada Completa (GitHub, Clone, Chat & Langfuse)
+* **Arquivo**: [`video/icepol_user_journey_langfuse_tokens.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_langfuse_tokens.mp4)
+* **Duração**: 60 segundos | **Resolução**: 1920x1080 Full HD (Depeche Mode 80s Soundtrack)
 
-### 3. Vídeo do Langfuse: Métricas e Árvore de Decisão (`video/langfuse_metrics_decision_tree.mp4`)
-* **Duração**: 36 segundos | **Resolução**: 1920x1080 Full HD
-* **Conteúdo**: Dashboard Langfuse, árvore de decisão (DAG), spans waterfall e inspeção de payloads.
+### 3. Vídeos Curtos de Demonstração Rápida
+* **Jornada Rápida**: [`video/icepol_journey_complete.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_journey_complete.mp4) (36s)
+* **Árvore de Decisão no Langfuse**: [`video/langfuse_metrics_decision_tree.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/langfuse_metrics_decision_tree.mp4) (36s)
 
 ---
 
