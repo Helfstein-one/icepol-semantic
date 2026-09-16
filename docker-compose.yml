@@ -24,6 +24,53 @@ services:
 
 
 
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: icepol_metrics
+      MYSQL_USER: icepol
+      MYSQL_PASSWORD: password123
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  postgres-langfuse:
+    image: postgres:15-alpine
+    container_name: postgres-langfuse
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: langfuse
+    volumes:
+      - postgres-langfuse-data:/var/lib/postgresql/data
+
+  langfuse:
+    image: langfuse/langfuse:2
+    container_name: langfuse-server
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password123@postgres-langfuse:5432/langfuse
+      - NEXTAUTH_URL=http://localhost:3001
+      - NEXTAUTH_SECRET=icepol-langfuse-secret-key-12345
+      - SALT=icepol-langfuse-salt-key-12345
+      - TELEMETRY_ENABLED=false
+      - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=true
+      - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse
+      - LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT=http://minio:9000
+      - LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID=admin
+      - LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY=password123
+      - LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE=true
+    depends_on:
+      - postgres-langfuse
+      - minio
+
   semantic-agent:
     build:
       context: .
@@ -37,9 +84,18 @@ services:
       - MINIO_ENDPOINT=minio-storage:9000
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=password123
+      - MYSQL_HOST=mysql-db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=icepol
+      - MYSQL_PASSWORD=password123
+      - MYSQL_DB=icepol_metrics
+      - LANGFUSE_HOST=http://langfuse:3000
+      - LANGFUSE_PUBLIC_KEY=pk-lf-icepol
+      - LANGFUSE_SECRET_KEY=sk-lf-icepol
     depends_on:
       - minio
       - polaris
+      - mysql
 
   mcp-server:
     build:
@@ -70,3 +126,5 @@ services:
 
 volumes:
   minio-data:
+  mysql-data:
+  postgres-langfuse-data:

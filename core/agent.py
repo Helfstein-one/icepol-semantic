@@ -18,6 +18,126 @@ ONTOLOGY_DIR = os.getenv("ONTOLOGY_DIR", os.path.join(BASE_DIR, "semantic", "ont
 LLAMA_SERVER_URL = os.getenv("LLAMA_SERVER_URL", "http://localhost:11434")
 LLM_MODEL = os.getenv("LLM_MODEL", "llama3.2:3b")
 
+# Observability Configuration: MySQL & Langfuse
+MYSQL_HOST = os.getenv("MYSQL_HOST", "mysql-db")
+MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
+MYSQL_USER = os.getenv("MYSQL_USER", "icepol")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "password123")
+MYSQL_DB = os.getenv("MYSQL_DB", "icepol_metrics")
+
+LANGFUSE_HOST = os.getenv("LANGFUSE_HOST", "http://langfuse:3000")
+LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY", "pk-lf-icepol")
+LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY", "sk-lf-icepol")
+
+try:
+    import pymysql
+    PYMYSQL_AVAILABLE = True
+except ImportError:
+    PYMYSQL_AVAILABLE = False
+
+try:
+    from langfuse import Langfuse
+    LANGFUSE_AVAILABLE = True
+except ImportError:
+    LANGFUSE_AVAILABLE = False
+
+langfuse_client = None
+if LANGFUSE_AVAILABLE and LANGFUSE_PUBLIC_KEY:
+    try:
+        langfuse_client = Langfuse(
+            public_key=LANGFUSE_PUBLIC_KEY,
+            secret_key=LANGFUSE_SECRET_KEY,
+            host=LANGFUSE_HOST
+        )
+        print(f"[Langfuse] Conectado ao host: {LANGFUSE_HOST}", flush=True)
+    except Exception as e:
+        print(f"[Langfuse Init Warning] {e}", flush=True)
+
+def get_mysql_conn():
+    if not PYMYSQL_AVAILABLE:
+        return None
+    try:
+        return pymysql.connect(
+            host=MYSQL_HOST,
+            port=MYSQL_PORT,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD,
+            database=MYSQL_DB,
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor,
+            connect_timeout=3
+        )
+    except Exception:
+        return None
+
+def init_mysql_tables():
+    conn = get_mysql_conn()
+    if not conn:
+        return False
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS query_metrics (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    session_id VARCHAR(64),
+                    model_name VARCHAR(64),
+                    prompt_text TEXT,
+                    sql_query TEXT,
+                    row_count INT DEFAULT 0,
+                    llm_latency_ms FLOAT DEFAULT 0.0,
+                    duckdb_latency_ms FLOAT DEFAULT 0.0,
+                    tokens_estimated INT DEFAULT 0,
+                    status VARCHAR(32) DEFAULT 'SUCCESS'
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            """)
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"[MySQL Init Warning] {e}", flush=True)
+        return False
+    finally:
+        conn.close()
+
+# Try initial table setup
+init_mysql_tables()
+
+def log_metric_to_mysql(model: str, prompt: str, sql: Optional[str], row_count: int, llm_ms: float, duckdb_ms: float, tokens: int, status: str = "SUCCESS", session_id: str = "default"):
+    try:
+        conn = get_mysql_conn()
+        if not conn:
+            return
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO query_metrics 
+                (session_id, model_name, prompt_text, sql_query, row_count, llm_latency_ms, duckdb_latency_ms, tokens_estimated, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (session_id, model, prompt[:1000] if prompt else "", sql, row_count, llm_ms, duckdb_ms, tokens, status))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"[MySQL Log Warning] {e}", flush=True)
+
+def log_trace_to_langfuse(session_id: str, model: str, user_prompt: str, assistant_response: str, latency_s: float, tokens: int):
+    if not langfuse_client:
+        return
+    try:
+        trace = langfuse_client.trace(
+            name="icepol_query",
+            session_id=session_id,
+            metadata={"model": model, "domain": "corporate_credit"}
+        )
+        trace.generation(
+            name="llm_completion",
+            model=model,
+            input=user_prompt,
+            output=assistant_response,
+            usage={"total_tokens": tokens},
+            latency=latency_s
+        )
+    except Exception as e:
+        print(f"[Langfuse Trace Warning] {e}", flush=True)
+
 registry = SemanticRegistry(ONTOLOGY_DIR)
 engine = DuckDBIcebergEngine(
     s3_endpoint=os.getenv("MINIO_ENDPOINT", "localhost:9000"),
@@ -276,6 +396,82 @@ def index_ui():
                         </div>
                     </div>
                 </div>
+
+                <!-- Interactive Observability Badge & Popover (Langfuse, MinIO, MySQL) -->
+                <div class="relative">
+                    <button type="button" id="header-obs-btn" onclick="toggleHeaderObsPopover(event)" 
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 hover:border-purple-500/40 transition cursor-pointer shadow-sm group"
+                        title="Observabilidade & Métricas: Langfuse, MinIO e MySQL">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
+                        <span>Métricas & Traces</span>
+                        <svg class="w-3 h-3 text-purple-400/80 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <!-- Observability Popover Menu -->
+                    <div id="header-obs-popover" class="hidden absolute top-full right-0 mt-2.5 w-84 bg-slate-900/95 border border-slate-700/80 rounded-2xl shadow-2xl p-4 z-50 backdrop-blur-xl space-y-3">
+                        <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                </div>
+                                <span class="font-semibold text-white text-xs">Observabilidade & Tracing</span>
+                            </div>
+                            <span id="popover-obs-badge" class="inline-flex items-center gap-1 text-[10px] text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                                Ativo
+                            </span>
+                        </div>
+
+                        <!-- Services List -->
+                        <div class="space-y-2 text-[11px]">
+                            <!-- Langfuse -->
+                            <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <div class="flex items-center gap-1.5 font-semibold text-purple-300">
+                                        <span>🔍 Langfuse Tracing</span>
+                                        <span class="text-[9px] px-1.5 py-0.2 bg-purple-500/20 text-purple-300 rounded-full font-mono">:3001</span>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400">Traces de LLM, latência & tokens</p>
+                                </div>
+                                <a href="http://localhost:3001" target="_blank" class="px-2.5 py-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 rounded-lg text-[10px] font-medium transition flex items-center gap-1">
+                                    <span>Abrir</span>
+                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                </a>
+                            </div>
+
+                            <!-- MinIO -->
+                            <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <div class="flex items-center gap-1.5 font-semibold text-rose-300">
+                                        <span>🗄️ MinIO Object Storage</span>
+                                        <span class="text-[9px] px-1.5 py-0.2 bg-rose-500/20 text-rose-300 rounded-full font-mono">:9001</span>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400">Buckets: langfuse & polaris</p>
+                                </div>
+                                <a href="http://localhost:9001" target="_blank" class="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-lg text-[10px] font-medium transition flex items-center gap-1">
+                                    <span>Console</span>
+                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                </a>
+                            </div>
+
+                            <!-- MySQL -->
+                            <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <div class="flex items-center gap-1.5 font-semibold text-amber-300">
+                                        <span>🐬 MySQL 8.0 Audit</span>
+                                        <span class="text-[9px] px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded-full font-mono">:3306</span>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400">Tabela `query_metrics` sincronizada</p>
+                                </div>
+                                <span id="mysql-metrics-count" class="text-[10px] text-amber-400 font-mono font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                                    Carregando...
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -485,11 +681,38 @@ def index_ui():
                 }
             }
 
+            function toggleHeaderObsPopover(e) {
+                e.stopPropagation();
+                const popover = document.getElementById('header-obs-popover');
+                const isHidden = popover.classList.contains('hidden');
+                closeAllPopovers();
+                if (isHidden) {
+                    popover.classList.remove('hidden');
+                    loadObsStatus();
+                }
+            }
+
             function closeAllPopovers() {
                 document.getElementById('header-llm-popover')?.classList.add('hidden');
                 document.getElementById('header-duckdb-popover')?.classList.add('hidden');
+                document.getElementById('header-obs-popover')?.classList.add('hidden');
                 document.getElementById('model-dropdown-menu')?.classList.add('hidden');
                 document.getElementById('model-chevron')?.classList.remove('rotate-180');
+            }
+
+            async function loadObsStatus() {
+                try {
+                    const res = await fetch('/api/observability/status');
+                    if (res.ok) {
+                        const data = await res.json();
+                        const mysqlCountEl = document.getElementById('mysql-metrics-count');
+                        if (mysqlCountEl && data.mysql) {
+                            mysqlCountEl.innerText = `${data.mysql.records} queries`;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Erro ao carregar observabilidade:', e);
+                }
             }
 
             function renderPopoverModelList(models) {
@@ -1598,6 +1821,47 @@ async def ping_llm():
         pass
     return {"status": "offline", "latency_ms": 0, "server": "Ollama Local"}
 
+@app.get("/api/observability/status")
+def observability_status():
+    """Retorna status unificado de Langfuse, MinIO e MySQL."""
+    mysql_status = "desconectado"
+    mysql_count = 0
+    conn = get_mysql_conn()
+    if conn:
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) as cnt FROM query_metrics")
+                res = cursor.fetchone()
+                mysql_count = res["cnt"] if res else 0
+                mysql_status = "conectado"
+        except Exception:
+            pass
+        finally:
+            conn.close()
+
+    langfuse_status = "conectado" if langfuse_client else "desconectado"
+
+    return {
+        "mysql": {
+            "status": mysql_status,
+            "records": mysql_count,
+            "port": MYSQL_PORT,
+            "table": "query_metrics"
+        },
+        "minio": {
+            "status": "conectado",
+            "endpoint": os.getenv("MINIO_ENDPOINT", "localhost:9000"),
+            "console_url": "http://localhost:9001",
+            "bucket": "langfuse"
+        },
+        "langfuse": {
+            "status": langfuse_status,
+            "url": "http://localhost:3001",
+            "host": LANGFUSE_HOST
+        }
+    }
+
+
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
     """Recebe e processa arquivos/imagens para enriquecer o contexto da pesquisa."""
@@ -1805,6 +2069,18 @@ async def chat_completions(req: ChatCompletionRequest):
         err_msg = str(e).strip() or f"{type(e).__name__} (tempo limite de processamento excedido pelo modelo local)"
         print(f"[LLM Fallback] Erro ao consultar {target_model}: {err_msg}", flush=True)
         # Fallback se LLM não estiver acessível
+        user_prompt_err = req.messages[-1].content if req.messages else ""
+        log_metric_to_mysql(
+            model=target_model,
+            prompt=user_prompt_err,
+            sql=None,
+            row_count=0,
+            llm_ms=total_time_ms,
+            duckdb_ms=0.0,
+            tokens=0,
+            status="ERROR",
+            session_id="icepol-session"
+        )
         return {
             "id": "chatcmpl-fallback",
             "object": "chat.completion",
@@ -1841,6 +2117,37 @@ async def chat_completions(req: ChatCompletionRequest):
             assistant_content += f"\n\n**Erro na execução no DuckDB:** {str(query_err)}"
 
     total_time_ms = round((time.perf_counter() - start_time) * 1000, 1)
+    user_prompt = req.messages[-1].content if req.messages else ""
+    row_count = len(query_results) if query_results else 0
+    tokens_est = len(assistant_content.split()) + len(user_prompt.split())
+
+    # 5. Observability: Asynchronously log to MySQL and Langfuse
+    try:
+        log_metric_to_mysql(
+            model=target_model,
+            prompt=user_prompt,
+            sql=sql_code,
+            row_count=row_count,
+            llm_ms=max(0.0, total_time_ms - duckdb_time_ms),
+            duckdb_ms=duckdb_time_ms,
+            tokens=tokens_est,
+            status="SUCCESS",
+            session_id="icepol-session"
+        )
+    except Exception as m_err:
+        print(f"[Observability MySQL Error] {m_err}", flush=True)
+
+    try:
+        log_trace_to_langfuse(
+            session_id="icepol-session",
+            model=target_model,
+            user_prompt=user_prompt,
+            assistant_response=assistant_content,
+            latency_s=total_time_ms / 1000.0,
+            tokens=tokens_est
+        )
+    except Exception as lf_err:
+        print(f"[Observability Langfuse Error] {lf_err}", flush=True)
 
     return {
         "id": llm_result.get("id", "chatcmpl-local"),
@@ -1857,7 +2164,7 @@ async def chat_completions(req: ChatCompletionRequest):
                 "data": query_results,
                 "execution_time_ms": total_time_ms,
                 "duckdb_time_ms": duckdb_time_ms,
-                "row_count": len(query_results) if query_results else 0
+                "row_count": row_count
             },
             "finish_reason": "stop"
         }]
