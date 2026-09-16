@@ -943,125 +943,207 @@ def index_ui():
                 code = code.replace(/^```(?:mermaid)?/i, "").replace(/```$/, "").trim();
 
                 // Check if ER diagram
-                if (/erDiagram/i.test(code)) {
-                    let lines = code.split(nl);
-                    let insideEntity = false;
-                    let sanitizedLines = ["erDiagram"];
-                    const knownTypes = new Set([
-                        "string", "str", "varchar", "text", "int", "integer", "bigint", "float", 
-                        "double", "number", "numeric", "decimal", "date", "datetime", "timestamp", 
-                        "boolean", "bool", "uuid"
-                    ]);
+                if (!/erDiagram/i.test(code)) {
+                    return code;
+                }
 
-                    for (let i = 0; i < lines.length; i++) {
-                        let line = lines[i];
-                        let trimmed = line.trim();
-                        if (!trimmed) continue;
-                        if (/^[\\s]*erDiagram/i.test(trimmed)) continue;
+                const entityAliases = {
+                    "counterparty": "counterparts",
+                    "counterpart": "counterparts",
+                    "counterparts": "counterparts",
+                    "contraparte": "counterparts",
+                    
+                    "facility": "facilities",
+                    "facilities": "facilities",
+                    "credit_facility": "facilities",
+                    "credit_facilities": "facilities",
+                    
+                    "collateral": "collaterals",
+                    "collaterals": "collaterals",
+                    "garantia": "collaterals",
+                    "garantias": "collaterals",
+                    
+                    "proposal": "proposals",
+                    "proposals": "proposals",
+                    "credit_proposal": "proposals",
+                    "credit_proposals": "proposals",
+                    "proposta": "proposals",
+                    
+                    "financial_statement": "financial_statements",
+                    "financial_statements": "financial_statements",
+                    "demonstracao_financeira": "financial_statements",
+                    
+                    "credit_limit": "credit_limits",
+                    "credit_limits": "credit_limits",
+                    "limite_credito": "credit_limits",
+                    
+                    "covenant": "covenants",
+                    "covenants": "covenants"
+                };
 
-                        // Comments
-                        if (trimmed.startsWith("#") || trimmed.startsWith("//")) {
-                            sanitizedLines.push("    %% " + trimmed.replace(/^[#/]+[\\s]*/, ""));
-                            continue;
-                        }
+                function normEnt(name) {
+                    if (!name) return "";
+                    let clean = name.trim().toLowerCase();
+                    return entityAliases[clean] || name.trim();
+                }
 
-                        // Relationship line check
-                        const isRel = /(?:\\|\\|--[o|]\\{|--|->|-->|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{|\\}o--o\\{|\\}o--\\|\\||\\*--\\*|<-->|<--)/.test(trimmed);
+                const lines = code.split(nl);
+                const rels = [];
+                const entityMap = new Map();
+                let currentEntity = null;
 
-                        // Entity start: e.g. counterparts { or entity counterparts { (must not be a relationship)
-                        if (!isRel && /\\{[\\s]*$/.test(trimmed)) {
-                            insideEntity = true;
-                            let entName = trimmed.replace(/PART[\\s]+OF[\\s]+/gi, "").replace(/["'{}]/g, "").trim().split(/[\\s]+/)[0];
-                            if (entName) {
-                                sanitizedLines.push(`    ${entName} {`);
+                const knownTypes = new Set([
+                    "string", "str", "varchar", "text", "int", "integer", "bigint", "float", 
+                    "double", "number", "numeric", "decimal", "date", "datetime", "timestamp", 
+                    "boolean", "bool", "uuid"
+                ]);
+
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+                    let trimmed = line.trim();
+                    if (!trimmed) continue;
+                    if (/^[\\s]*erDiagram/i.test(trimmed)) continue;
+                    if (trimmed.startsWith("#") || trimmed.startsWith("//") || trimmed.startsWith("%%")) continue;
+
+                    // Match relationship line or pseudo connector (e.g. |---| other or ||--o{)
+                    const relMatch = trimmed.match(/^([a-zA-Z0-9_]+)?[\\s]*([|][-|oO{}]+|--|->|-->|<--|<-->|[*][*])[\\s]*([a-zA-Z0-9_]+)(?:[\\s]*:[\\s]*"?([^"]*)"?)?/);
+                    if (relMatch) {
+                        let left = normEnt(relMatch[1] || currentEntity || "");
+                        let right = normEnt(relMatch[3] || "");
+                        let label = (relMatch[4] || "relaciona").trim();
+
+                        if (left && right && left !== right) {
+                            let arrow = relMatch[2];
+                            if (arrow.includes("-->")) arrow = "||--o{";
+                            else if (arrow.includes("<--")) arrow = "}o--||";
+                            else if (arrow.includes("<-->") || arrow.includes("*--*") || arrow.includes("|---|")) arrow = "||--o{";
+                            else if (!/(?:\\|\\|--[o|]\\{|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{|\\}o--o\\{|\\}o--\\|\\|)/.test(arrow)) {
+                                arrow = "||--o{";
                             }
+                            rels.push(`    ${left} ${arrow} ${right} : "${label}"`);
                             continue;
                         }
+                    }
 
-                        // Entity end
-                        if (!isRel && (trimmed === "}" || trimmed.endsWith("}"))) {
-                            insideEntity = false;
-                            sanitizedLines.push("    }");
-                            continue;
-                        }
-
-                        if (insideEntity) {
-                            // Split line if multiple attributes (e.g. separated by commas, semicolons, or multiple '=' assignments)
-                            let subAttributes = trimmed.split(/[\\s]+(?=[a-zA-Z0-9_]+[\\s]*=)|[,;]+/);
-                            for (let subAttr of subAttributes) {
-                                let item = subAttr.trim();
-                                if (!item) continue;
-
-                                // Clean quotes and symbols
-                                let clean = item.replace(/[=:'"]/g, " ").replace(/[\\s]+/g, " ").trim();
-                                let parts = clean.split(" ").filter(p => p.length > 0);
-                                if (parts.length === 0) continue;
-
-                                let type = "string";
-                                let col = "";
-                                let key = "";
-
-                                let filtered = [];
-                                for (let p of parts) {
-                                    let up = p.toUpperCase();
-                                    if (up === "PK" || up === "FK" || up === "UK") {
-                                        key = up;
-                                    } else {
-                                        filtered.push(p);
-                                    }
-                                }
-
-                                if (filtered.length === 1) {
-                                    col = filtered[0].replace(/[^a-zA-Z0-9_]/g, "");
-                                } else if (filtered.length >= 2) {
-                                    let p0Low = filtered[0].toLowerCase();
-                                    let p1Low = filtered[1].toLowerCase();
-                                    if (knownTypes.has(p0Low)) {
-                                        type = p0Low;
-                                        col = filtered[1].replace(/[^a-zA-Z0-9_]/g, "");
-                                    } else if (knownTypes.has(p1Low)) {
-                                        type = p1Low;
-                                        col = filtered[0].replace(/[^a-zA-Z0-9_]/g, "");
-                                    } else {
-                                        if (p0Low.includes("_") || p0Low.endsWith("id") || p0Low.startsWith("nm_") || p0Low.startsWith("dt_") || p0Low.startsWith("vl_")) {
-                                            col = filtered[0].replace(/[^a-zA-Z0-9_]/g, "");
-                                            type = (p1Low === "id" || p1Low === "key") ? "string" : (p1Low.length <= 8 ? p1Low : "string");
-                                        } else {
-                                            type = p0Low.length <= 8 ? p0Low : "string";
-                                            col = filtered[1].replace(/[^a-zA-Z0-9_]/g, "");
-                                        }
-                                    }
-                                }
-
-                                if (col) {
-                                    sanitizedLines.push(`        ${type} ${col}${key ? " " + key : ""}`);
-                                }
+                    // Entity header: e.g. entity_name {
+                    if (/\\{[\\s]*$/.test(trimmed)) {
+                        let entName = trimmed.replace(/PART[\\s]+OF[\\s]+/gi, "").replace(/["'{}]/g, "").trim().split(/[\\s]+/)[0];
+                        if (entName && !["erdiagram", "graph", "flowchart", "classdiagram"].includes(entName.toLowerCase())) {
+                            currentEntity = normEnt(entName);
+                            if (!entityMap.has(currentEntity)) {
+                                entityMap.set(currentEntity, new Set());
                             }
-                        } else {
-                            // Relationship line outside entity
-                            let cleanRel = trimmed.replace(/PART[\\s]+OF[\\s]+/gi, "").replace(/["']/g, "");
-                            cleanRel = cleanRel.replaceAll("*--*", "}|--|{")
-                                               .replaceAll("<-->", "}|--|{")
-                                               .replaceAll("-->", "||--o{")
-                                               .replaceAll("<--", "}o--||");
+                        }
+                        continue;
+                    }
 
-                            if (/(?:\\|\\|--[o|]\\{|--|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{|\\}o--o\\{|\\}o--\\|\\|)/.test(cleanRel)) {
-                                if (!cleanRel.includes(":")) {
-                                    cleanRel += ' : "relaciona"';
+                    // Entity close
+                    if (trimmed === "}" || trimmed.endsWith("}")) {
+                        currentEntity = null;
+                        continue;
+                    }
+
+                    // Attributes inside entity
+                    if (currentEntity) {
+                        let subAttributes = trimmed.split(/[\\s]+(?=[a-zA-Z0-9_]+[\\s]*=)|[,;]+/);
+                        for (let subAttr of subAttributes) {
+                            let item = subAttr.trim();
+                            if (!item || item === "{" || item === "}") continue;
+                            if (item.includes("--") || item.includes("->") || item.includes("|")) continue;
+
+                            let clean = item.replace(/[=:'"]/g, " ").replace(/[\\s]+/g, " ").trim();
+                            let parts = clean.split(" ").filter(p => p.length > 0);
+                            if (parts.length === 0) continue;
+
+                            let type = "string";
+                            let col = "";
+                            let key = "";
+
+                            let filtered = [];
+                            for (let p of parts) {
+                                let up = p.toUpperCase();
+                                if (up === "PK" || up === "FK" || up === "UK") {
+                                    key = up;
                                 } else {
-                                    let parts = cleanRel.split(":");
-                                    let relPart = parts[0].trim();
-                                    let labelPart = parts.slice(1).join(":").trim().replace(/^["']|["']$/g, "");
-                                    cleanRel = `${relPart} : "${labelPart || "relaciona"}"`;
+                                    filtered.push(p);
                                 }
-                                sanitizedLines.push("    " + cleanRel);
+                            }
+
+                            if (filtered.length === 1) {
+                                col = filtered[0].replace(/[^a-zA-Z0-9_]/g, "");
+                            } else if (filtered.length >= 2) {
+                                let p0Low = filtered[0].toLowerCase();
+                                let p1Low = filtered[1].toLowerCase();
+                                if (knownTypes.has(p0Low)) {
+                                    type = p0Low;
+                                    col = filtered[1].replace(/[^a-zA-Z0-9_]/g, "");
+                                } else if (knownTypes.has(p1Low)) {
+                                    type = p1Low;
+                                    col = filtered[0].replace(/[^a-zA-Z0-9_]/g, "");
+                                } else {
+                                    if (p0Low.includes("_") || p0Low.endsWith("id") || p0Low.startsWith("nm_") || p0Low.startsWith("dt_") || p0Low.startsWith("vl_")) {
+                                        col = filtered[0].replace(/[^a-zA-Z0-9_]/g, "");
+                                        type = (p1Low === "id" || p1Low === "key") ? "string" : (p1Low.length <= 8 ? p1Low : "string");
+                                    } else {
+                                        type = p0Low.length <= 8 ? p0Low : "string";
+                                        col = filtered[1].replace(/[^a-zA-Z0-9_]/g, "");
+                                    }
+                                }
+                            }
+
+                            if (col && !col.toLowerCase().includes("erdiagram")) {
+                                entityMap.get(currentEntity).add(`        ${type} ${col}${key ? " " + key : ""}`);
                             }
                         }
                     }
-                    return sanitizedLines.join(nl);
                 }
 
-                return code;
+                // Domain default connections for known credit entities if not yet connected
+                const connectedEntities = new Set();
+                for (const r of rels) {
+                    const parts = r.trim().split(/[\\s]+/);
+                    if (parts[0]) connectedEntities.add(parts[0]);
+                    if (parts[2]) connectedEntities.add(parts[2]);
+                }
+
+                const defaultRelations = [
+                    { ent: "facilities", parent: "counterparts", rel: "possui" },
+                    { ent: "collaterals", parent: "facilities", rel: "garantido_por" },
+                    { ent: "proposals", parent: "counterparts", rel: "solicita" },
+                    { ent: "financial_statements", parent: "counterparts", rel: "declara" },
+                    { ent: "credit_limits", parent: "counterparts", rel: "possui" },
+                    { ent: "covenants", parent: "facilities", rel: "sujeito_a" }
+                ];
+
+                for (const d of defaultRelations) {
+                    if (entityMap.has(d.ent) && !connectedEntities.has(d.ent)) {
+                        if (entityMap.has(d.parent)) {
+                            rels.push(`    ${d.parent} ||--o{ ${d.ent} : "${d.rel}"`);
+                            connectedEntities.add(d.ent);
+                            connectedEntities.add(d.parent);
+                        }
+                    }
+                }
+
+                const output = ["erDiagram"];
+                const uniqueRels = Array.from(new Set(rels));
+                for (const r of uniqueRels) {
+                    output.push(r);
+                }
+
+                for (const [ent, attrs] of entityMap.entries()) {
+                    output.push(`    ${ent} {`);
+                    if (attrs.size === 0) {
+                        output.push(`        string id PK`);
+                    } else {
+                        for (const a of attrs) {
+                            output.push(a);
+                        }
+                    }
+                    output.push(`    }`);
+                }
+
+                return output.join(nl);
             }
 
             function fallbackToGraph(code) {
@@ -1071,6 +1153,26 @@ def index_ui():
                 const edges = [];
                 let inEntity = false;
 
+                const entityAliases = {
+                    "counterparty": "counterparts",
+                    "counterpart": "counterparts",
+                    "counterparts": "counterparts",
+                    "facility": "facilities",
+                    "facilities": "facilities",
+                    "credit_facility": "facilities",
+                    "credit_facilities": "facilities",
+                    "collateral": "collaterals",
+                    "collaterals": "collaterals",
+                    "proposal": "proposals",
+                    "proposals": "proposals",
+                    "financial_statement": "financial_statements",
+                    "financial_statements": "financial_statements",
+                    "credit_limit": "credit_limits",
+                    "credit_limits": "credit_limits",
+                    "covenant": "covenants",
+                    "covenants": "covenants"
+                };
+
                 for (const l of lines) {
                     const trimmed = l.trim();
                     if (!trimmed) continue;
@@ -1078,10 +1180,12 @@ def index_ui():
                     // Match relationships e.g. A ||--o{ B : "label" or A --> B
                     const match = trimmed.match(/^([a-zA-Z0-9_]+)[\\s]*(?:\\|\\|--[o|]\\{|--|->|-->|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{|\\}o--o\\{|\\}o--\\|\\|)[\\s]*([a-zA-Z0-9_]+)(?:[\\s]*:[\\s]*"?([^"]*)"?)?/);
                     if (match) {
-                        nodes.add(match[1]);
-                        nodes.add(match[2]);
+                        const left = entityAliases[match[1].toLowerCase()] || match[1];
+                        const right = entityAliases[match[2].toLowerCase()] || match[2];
+                        nodes.add(left);
+                        nodes.add(right);
                         const label = match[3] ? `|"${match[3].trim()}"| ` : '';
-                        edges.push(`    ${match[1]} --> ${label}${match[2]}`);
+                        edges.push(`    ${left} --> ${label}${right}`);
                         continue;
                     }
 
@@ -1089,7 +1193,8 @@ def index_ui():
                         inEntity = true;
                         const entMatch = trimmed.match(/^([a-zA-Z0-9_]+)[\\s]*\\{/);
                         if (entMatch && !["erdiagram", "graph", "flowchart", "classdiagram"].includes(entMatch[1].toLowerCase())) {
-                            nodes.add(entMatch[1]);
+                            const ent = entityAliases[entMatch[1].toLowerCase()] || entMatch[1];
+                            nodes.add(ent);
                         }
                         continue;
                     }
@@ -1588,24 +1693,70 @@ async def chat_completions(req: ChatCompletionRequest):
         "6. Se for apenas conversa genérica, pesquisa conceitual ou saudação, responda normalmente em português.\n"
         "7. Quando o usuário solicitar modelo de dados, relações entre entidades (ERD), arquitetura, linhagem ou diagramas de fluxo, você DEVE gerar um diagrama Mermaid válido dentro de um bloco ```mermaid ... ```.\n"
         "   ATENÇÃO CRÍTICA À SINTAXE DO MERMAID ERDIAGRAM:\n"
+        "   - Declare SEMPRE todas as relações no início do diagrama, ANTES da abertura das entidades { }.\n"
+        "   - Use as relações canônicas de crédito corporativo:\n"
+        "       counterparts ||--o{ facilities : \"possui\"\n"
+        "       facilities ||--o{ collaterals : \"garantido_por\"\n"
+        "       counterparts ||--o{ proposals : \"solicita\"\n"
+        "       counterparts ||--o{ financial_statements : \"declara\"\n"
+        "       counterparts ||--o{ credit_limits : \"possui\"\n"
+        "       facilities ||--o{ covenants : \"sujeito_a\"\n"
         "   - Dentro de cada entidade { }, os atributos devem ser estritamente: `tipo nome_coluna [PK/FK]` (ex: `string counterpart_id PK`).\n"
         "   - NUNCA use sinal de igual `=` ou aspas dentro da entidade (ex: NUNCA escreva `id = \"string\"` ou `col = \"id\"`).\n"
-        "   - Toda relação entre entidades DEVE ter um rótulo com dois pontos e aspas (ex: `counterparts ||--o{ facilities : \"possui\"`).\n"
         "   - NUNCA use `PART OF`. Use diretamente o nome da entidade (ex: `counterparts`, `facilities`, `collaterals`, `proposals`).\n"
+        "   - NUNCA aninhe entidades ou coloque relações dentro de `{ }` de uma entidade.\n"
         "   Exemplo canônico de erDiagram:\n"
         "   ```mermaid\n"
         "   erDiagram\n"
         "       counterparts ||--o{ facilities : \"possui\"\n"
         "       facilities ||--o{ collaterals : \"garantido_por\"\n"
+        "       counterparts ||--o{ proposals : \"solicita\"\n"
+        "       counterparts ||--o{ financial_statements : \"declara\"\n"
+        "       counterparts ||--o{ credit_limits : \"possui\"\n"
+        "       facilities ||--o{ covenants : \"sujeito_a\"\n"
         "       counterparts {\n"
         "           string counterpart_id PK\n"
         "           string nm_counterpart\n"
-        "           string sector\n"
+        "           string nm_economic_group\n"
+        "           string ds_cnae_sector\n"
+        "           string cd_rating_agency\n"
         "       }\n"
         "       facilities {\n"
         "           string facility_id PK\n"
         "           string counterpart_id FK\n"
+        "           string tp_operation\n"
+        "           string st_operation\n"
         "           float limit_amount\n"
+        "       }\n"
+        "       collaterals {\n"
+        "           string collateral_id PK\n"
+        "           string facility_id FK\n"
+        "           string tp_collateral\n"
+        "           string st_collateral\n"
+        "       }\n"
+        "       proposals {\n"
+        "           string proposal_id PK\n"
+        "           string counterpart_id FK\n"
+        "           string st_decision\n"
+        "           string nm_committee\n"
+        "       }\n"
+        "       financial_statements {\n"
+        "           string statement_id PK\n"
+        "           string counterpart_id FK\n"
+        "           string nr_fiscal_year\n"
+        "           string st_audited\n"
+        "       }\n"
+        "       credit_limits {\n"
+        "           string limit_id PK\n"
+        "           string counterpart_id FK\n"
+        "           string tp_limit\n"
+        "           string st_limit\n"
+        "       }\n"
+        "       covenants {\n"
+        "           string covenant_id PK\n"
+        "           string facility_id FK\n"
+        "           string tp_covenant\n"
+        "           string st_compliance\n"
         "       }\n"
         "   ```\n"
     )
@@ -1629,6 +1780,7 @@ async def chat_completions(req: ChatCompletionRequest):
                     "model": target_model,
                     "messages": llm_messages,
                     "temperature": req.temperature,
+                    "max_tokens": 1500,
                     "stream": False
                 }
             )
@@ -1641,6 +1793,7 @@ async def chat_completions(req: ChatCompletionRequest):
                         "model": LLM_MODEL,
                         "messages": llm_messages,
                         "temperature": req.temperature,
+                        "max_tokens": 1500,
                         "stream": False
                     }
                 )
