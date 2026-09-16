@@ -362,16 +362,21 @@ pie title Distribuição Percentual de Gastos de Tokens por Consulta (342 Tokens
 
 O projeto conta com vídeos demonstrativos e **gravação real da tela** (*screen recording* com automação de cursor, digitação e interação ao vivo) em Full HD 1080p:
 
-### 1. 🎥 ⚡ 🌟 Gravação Real da Tela: Jornada Completa (Trilha Oficial 'Take On Me' - A-ha)
-* **Arquivo de Vídeo**: [`video/icepol_user_journey.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey.mp4)
-* **Gravação Real de Tela**: Captura contínua de 60 segundos com movimentação fluida de cursor do mouse, clique com efeito visual ripple, rolagem suave da página oficial do GitHub, digitação em tempo real no terminal e interação direta no chat local (`http://localhost:8000`) e no cockpit do Langfuse (`:3001`).
-* **Trilha Sonora Original**: [`video/soundtrack_take_on_me_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_take_on_me_60s.wav) — Composição synth-pop super animada e enérgica em **168 BPM** (B minor / Si menor), inspirada no clássico do A-ha:
-  - **Hook Inconfundível de Teclado**: Riff melódico icônico sintetizado com onda híbrida square/sawtooth brilhante, delay estéreo em colcheias e chorus vintage Roland Juno.
-  - **Bassline Bouncing em Oitavas**: Linha de baixo pulsante em colcheias staccato saltando oitavas em alta velocidade (`Bm` &rarr; `E` &rarr; `A` &rarr; `D` / `F#m`).
-  - **Bateria Eletrônica LinnDrum**: Bumbo rápido four-on-the-floor, caixa com estalo gated, chimbais rápidos em semicolcheias e open hi-hats nos contratempos.
+### 1. 🕺 ⚡ 🌟 Gravação Real da Tela: Jornada Completa (Trilha Eurodance 90s 'What Is Love' - Haddaway)
+* **Arquivo de Vídeo**: [`video/icepol_user_journey_what_is_love.mp4`](video/icepol_user_journey_what_is_love.mp4) (e [`video/icepol_user_journey.mp4`](video/icepol_user_journey.mp4))
+* **Gravação Real de Tela**: Captura contínua de 60 segundos com navegação no repositório GitHub com scroll do README e arquitetura, clone no terminal com `make seed` e inicialização de containers, chat analítico interativo na porta `:8000` com geração de diagrama Mermaid, inspeção do painel de telemetria `🐘 PostgreSQL 15 Audit` (:5432) e cockpit do Langfuse (:3001) com decomposição de custos de tokens.
+* **Trilha Sonora Original**: [`video/soundtrack_what_is_love_60s.wav`](video/soundtrack_what_is_love_60s.wav) — Arranjo Eurodance ultra animado e contagiante em **125 BPM** (Sol menor / G minor), reproduzindo a energia do clássico de Haddaway:
+  - **Bateria Roland TR-909 Pumping**: Bumbo four-on-the-floor pesado, palmas estéreo estaladas nos tempos 2 e 4, e chimbais abertos pulsantes em todos os contratempos.
+  - **Rolling Eurodance Bassline**: Baixo em semicolcheias com saltos de oitava rápidos (`Gm` &rarr; `Bb` &rarr; `Eb` &rarr; `F`) e filtro analógico ressonante.
+  - **Stabs de Órgão Korg M1 (House Organ 2)**: Acordes percussivos sincopados nos contratempos com chorus estéreo envolvente.
+  - **Hook Principal de Sintetizador**: Melodia inconfundível (*"What is love? Baby don't hurt me, don't hurt me, no more"*) em supersaw analógica com vibrato e ping-pong delay.
 * **Duração**: **60 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
 
-### 2. 🤖 🌟 Opção French House / Nu-Disco: 'Around the World / Harder Better Faster' (Daft Punk)
+### 2. 🎥 ⚡ Opção Synth-Pop 80s: 'Take On Me' (A-ha)
+* **Arquivo de Vídeo**: [`video/icepol_user_journey_take_on_me.mp4`](video/icepol_user_journey_take_on_me.mp4)
+* **Trilha Sonora Original**: [`video/soundtrack_take_on_me_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_take_on_me_60s.wav) (60s, 168 BPM em Si menor, LinnDrum e DX7 Solid Bass).
+
+### 3. 🤖 🌟 Opção French House / Nu-Disco: 'Around the World / Harder Better Faster' (Daft Punk)
 * **Arquivo de Vídeo**: [`video/icepol_user_journey_daft_punk.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_daft_punk.mp4)
 * **Trilha Sonora Original**: [`video/soundtrack_daft_punk_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_daft_punk_60s.wav) — Composição French House refinada em **123 BPM** (Mi menor / E minor), inspirada no estilo icônico do Daft Punk (*Discovery* & *Homework*):
   - **Bassline Funk Slap (Estilo Chic / Bernard Edwards)**: Linha de baixo dançante e groovada com modulação de envelope filter e sidechain característico.
