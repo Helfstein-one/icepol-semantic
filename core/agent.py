@@ -90,8 +90,43 @@ def index_ui():
     <body class="bg-slate-950 text-slate-100 flex flex-col h-full font-sans antialiased selection:bg-blue-500 selection:text-white">
         <!-- Minimalist Header -->
         <header class="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur-md px-6 md:px-10 py-4 flex items-center justify-between sticky top-0 z-20">
-            <div class="flex items-center">
-                <span class="text-xl font-bold tracking-tight text-white font-mono">icepol-semantic</span>
+            <div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.reload()" title="Reiniciar chat / Voltar ao início">
+                <!-- Polar Bear Vector Logo -->
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500/15 via-slate-800/60 to-slate-900 border border-sky-500/30 flex items-center justify-center shadow-lg shadow-sky-950/40 group-hover:border-sky-400/60 group-hover:shadow-sky-500/20 group-hover:scale-105 transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="transition-transform duration-300 group-hover:scale-105">
+                        <defs>
+                            <linearGradient id="iceBearGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff"/>
+                                <stop offset="45%" stop-color="#7dd3fc"/>
+                                <stop offset="100%" stop-color="#0284c7"/>
+                            </linearGradient>
+                            <linearGradient id="iceBearFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.22"/>
+                                <stop offset="100%" stop-color="#0284c7" stop-opacity="0.05"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Bear Silhouette in Clean Line-art -->
+                        <!-- Ear -->
+                        <path d="M10 6 C10 4 12 3 14 4 C15 4.8 15 6 15 7" stroke="url(#iceBearGrad)" stroke-width="1.6" stroke-linecap="round" fill="rgba(56, 189, 248, 0.25)"/>
+                        <!-- Snout & Profile -->
+                        <path d="M15 7 L21 11 L28 14 L29 15.5 L26 17 L22 17" stroke="url(#iceBearGrad)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" fill="url(#iceBearFill)"/>
+                        <!-- Jaw, Neck & Shoulder -->
+                        <path d="M22 17 L20 21 L17 26 L12 26 L8 21 L8 14 L10 6" stroke="url(#iceBearGrad)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" fill="url(#iceBearFill)"/>
+                        <!-- Internal Facets / Ice Polygon Lines -->
+                        <path d="M15 7 L17 14 L28 14" stroke="url(#iceBearGrad)" stroke-width="1.2" stroke-linejoin="round" stroke-opacity="0.8"/>
+                        <path d="M17 14 L22 17" stroke="url(#iceBearGrad)" stroke-width="1.2" stroke-linejoin="round" stroke-opacity="0.75"/>
+                        <path d="M17 14 L14 20 L20 21" stroke="url(#iceBearGrad)" stroke-width="1.2" stroke-linejoin="round" stroke-opacity="0.65"/>
+                        <path d="M8 14 L17 14" stroke="url(#iceBearGrad)" stroke-width="1.1" stroke-linejoin="round" stroke-opacity="0.5"/>
+                        <path d="M14 20 L12 26" stroke="url(#iceBearGrad)" stroke-width="1.1" stroke-linejoin="round" stroke-opacity="0.5"/>
+                        <!-- Eye & Spark -->
+                        <circle cx="19.5" cy="12.5" r="1.1" fill="#ffffff"/>
+                        <circle cx="28.5" cy="14.8" r="0.8" fill="#7dd3fc"/>
+                    </svg>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xl font-bold tracking-tight text-white font-mono group-hover:text-sky-200 transition-colors">icepol</span>
+                    <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 group-hover:bg-sky-500/20 group-hover:border-sky-400/30 transition-colors">semantic</span>
+                </div>
             </div>
             <div class="flex items-center space-x-3 text-xs">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
