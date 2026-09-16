@@ -231,8 +231,10 @@ def index_ui():
             let attachedFiles = [];
             let cellCounter = 0;
             let currentModel = 'llama3.2:3b';
+            let availableModels = ['llama3.2:3b', 'llama3.2:1b'];
             let recognition = null;
             let isRecording = false;
+            let speechBaseText = '';
 
             // --- MODEL MANAGEMENT ---
             async function loadAvailableModels() {
@@ -240,13 +242,14 @@ def index_ui():
                     const res = await fetch('/api/models');
                     const data = await res.json();
                     if (data.models && data.models.length > 0) {
+                        availableModels = data.models;
                         currentModel = data.default || data.models[0];
-                        renderModelList(data.models);
+                        renderModelList(availableModels);
                         updateModelUI(currentModel);
                     }
                 } catch (err) {
                     console.warn('Erro ao carregar modelos:', err);
-                    renderModelList(['llama3.2:3b', 'llama3.2:1b']);
+                    renderModelList(availableModels);
                 }
             }
 
@@ -271,12 +274,7 @@ def index_ui():
                 updateModelUI(modelName);
                 modelDropdownMenu.classList.add('hidden');
                 document.getElementById('model-chevron')?.classList.remove('rotate-180');
-                
-                // Re-render list to show checkmark
-                fetch('/api/models')
-                    .then(r => r.json())
-                    .then(d => { if (d.models) renderModelList(d.models); })
-                    .catch(() => {});
+                renderModelList(availableModels);
             }
 
             function updateModelUI(modelName) {
@@ -293,7 +291,7 @@ def index_ui():
                 }
             });
 
-            // --- FILE & IMAGE ATTACHMENTS ---
+            // --- FILE & IMAGE ATTACHMENTS VIA /api/upload ---
             function formatSize(bytes) {
                 if (!bytes || bytes === 0) return '0 B';
                 const k = 1024;
@@ -302,61 +300,67 @@ def index_ui():
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
             }
 
-            function handleFileSelect(e) {
+            async function handleFileSelect(e) {
                 const files = Array.from(e.target.files || []);
                 if (!files.length) return;
 
-                files.forEach(file => {
+                for (const file of files) {
                     const isImg = file.type.startsWith('image/');
-                    const reader = new FileReader();
+                    const previewUrl = isImg ? URL.createObjectURL(file) : null;
+                    const tempId = 'att-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
 
-                    if (isImg) {
-                        reader.onload = (ev) => {
-                            attachedFiles.push({
-                                name: file.name,
-                                size: file.size,
-                                type: file.type,
-                                is_image: true,
-                                previewUrl: ev.target.result,
-                                content: ev.target.result // Base64 data URL
-                            });
-                            renderAttachmentPreviews();
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        reader.onload = (ev) => {
-                            attachedFiles.push({
-                                name: file.name,
-                                size: file.size,
-                                type: file.type || 'text/plain',
-                                is_image: false,
-                                previewUrl: null,
-                                content: ev.target.result // Text content
-                            });
-                            renderAttachmentPreviews();
-                        };
-                        // For structured text or source code files, read as text
-                        if (file.name.endsWith('.parquet') || file.type.includes('pdf')) {
-                            attachedFiles.push({
-                                name: file.name,
-                                size: file.size,
-                                type: file.type || 'application/octet-stream',
-                                is_image: false,
-                                previewUrl: null,
-                                content: null
-                            });
-                            renderAttachmentPreviews();
+                    const attItem = {
+                        id: tempId,
+                        name: file.name,
+                        size: file.size,
+                        type: file.type || 'application/octet-stream',
+                        is_image: isImg,
+                        previewUrl: previewUrl,
+                        content: null,
+                        uploading: true
+                    };
+                    attachedFiles.push(attItem);
+                    renderAttachmentPreviews();
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    try {
+                        const res = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const item = attachedFiles.find(a => a.id === tempId);
+                            if (item) {
+                                item.content = data.content;
+                                item.type = data.type || item.type;
+                                item.is_image = data.is_image;
+                                item.uploading = false;
+                                renderAttachmentPreviews();
+                            }
                         } else {
-                            reader.readAsText(file);
+                            throw new Error('Upload error: ' + res.status);
+                        }
+                    } catch (err) {
+                        console.warn('Fallback leitura local para arquivo:', file.name, err);
+                        const item = attachedFiles.find(a => a.id === tempId);
+                        if (item) {
+                            item.uploading = false;
+                            renderAttachmentPreviews();
                         }
                     }
-                });
+                }
 
                 e.target.value = ''; // Reset input
             }
 
             function removeAttachment(index) {
-                attachedFiles.splice(index, 1);
+                const removed = attachedFiles.splice(index, 1)[0];
+                if (removed && removed.previewUrl && removed.previewUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(removed.previewUrl);
+                }
                 renderAttachmentPreviews();
             }
 
@@ -369,10 +373,16 @@ def index_ui():
 
                 attachmentsBar.classList.remove('hidden');
                 attachmentsBar.innerHTML = attachedFiles.map((att, idx) => {
+                    const spinner = att.uploading ? `
+                        <svg class="w-3.5 h-3.5 animate-spin text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>` : '';
                     if (att.is_image) {
                         return `
-                            <div class="flex items-center gap-2 bg-slate-800/90 text-slate-200 px-2.5 py-1.5 rounded-xl text-xs border border-slate-700/80 shadow-sm animate-fade-in">
-                                <img src="${att.previewUrl}" class="w-6 h-6 rounded-md object-cover border border-slate-600">
+                            <div class="flex items-center gap-2 bg-slate-800/90 text-slate-200 px-2.5 py-1.5 rounded-xl text-xs border border-slate-700/80 shadow-sm">
+                                ${att.previewUrl ? `<img src="${att.previewUrl}" class="w-6 h-6 rounded-md object-cover border border-slate-600">` : ''}
+                                ${spinner}
                                 <span class="max-w-[130px] truncate font-medium">${att.name}</span>
                                 <span class="text-slate-400 text-[10px]">${formatSize(att.size)}</span>
                                 <button type="button" onclick="removeAttachment(${idx})" class="text-slate-400 hover:text-rose-400 ml-1 transition" title="Remover">
@@ -382,10 +392,11 @@ def index_ui():
                         `;
                     } else {
                         return `
-                            <div class="flex items-center gap-2 bg-slate-800/90 text-slate-200 px-2.5 py-1.5 rounded-xl text-xs border border-slate-700/80 shadow-sm animate-fade-in">
+                            <div class="flex items-center gap-2 bg-slate-800/90 text-slate-200 px-2.5 py-1.5 rounded-xl text-xs border border-slate-700/80 shadow-sm">
                                 <svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                                 </svg>
+                                ${spinner}
                                 <span class="max-w-[130px] truncate font-medium">${att.name}</span>
                                 <span class="text-slate-400 text-[10px]">${formatSize(att.size)}</span>
                                 <button type="button" onclick="removeAttachment(${idx})" class="text-slate-400 hover:text-rose-400 ml-1 transition" title="Remover">
@@ -401,7 +412,7 @@ def index_ui():
             function toggleSpeechRecognition() {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if (!SpeechRecognition) {
-                    alert('Reconhecimento de voz não é suportado pelo seu navegador atual. Recomendamos Chrome ou Edge.');
+                    alert('Reconhecimento de voz não é suportado pelo seu navegador atual. Recomendamos o Google Chrome ou Microsoft Edge.');
                     return;
                 }
 
@@ -413,27 +424,31 @@ def index_ui():
 
                     recognition.onstart = () => {
                         isRecording = true;
+                        speechBaseText = userInput.value ? userInput.value.trim() + ' ' : '';
                         updateMicUi(true);
                     };
 
                     recognition.onresult = (event) => {
                         let finalTranscript = '';
                         let interimTranscript = '';
-                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        for (let i = 0; i < event.results.length; ++i) {
                             if (event.results[i].isFinal) {
                                 finalTranscript += event.results[i][0].transcript;
                             } else {
                                 interimTranscript += event.results[i][0].transcript;
                             }
                         }
-                        const transcribed = finalTranscript || interimTranscript;
-                        if (transcribed) {
-                            userInput.value = transcribed.trim();
+                        const combinedSpeech = (finalTranscript + (interimTranscript ? ' ' + interimTranscript : '')).trim();
+                        if (combinedSpeech) {
+                            userInput.value = speechBaseText + combinedSpeech;
                         }
                     };
 
                     recognition.onerror = (event) => {
                         console.warn('Speech recognition status:', event.error);
+                        if (event.error === 'not-allowed') {
+                            alert('Permissão de microfone negada. Por favor, permita o acesso ao microfone nas configurações do seu navegador.');
+                        }
                         if (event.error !== 'no-speech') {
                             isRecording = false;
                             updateMicUi(false);
@@ -450,6 +465,7 @@ def index_ui():
                     recognition.stop();
                 } else {
                     try {
+                        speechBaseText = userInput.value ? userInput.value.trim() + ' ' : '';
                         recognition.start();
                     } catch (err) {
                         console.error('Falha ao iniciar reconhecimento de áudio:', err);
@@ -531,10 +547,17 @@ def index_ui():
                 return html;
             }
 
-            function appendUserMessage(content, sentAttachments = []) {
+            function appendUserMessage(content, sentAttachments = [], modelUsed = null) {
                 const wrapper = document.createElement('div');
-                wrapper.className = 'flex justify-end pt-2';
+                wrapper.className = 'flex flex-col items-end pt-2';
                 
+                if (modelUsed) {
+                    const modelTag = document.createElement('div');
+                    modelTag.className = 'text-[11px] font-mono text-slate-400 mb-1 mr-2 flex items-center gap-1';
+                    modelTag.innerHTML = `<span>Peça ao</span> <span class="text-indigo-300 font-semibold">${modelUsed}</span>`;
+                    wrapper.appendChild(modelTag);
+                }
+
                 const bubble = document.createElement('div');
                 bubble.className = 'bg-blue-600 text-white rounded-3xl rounded-tr-sm px-6 py-4 max-w-2xl text-sm shadow-md leading-relaxed';
                 
@@ -632,7 +655,7 @@ def index_ui():
                 return () => clearInterval(timerInterval);
             }
 
-            function appendAssistantNotebookCell(msgData) {
+            function appendAssistantNotebookCell(msgData, modelName = null) {
                 cellCounter++;
                 const cellId = 'cell-' + cellCounter;
                 const sql = msgData.sql || '';
@@ -641,6 +664,7 @@ def index_ui():
                 const duckTime = msgData.duckdb_time_ms || 0;
                 const rowCount = msgData.row_count || 0;
                 const fullContent = msgData.content || '';
+                const modelUsed = modelName || msgData.model || currentModel;
 
                 const wrapper = document.createElement('div');
                 wrapper.className = 'w-full pt-2';
@@ -652,9 +676,15 @@ def index_ui():
                 // Cell Header / Notebook Action Bar
                 let actionsHtml = `
                     <div class="bg-slate-950/80 border-b border-slate-800 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2.5 flex-wrap">
                             <span class="font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                                 [Out ${cellCounter}]
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 font-mono text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20 font-medium">
+                                <svg class="w-3.5 h-3.5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                <span>${modelUsed}</span>
                             </span>
                             <span class="text-slate-400 font-mono">
                                 DuckDB Engine
@@ -781,6 +811,12 @@ def index_ui():
 
             async function handleSubmit(e) {
                 e.preventDefault();
+                if (recognition && isRecording) {
+                    recognition.stop();
+                    isRecording = false;
+                    updateMicUi(false);
+                }
+
                 const q = userInput.value.trim();
                 if (!q && attachedFiles.length === 0) return;
 
@@ -789,9 +825,10 @@ def index_ui():
 
                 const promptText = q || 'Analise os arquivos anexados.';
                 const currentAttachments = [...attachedFiles];
+                const requestedModel = currentModel;
 
-                // Append user message with attachments preview
-                appendUserMessage(promptText, currentAttachments);
+                // Append user message with attachments preview and identified model
+                appendUserMessage(promptText, currentAttachments, requestedModel);
                 messages.push({
                     role: 'user', 
                     content: promptText,
@@ -807,14 +844,14 @@ def index_ui():
                 sendBtn.disabled = true;
                 sendBtn.innerHTML = '<svg class="w-4 h-4 animate-spin text-slate-900" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>';
 
-                const stopTimer = showProcessingStepper(currentModel);
+                const stopTimer = showProcessingStepper(requestedModel);
 
                 try {
                     const res = await fetch('/v1/chat/completions', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
-                            model: currentModel,
+                            model: requestedModel,
                             messages: messages,
                             attachments: currentAttachments
                         })
@@ -826,7 +863,8 @@ def index_ui():
                     if (stepperEl) stepperEl.remove();
 
                     const choiceMsg = data.choices[0].message;
-                    appendAssistantNotebookCell(choiceMsg);
+                    const modelUsed = (data && data.model) || (choiceMsg && choiceMsg.model) || requestedModel;
+                    appendAssistantNotebookCell(choiceMsg, modelUsed);
                     messages.push({role: 'assistant', content: choiceMsg.content});
                 } catch (err) {
                     stopTimer();
@@ -837,7 +875,7 @@ def index_ui():
                         content: '⚠️ **Erro ao consultar o agente:** ' + err.message,
                         sql: null,
                         data: null
-                    });
+                    }, requestedModel);
                 } finally {
                     userInput.disabled = false;
                     sendBtn.disabled = false;
@@ -887,12 +925,40 @@ async def upload_file(file: UploadFile = File(...)):
     is_image = content_type.startswith("image/")
     
     text_preview = None
-    if not is_image:
-        try:
-            text_str = content.decode("utf-8", errors="replace")
-            text_preview = text_str[:4000]
-        except Exception:
-            pass
+    if is_image:
+        text_preview = f"[Imagem anexada: {filename} ({round(size_bytes / 1024, 1)} KB)]"
+    else:
+        # Check if parquet file
+        if filename.lower().endswith(".parquet") or content.startswith(b"PAR1"):
+            try:
+                import tempfile
+                import duckdb
+                with tempfile.NamedTemporaryFile(suffix=".parquet", delete=True) as tmp:
+                    tmp.write(content)
+                    tmp.flush()
+                    con = duckdb.connect()
+                    df_summary = con.execute(f"DESCRIBE SELECT * FROM '{tmp.name}'").fetchdf()
+                    cols = ", ".join([f"{row['column_name']} ({row['column_type']})" for _, row in df_summary.iterrows()])
+                    row_count = con.execute(f"SELECT COUNT(*) FROM '{tmp.name}'").fetchone()[0]
+                    text_preview = f"Arquivo Parquet: {filename} | Total de linhas: {row_count}\nColunas e tipos: {cols}"
+            except Exception:
+                text_preview = f"Arquivo Parquet: {filename} ({round(size_bytes / 1024, 1)} KB)"
+        elif filename.lower().endswith((".csv", ".tsv", ".txt", ".json", ".sql", ".yaml", ".yml", ".md", ".xml", ".log")):
+            try:
+                text_str = content.decode("utf-8", errors="replace")
+                text_preview = text_str[:4000]
+            except Exception:
+                pass
+        else:
+            # Check for null bytes to avoid dumping binary gibberish
+            if b"\x00" in content[:1024]:
+                text_preview = f"[Arquivo binário anexado: {filename} ({round(size_bytes / 1024, 1)} KB)]"
+            else:
+                try:
+                    text_str = content.decode("utf-8", errors="replace")
+                    text_preview = text_str[:4000]
+                except Exception:
+                    text_preview = f"[Arquivo anexado: {filename} ({round(size_bytes / 1024, 1)} KB)]"
 
     return {
         "name": filename,
@@ -990,6 +1056,7 @@ async def chat_completions(req: ChatCompletionRequest):
                 "index": 0,
                 "message": {
                     "role": "assistant",
+                    "model": target_model,
                     "content": f"[Middleware Fallback - LLM Offline] Contexto Semântico:\n{semantic_context}\n\nErro ao conectar ao LLM ({target_model}): {str(e)}",
                     "sql": None,
                     "data": None,
@@ -1026,6 +1093,7 @@ async def chat_completions(req: ChatCompletionRequest):
             "index": 0,
             "message": {
                 "role": "assistant",
+                "model": target_model,
                 "content": assistant_content,
                 "sql": sql_code,
                 "data": query_results,
