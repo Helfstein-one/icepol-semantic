@@ -2,7 +2,7 @@ import os
 import json
 import time
 import httpx
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
@@ -25,15 +25,24 @@ engine = DuckDBIcebergEngine(
     s3_secret_key=os.getenv("MINIO_SECRET_KEY", "password123")
 )
 
+class Attachment(BaseModel):
+    name: str
+    size: Optional[int] = 0
+    type: Optional[str] = "application/octet-stream"
+    content: Optional[str] = None
+    is_image: Optional[bool] = False
+
 class ChatMessage(BaseModel):
     role: str
     content: str
+    attachments: Optional[List[Attachment]] = None
 
 class ChatCompletionRequest(BaseModel):
-    model: str = "local-model"
+    model: Optional[str] = "llama3.2:3b"
     messages: List[ChatMessage]
     temperature: Optional[float] = 0.2
     stream: Optional[bool] = False
+    attachments: Optional[List[Attachment]] = None
 
 @app.get("/", response_class=HTMLResponse)
 def index_ui():
@@ -87,7 +96,7 @@ def index_ui():
             <div class="flex items-center space-x-3 text-xs">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    LLM: llama3.2:3b (Ollama)
+                    LLM: <span id="header-llm-label">llama3.2:3b</span> (Ollama)
                 </span>
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
                     <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
@@ -106,7 +115,7 @@ def index_ui():
                             Olá, Mauricio
                         </h1>
                         <p class="text-xl md:text-2xl text-slate-400 font-normal">
-                            Como posso ajudar com crédito corporativo hoje?
+                            Como posso ajudar com sua pesquisa hoje?
                         </p>
                     </div>
 
@@ -133,45 +142,75 @@ def index_ui():
             </div>
         </main>
 
-        <!-- Gemini Pill Floating Footer Input (Exact Perspective) -->
+        <!-- Gemini Pill Floating Footer Input -->
         <footer class="px-4 md:px-8 py-5 sticky bottom-0 z-20">
             <div class="max-w-4xl mx-auto">
-                <form id="chat-form" onsubmit="handleSubmit(event)" class="relative flex items-center bg-[#1e1f20] hover:bg-[#26282c] focus-within:bg-[#1e1f20] border border-slate-700/70 focus-within:border-slate-500 rounded-full px-3.5 py-2.5 md:py-3 shadow-2xl transition-all duration-200">
+                <!-- Hidden file input for images & documents -->
+                <input type="file" id="file-input" multiple accept="image/*,.pdf,.csv,.json,.txt,.parquet,.sql,.xlsx,.doc,.docx" class="hidden" onchange="handleFileSelect(event)">
+
+                <form id="chat-form" onsubmit="handleSubmit(event)" class="relative flex flex-col bg-[#1e1f20] hover:bg-[#26282c] focus-within:bg-[#1e1f20] border border-slate-700/70 focus-within:border-slate-500 rounded-3xl px-3.5 py-2 md:py-2.5 shadow-2xl transition-all duration-200">
                     
-                    <!-- Left + Button (Actions / Tools) -->
-                    <button type="button" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition shrink-0" title="Ações e ferramentas">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                    </button>
+                    <!-- Attachment Previews Badge Bar -->
+                    <div id="attachments-bar" class="hidden w-full px-2 py-1.5 mb-1.5 border-b border-slate-700/50 flex flex-wrap gap-2 items-center"></div>
 
-                    <!-- Text input with 'Peça ao Gemini' placeholder -->
-                    <input id="user-input" type="text" placeholder="Peça ao Gemini" 
-                        class="flex-1 bg-transparent border-0 text-white placeholder-slate-400 text-sm md:text-base focus:ring-0 focus:outline-none px-3 font-sans">
-
-                    <!-- Right Items: Flash Model Dropdown & Microphone -->
-                    <div class="flex items-center space-x-1.5 shrink-0 pr-1">
-                        <!-- Model badge dropdown (Flash) -->
-                        <div class="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/10 transition cursor-pointer font-sans" title="Modelo selecionado">
-                            <span>Flash</span>
-                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-
-                        <!-- Microphone button -->
-                        <button type="button" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition" title="Entrada por voz">
+                    <div class="flex items-center w-full">
+                        <!-- Left + Button (Files / Images / Tools) -->
+                        <button type="button" onclick="document.getElementById('file-input').click()" 
+                            class="w-9 h-9 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition shrink-0" 
+                            title="Anexar arquivos ou imagens para ajudar na pesquisa">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 02-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
                         </button>
 
-                        <!-- Send button -->
-                        <button type="submit" id="send-btn" class="w-9 h-9 rounded-full bg-white hover:bg-slate-200 text-slate-900 flex items-center justify-center transition shadow shrink-0" title="Enviar">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </button>
+                        <!-- Text input with dynamic 'Peça ao <modelo>' placeholder -->
+                        <input id="user-input" type="text" placeholder="Peça ao llama3.2:3b" 
+                            class="flex-1 bg-transparent border-0 text-white placeholder-slate-400 text-sm md:text-base focus:ring-0 focus:outline-none px-3 font-sans">
+
+                        <!-- Right Items: Model Selector Dropdown, Microphone & Send -->
+                        <div class="flex items-center space-x-1.5 shrink-0 pr-1">
+                            
+                            <!-- Model badge dropdown -->
+                            <div class="relative">
+                                <button type="button" id="model-dropdown-btn" onclick="toggleModelDropdown(event)" 
+                                    class="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/10 transition cursor-pointer font-sans" 
+                                    title="Selecionar modelo de IA disponível">
+                                    <span id="selected-model-label">llama3.2:3b</span>
+                                    <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" id="model-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                
+                                <!-- Floating Dropdown Menu -->
+                                <div id="model-dropdown-menu" class="hidden absolute bottom-full mb-2 right-0 w-52 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl py-1.5 z-50 backdrop-blur-md">
+                                    <div class="px-3 py-1.5 text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800 flex items-center justify-between">
+                                        <span>Modelos Ollama</span>
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    </div>
+                                    <div id="model-list" class="max-h-52 overflow-y-auto py-1">
+                                        <!-- Dynamically populated -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Microphone Voice Input Button -->
+                            <button type="button" id="mic-btn" onclick="toggleSpeechRecognition()" 
+                                class="w-9 h-9 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition shrink-0" 
+                                title="Escutar áudio para pesquisa">
+                                <svg id="mic-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 02-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                </svg>
+                            </button>
+
+                            <!-- Send button -->
+                            <button type="submit" id="send-btn" 
+                                class="w-9 h-9 rounded-full bg-white hover:bg-slate-200 text-slate-900 flex items-center justify-center transition shadow shrink-0" 
+                                title="Enviar consulta">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -181,8 +220,252 @@ def index_ui():
             const chatBox = document.getElementById('chat-box');
             const userInput = document.getElementById('user-input');
             const sendBtn = document.getElementById('send-btn');
+            const attachmentsBar = document.getElementById('attachments-bar');
+            const selectedModelLabel = document.getElementById('selected-model-label');
+            const headerLlmLabel = document.getElementById('header-llm-label');
+            const modelDropdownMenu = document.getElementById('model-dropdown-menu');
+            const modelListEl = document.getElementById('model-list');
+            const micBtn = document.getElementById('mic-btn');
+
             const messages = [];
+            let attachedFiles = [];
             let cellCounter = 0;
+            let currentModel = 'llama3.2:3b';
+            let recognition = null;
+            let isRecording = false;
+
+            // --- MODEL MANAGEMENT ---
+            async function loadAvailableModels() {
+                try {
+                    const res = await fetch('/api/models');
+                    const data = await res.json();
+                    if (data.models && data.models.length > 0) {
+                        currentModel = data.default || data.models[0];
+                        renderModelList(data.models);
+                        updateModelUI(currentModel);
+                    }
+                } catch (err) {
+                    console.warn('Erro ao carregar modelos:', err);
+                    renderModelList(['llama3.2:3b', 'llama3.2:1b']);
+                }
+            }
+
+            function renderModelList(models) {
+                modelListEl.innerHTML = models.map(m => `
+                    <button type="button" onclick="selectModel('${m}')" 
+                        class="w-full text-left px-3 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-xl transition flex items-center justify-between font-mono">
+                        <span class="truncate">${m}</span>
+                        ${m === currentModel ? '<span class="text-emerald-400 font-bold ml-2">✓</span>' : ''}
+                    </button>
+                `).join('');
+            }
+
+            function toggleModelDropdown(e) {
+                e.stopPropagation();
+                modelDropdownMenu.classList.toggle('hidden');
+                document.getElementById('model-chevron')?.classList.toggle('rotate-180');
+            }
+
+            function selectModel(modelName) {
+                currentModel = modelName;
+                updateModelUI(modelName);
+                modelDropdownMenu.classList.add('hidden');
+                document.getElementById('model-chevron')?.classList.remove('rotate-180');
+                
+                // Re-render list to show checkmark
+                fetch('/api/models')
+                    .then(r => r.json())
+                    .then(d => { if (d.models) renderModelList(d.models); })
+                    .catch(() => {});
+            }
+
+            function updateModelUI(modelName) {
+                selectedModelLabel.innerText = modelName;
+                if (headerLlmLabel) headerLlmLabel.innerText = modelName;
+                userInput.placeholder = `Peça ao ${modelName}`;
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!modelDropdownMenu.contains(e.target) && !document.getElementById('model-dropdown-btn')?.contains(e.target)) {
+                    modelDropdownMenu.classList.add('hidden');
+                    document.getElementById('model-chevron')?.classList.remove('rotate-180');
+                }
+            });
+
+            // --- FILE & IMAGE ATTACHMENTS ---
+            function formatSize(bytes) {
+                if (!bytes || bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
+
+            function handleFileSelect(e) {
+                const files = Array.from(e.target.files || []);
+                if (!files.length) return;
+
+                files.forEach(file => {
+                    const isImg = file.type.startsWith('image/');
+                    const reader = new FileReader();
+
+                    if (isImg) {
+                        reader.onload = (ev) => {
+                            attachedFiles.push({
+                                name: file.name,
+                                size: file.size,
+                                type: file.type,
+                                is_image: true,
+                                previewUrl: ev.target.result,
+                                content: ev.target.result // Base64 data URL
+                            });
+                            renderAttachmentPreviews();
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        reader.onload = (ev) => {
+                            attachedFiles.push({
+                                name: file.name,
+                                size: file.size,
+                                type: file.type || 'text/plain',
+                                is_image: false,
+                                previewUrl: null,
+                                content: ev.target.result // Text content
+                            });
+                            renderAttachmentPreviews();
+                        };
+                        // For structured text or source code files, read as text
+                        if (file.name.endsWith('.parquet') || file.type.includes('pdf')) {
+                            attachedFiles.push({
+                                name: file.name,
+                                size: file.size,
+                                type: file.type || 'application/octet-stream',
+                                is_image: false,
+                                previewUrl: null,
+                                content: null
+                            });
+                            renderAttachmentPreviews();
+                        } else {
+                            reader.readAsText(file);
+                        }
+                    }
+                });
+
+                e.target.value = ''; // Reset input
+            }
+
+            function removeAttachment(index) {
+                attachedFiles.splice(index, 1);
+                renderAttachmentPreviews();
+            }
+
+            function renderAttachmentPreviews() {
+                if (!attachedFiles.length) {
+                    attachmentsBar.classList.add('hidden');
+                    attachmentsBar.innerHTML = '';
+                    return;
+                }
+
+                attachmentsBar.classList.remove('hidden');
+                attachmentsBar.innerHTML = attachedFiles.map((att, idx) => {
+                    if (att.is_image) {
+                        return `
+                            <div class="flex items-center gap-2 bg-slate-800/90 text-slate-200 px-2.5 py-1.5 rounded-xl text-xs border border-slate-700/80 shadow-sm animate-fade-in">
+                                <img src="${att.previewUrl}" class="w-6 h-6 rounded-md object-cover border border-slate-600">
+                                <span class="max-w-[130px] truncate font-medium">${att.name}</span>
+                                <span class="text-slate-400 text-[10px]">${formatSize(att.size)}</span>
+                                <button type="button" onclick="removeAttachment(${idx})" class="text-slate-400 hover:text-rose-400 ml-1 transition" title="Remover">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="flex items-center gap-2 bg-slate-800/90 text-slate-200 px-2.5 py-1.5 rounded-xl text-xs border border-slate-700/80 shadow-sm animate-fade-in">
+                                <svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                                <span class="max-w-[130px] truncate font-medium">${att.name}</span>
+                                <span class="text-slate-400 text-[10px]">${formatSize(att.size)}</span>
+                                <button type="button" onclick="removeAttachment(${idx})" class="text-slate-400 hover:text-rose-400 ml-1 transition" title="Remover">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                        `;
+                    }
+                }).join('');
+            }
+
+            // --- SPEECH RECOGNITION (AUDIO / MIC) ---
+            function toggleSpeechRecognition() {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    alert('Reconhecimento de voz não é suportado pelo seu navegador atual. Recomendamos Chrome ou Edge.');
+                    return;
+                }
+
+                if (!recognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.lang = 'pt-BR';
+                    recognition.continuous = true;
+                    recognition.interimResults = true;
+
+                    recognition.onstart = () => {
+                        isRecording = true;
+                        updateMicUi(true);
+                    };
+
+                    recognition.onresult = (event) => {
+                        let finalTranscript = '';
+                        let interimTranscript = '';
+                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                            if (event.results[i].isFinal) {
+                                finalTranscript += event.results[i][0].transcript;
+                            } else {
+                                interimTranscript += event.results[i][0].transcript;
+                            }
+                        }
+                        const transcribed = finalTranscript || interimTranscript;
+                        if (transcribed) {
+                            userInput.value = transcribed.trim();
+                        }
+                    };
+
+                    recognition.onerror = (event) => {
+                        console.warn('Speech recognition status:', event.error);
+                        if (event.error !== 'no-speech') {
+                            isRecording = false;
+                            updateMicUi(false);
+                        }
+                    };
+
+                    recognition.onend = () => {
+                        isRecording = false;
+                        updateMicUi(false);
+                    };
+                }
+
+                if (isRecording) {
+                    recognition.stop();
+                } else {
+                    try {
+                        recognition.start();
+                    } catch (err) {
+                        console.error('Falha ao iniciar reconhecimento de áudio:', err);
+                    }
+                }
+            }
+
+            function updateMicUi(recording) {
+                if (recording) {
+                    micBtn.className = 'w-9 h-9 rounded-full bg-red-500/20 text-red-400 ring-2 ring-red-500/50 flex items-center justify-center transition shrink-0 animate-pulse';
+                    userInput.placeholder = 'Ouvindo áudio... Fale sua pesquisa agora';
+                } else {
+                    micBtn.className = 'w-9 h-9 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition shrink-0';
+                    userInput.placeholder = `Peça ao ${currentModel}`;
+                }
+            }
 
             function sendPrompt(text) {
                 userInput.value = text;
@@ -248,20 +531,46 @@ def index_ui():
                 return html;
             }
 
-            function appendUserMessage(content) {
+            function appendUserMessage(content, sentAttachments = []) {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'flex justify-end pt-2';
                 
                 const bubble = document.createElement('div');
                 bubble.className = 'bg-blue-600 text-white rounded-3xl rounded-tr-sm px-6 py-4 max-w-2xl text-sm shadow-md leading-relaxed';
-                bubble.innerText = content;
                 
+                let html = `<div>${content}</div>`;
+                if (sentAttachments && sentAttachments.length > 0) {
+                    html += `<div class="mt-3 pt-2.5 border-t border-blue-500/40 flex flex-wrap gap-2">`;
+                    sentAttachments.forEach(att => {
+                        if (att.is_image) {
+                            html += `
+                                <div class="space-y-1">
+                                    <img src="${att.previewUrl || att.content}" class="max-h-40 max-w-xs rounded-xl border border-blue-400/40 object-cover shadow-sm">
+                                    <span class="text-[10px] text-blue-200 block truncate max-w-[160px]">${att.name}</span>
+                                </div>
+                            `;
+                        } else {
+                            html += `
+                                <div class="inline-flex items-center gap-1.5 bg-blue-700/70 border border-blue-400/40 px-3 py-1.5 rounded-xl text-xs">
+                                    <svg class="w-3.5 h-3.5 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                    </svg>
+                                    <span class="font-medium">${att.name}</span>
+                                    <span class="text-blue-200 text-[10px]">(${formatSize(att.size)})</span>
+                                </div>
+                            `;
+                        }
+                    });
+                    html += `</div>`;
+                }
+
+                bubble.innerHTML = html;
                 wrapper.appendChild(bubble);
                 chatBox.appendChild(wrapper);
                 chatBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
 
-            function showProcessingStepper() {
+            function showProcessingStepper(modelUsed) {
                 const stepper = document.createElement('div');
                 stepper.id = 'gemini-stepper';
                 stepper.className = 'border border-blue-500/30 bg-slate-900/80 rounded-3xl p-6 shadow-xl space-y-4';
@@ -274,7 +583,7 @@ def index_ui():
                                 <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                             </span>
                             <span class="text-xs font-mono font-semibold uppercase tracking-wider text-blue-400">
-                                Gemini Processing Cell [In ${cellCounter + 1}]
+                                Pesquisa Analítica [In ${cellCounter + 1}]
                             </span>
                         </div>
                         <span class="text-xs text-slate-400 font-mono" id="stepper-time">0.0s</span>
@@ -282,11 +591,11 @@ def index_ui():
                     <div class="space-y-2.5 text-xs text-slate-300 font-mono">
                         <div id="step-1" class="flex items-center gap-2.5 text-blue-300">
                             <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-                            <span>Mapeando ontologias & contratos de crédito corporativo...</span>
+                            <span>Mapeando ontologias & contexto da pesquisa...</span>
                         </div>
                         <div id="step-2" class="flex items-center gap-2.5 text-slate-500">
                             <span class="w-2 h-2 rounded-full bg-slate-700"></span>
-                            <span>Compilando AST SQL canônico via Ollama (llama3.2:3b)...</span>
+                            <span>Compilando consulta analítica via Ollama (${modelUsed})...</span>
                         </div>
                         <div id="step-3" class="flex items-center gap-2.5 text-slate-500">
                             <span class="w-2 h-2 rounded-full bg-slate-700"></span>
@@ -356,7 +665,7 @@ def index_ui():
                         </div>
                         <div class="flex items-center gap-2">
                             ${sql ? `
-                                <button onclick="copyToClipboard(\`${sql.replace(/`/g, '\\\\`')}\`, this)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700 transition flex items-center gap-1">
+                                <button onclick="copyToClipboard(window.cellSql_${cellCounter}, this)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700 transition flex items-center gap-1">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     <span>Copiar SQL</span>
                                 </button>
@@ -367,14 +676,16 @@ def index_ui():
                                     <span>Exportar CSV</span>
                                 </button>
                             ` : ''}
-                            <button onclick="copyToClipboard(\`${fullContent.replace(/`/g, '\\\\`')}\`, this)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700 transition flex items-center gap-1">
+                            <button onclick="copyToClipboard(window.cellContent_${cellCounter}, this)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700 transition flex items-center gap-1">
                                 <span>Copiar Resposta</span>
                             </button>
                         </div>
                     </div>
                 `;
 
-                // If tabular data exists, save to window for CSV export
+                // Save data and text to window for copy/export actions
+                window['cellSql_' + cellCounter] = sql;
+                window['cellContent_' + cellCounter] = fullContent;
                 if (data) {
                     window['cellData_' + cellCounter] = data;
                 }
@@ -471,32 +782,45 @@ def index_ui():
             async function handleSubmit(e) {
                 e.preventDefault();
                 const q = userInput.value.trim();
-                if (!q) return;
+                if (!q && attachedFiles.length === 0) return;
 
                 const welcomeEl = document.getElementById('welcome-view');
                 if (welcomeEl) welcomeEl.remove();
 
-                appendUserMessage(q);
-                messages.push({role: 'user', content: q});
+                const promptText = q || 'Analise os arquivos anexados.';
+                const currentAttachments = [...attachedFiles];
+
+                // Append user message with attachments preview
+                appendUserMessage(promptText, currentAttachments);
+                messages.push({
+                    role: 'user', 
+                    content: promptText,
+                    attachments: currentAttachments
+                });
+
+                // Clear input and attachments
                 userInput.value = '';
+                attachedFiles = [];
+                renderAttachmentPreviews();
+
                 userInput.disabled = true;
                 sendBtn.disabled = true;
                 sendBtn.innerHTML = '<svg class="w-4 h-4 animate-spin text-slate-900" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>';
 
-                const stopTimer = showProcessingStepper();
+                const stopTimer = showProcessingStepper(currentModel);
 
                 try {
                     const res = await fetch('/v1/chat/completions', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
-                            model: 'llama3.2:3b',
-                            messages: messages
+                            model: currentModel,
+                            messages: messages,
+                            attachments: currentAttachments
                         })
                     });
                     const data = await res.json();
                     
-                    // Remove stepper
                     stopTimer();
                     const stepperEl = document.getElementById('gemini-stepper');
                     if (stepperEl) stepperEl.remove();
@@ -521,6 +845,9 @@ def index_ui():
                     userInput.focus();
                 }
             }
+
+            // Initialize models on load
+            loadAvailableModels();
         </script>
     </body>
     </html>
@@ -534,22 +861,86 @@ def health_check():
 def get_semantic_context():
     return {"context": registry.get_prompt_context()}
 
+@app.get("/api/models")
+async def list_models():
+    """Retorna os modelos LLM disponíveis via Ollama."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{LLAMA_SERVER_URL}/api/tags")
+            if resp.status_code == 200:
+                data = resp.json()
+                models = [m["name"] for m in data.get("models", [])]
+                if models:
+                    default_m = LLM_MODEL if LLM_MODEL in models else models[0]
+                    return {"models": models, "default": default_m}
+    except Exception:
+        pass
+    return {"models": [LLM_MODEL, "llama3.2:1b"], "default": LLM_MODEL}
+
+@app.post("/api/upload")
+async def upload_file(file: UploadFile = File(...)):
+    """Recebe e processa arquivos/imagens para enriquecer o contexto da pesquisa."""
+    content = await file.read()
+    filename = file.filename or "uploaded_file"
+    content_type = file.content_type or "application/octet-stream"
+    size_bytes = len(content)
+    is_image = content_type.startswith("image/")
+    
+    text_preview = None
+    if not is_image:
+        try:
+            text_str = content.decode("utf-8", errors="replace")
+            text_preview = text_str[:4000]
+        except Exception:
+            pass
+
+    return {
+        "name": filename,
+        "size": size_bytes,
+        "type": content_type,
+        "is_image": is_image,
+        "content": text_preview
+    }
+
 @app.post("/v1/chat/completions")
 async def chat_completions(req: ChatCompletionRequest):
-    """Middleware compatível com OpenAI API para Open WebUI."""
-    user_message = req.messages[-1].content if req.messages else ""
+    """Middleware compatível com OpenAI API para Open WebUI e interface Web."""
+    target_model = req.model if req.model and req.model not in ("local-model", "") else LLM_MODEL
     
-    # 1. Inject Semantic Context into System Prompt
+    # 1. Collect Attachments Context
+    all_attachments: List[Attachment] = []
+    if req.attachments:
+        all_attachments.extend(req.attachments)
+    for msg in req.messages:
+        if msg.attachments:
+            all_attachments.extend(msg.attachments)
+
+    attachments_context = ""
+    if all_attachments:
+        attachments_context = "\n=== ARQUIVOS E ANEXOS DA PESQUISA ===\n"
+        for att in all_attachments:
+            att_info = f"- Arquivo: {att.name} (tipo: {att.type or 'desconhecido'}, tamanho: {round(att.size / 1024, 1) if att.size else 0} KB)"
+            if att.content and not att.is_image:
+                preview = att.content[:3000]
+                att_info += f"\n  Conteúdo:\n```\n{preview}\n```"
+            elif att.is_image:
+                att_info += " [Imagem anexada pelo usuário para contexto visual/análise]"
+            attachments_context += att_info + "\n"
+        attachments_context += "======================================\n"
+
+    # 2. Inject Semantic Context and Attachments into System Prompt
     semantic_context = registry.get_prompt_context()
     system_prompt = (
-        "Você é um assistente analítico especializado em Crédito Corporativo e Camada Semântica.\n"
-        "Com base no Modelo Semântico abaixo, converta a pergunta do usuário em uma consulta SQL válida para DuckDB.\n\n"
-        f"=== CONTEXTO SEMÂNTICO ===\n{semantic_context}\n===========================\n\n"
+        "Você é um assistente analítico especializado em Pesquisa, Crédito Corporativo e Camada Semântica.\n"
+        "Com base no Modelo Semântico e em quaisquer arquivos anexados, converta a pergunta do usuário em uma consulta SQL válida para DuckDB.\n\n"
+        f"=== CONTEXTO SEMÂNTICO ===\n{semantic_context}\n===========================\n"
+        f"{attachments_context}\n"
         "Regras fundamentais:\n"
         "1. Responda com a query SQL dentro de um bloco ```sql ... ``` se a solicitação puder ser convertida em consulta analítica.\n"
         "2. Sempre use as tabelas qualificadas com o schema (ex: `corporate_credit.facilities`, `corporate_credit.counterparts`).\n"
         "3. Ao combinar métricas de uma entidade com dimensões de outra, utilize JOIN explícito usando as relações indicadas em 'Joins' (ex: `JOIN corporate_credit.counterparts c ON f.counterpart_id = c.counterpart_id`).\n"
-        "4. Se for apenas conversa genérica ou saudação, responda normalmente em português.\n"
+        "4. Se o usuário anexou arquivos (como CSVs ou relatórios), correlacione os dados fornecidos com o modelo analítico.\n"
+        "5. Se for apenas conversa genérica, pesquisa conceitual ou saudação, responda normalmente em português.\n"
     )
 
     llm_messages = [{"role": "system", "content": system_prompt}]
@@ -561,34 +952,45 @@ async def chat_completions(req: ChatCompletionRequest):
     sql_code = None
     query_results = None
 
-    # 2. Query llama.cpp server
+    # 3. Query Ollama / llama.cpp server
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(
                 f"{LLAMA_SERVER_URL}/v1/chat/completions",
                 json={
-                    "model": LLM_MODEL,
+                    "model": target_model,
                     "messages": llm_messages,
                     "temperature": req.temperature,
                     "stream": False
                 }
             )
+            # Fallback to default LLM_MODEL if target_model failed
+            if resp.status_code != 200 and target_model != LLM_MODEL:
+                resp = await client.post(
+                    f"{LLAMA_SERVER_URL}/v1/chat/completions",
+                    json={
+                        "model": LLM_MODEL,
+                        "messages": llm_messages,
+                        "temperature": req.temperature,
+                        "stream": False
+                    }
+                )
             if resp.status_code != 200:
                 raise HTTPException(status_code=resp.status_code, detail=resp.text)
             llm_result = resp.json()
     except Exception as e:
         total_time_ms = round((time.perf_counter() - start_time) * 1000, 1)
-        # Fallback se llama-server não estiver acessível
+        # Fallback se LLM não estiver acessível
         return {
             "id": "chatcmpl-fallback",
             "object": "chat.completion",
             "created": 0,
-            "model": req.model,
+            "model": target_model,
             "choices": [{
                 "index": 0,
                 "message": {
                     "role": "assistant",
-                    "content": f"[Middleware Fallback - LLM Offline] Contexto Semântico:\n{semantic_context}\n\nErro ao conectar ao LLM: {str(e)}",
+                    "content": f"[Middleware Fallback - LLM Offline] Contexto Semântico:\n{semantic_context}\n\nErro ao conectar ao LLM ({target_model}): {str(e)}",
                     "sql": None,
                     "data": None,
                     "execution_time_ms": total_time_ms,
@@ -601,7 +1003,7 @@ async def chat_completions(req: ChatCompletionRequest):
 
     assistant_content = llm_result["choices"][0]["message"]["content"]
 
-    # 3. Check if SQL was generated & Execute in DuckDB
+    # 4. Check if SQL was generated & Execute in DuckDB
     if "```sql" in assistant_content:
         try:
             sql_code = assistant_content.split("```sql")[1].split("```")[0].strip()
@@ -619,7 +1021,7 @@ async def chat_completions(req: ChatCompletionRequest):
         "id": llm_result.get("id", "chatcmpl-local"),
         "object": "chat.completion",
         "created": llm_result.get("created", 0),
-        "model": req.model,
+        "model": target_model,
         "choices": [{
             "index": 0,
             "message": {
@@ -638,3 +1040,4 @@ async def chat_completions(req: ChatCompletionRequest):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
