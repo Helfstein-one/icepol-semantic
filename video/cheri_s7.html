@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-950">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style> body { width: 1920px; height: 1080px; overflow: hidden; } </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col h-full font-sans antialiased">
+  <header class="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur-md px-10 py-4 flex items-center justify-between sticky top-0 z-20">
+    <div class="flex items-center gap-3">
+      <h1 class="text-xl font-bold text-white">Icepol Semantic Layer</h1>
+      <span class="text-xs text-slate-400">• Execução Analítica DuckDB (180ms)</span>
+    </div>
+    <div class="flex items-center gap-3 text-xs">
+      <span class="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">deepseek-r1:1.5b</span>
+      <span class="px-3 py-1.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-semibold">⚡ 1.49s Total</span>
+    </div>
+  </header>
+
+  <main class="flex-1 p-10 max-w-5xl mx-auto w-full space-y-6">
+    <div class="flex justify-end">
+      <div class="bg-sky-600 text-white rounded-2xl rounded-tr-none px-5 py-3 max-w-xl text-sm font-medium">
+        Qual a exposição total e alavancagem média por setor? Gere também o modelo relacional Mermaid.
+      </div>
+    </div>
+
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 text-xs text-slate-400">
+        <span><b>deepseek-r1:1.5b</b> • DuckDB Engine • Zero Alucinação</span>
+        <span class="font-mono text-sky-400">Trace: tr_icepol_8f492a</span>
+      </div>
+
+      <div class="overflow-hidden border border-slate-800 rounded-xl bg-slate-950/60">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-900/80 text-xs text-slate-400 border-b border-slate-800 font-semibold">
+            <tr>
+              <th class="p-3">Setor Econômico (CNAE)</th>
+              <th class="p-3">Exposição Total (total_exposure)</th>
+              <th class="p-3">Alavancagem Média (Dívida/EBITDA)</th>
+              <th class="p-3">Status de Risco</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 text-slate-300">
+            <tr>
+              <td class="p-3 font-medium text-white">Indústria & Manufatura</td>
+              <td class="p-3 font-mono text-sky-400 font-bold">R$ 4.820.000.000</td>
+              <td class="p-3 font-mono">2.1x</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400">Baixo</span></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-white">Agronegócio & Grãos</td>
+              <td class="p-3 font-mono text-sky-400 font-bold">R$ 3.650.000.000</td>
+              <td class="p-3 font-mono">1.8x</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400">Baixo</span></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-white">Varejo & Consumo</td>
+              <td class="p-3 font-mono text-sky-400 font-bold">R$ 2.410.000.000</td>
+              <td class="p-3 font-mono text-amber-400 font-bold">3.4x</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400">Atenção</span></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-white">Energia & Infraestrutura</td>
+              <td class="p-3 font-mono text-sky-400 font-bold">R$ 1.950.000.000</td>
+              <td class="p-3 font-mono">1.4x</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400">Ótimo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="px-3.5 py-1.5 rounded-lg bg-sky-600/20 text-sky-300 border border-sky-500/40 text-xs font-bold">📐 Aba Mermaid Ativa ➔</span>
+        <span class="text-xs text-slate-400">Renderização em SVG com Crow's foot cardinality</span>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

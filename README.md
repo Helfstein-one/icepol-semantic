@@ -360,36 +360,30 @@ pie title Distribuição Percentual de Gastos de Tokens por Consulta (342 Tokens
 
 ## 🎬 Vídeos Demonstrativos & Mermaid Interativo
 
-O projeto conta com vídeos demonstrativos de alta definição gravados com trilha sonora original estilo **synthwave anos 80 (Depeche Mode style)**:
+O projeto conta com vídeos demonstrativos de alta definição (1080p Full HD) documentando a jornada completa de ponta a ponta:
 
-### 1. 🎹 🌟 Vídeo da Jornada na UI de Chat (1.5x Speed & Estilo 'Policy of Truth' Depeche Mode)
-* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_1.5x_policy_of_truth.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_1.5x_policy_of_truth.mp4)
-* **Trilha Sonora Original**: [`video/soundtrack_policy_of_truth_dm_40s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_policy_of_truth_dm_40s.wav) — Composição animada em **114 BPM** (D minor) fielmente inspirada na lendária *Policy of Truth* do Depeche Mode (*Violator*, 1990):
-  - **Bassline Sincopada de 16 notas**: Linha analógica pulsante com saltos de oitava e modulação de filtro ressonante (Alan Wilder / Minimoog).
-  - **Bateria Eletrônica Industrial**: Batida 4-on-the-floor enérgica, caixa com efeito *gated reverb* e chimbais mecânicos dançantes.
-  - **Riff de Guitarra / Lead Sintetizado com Slide**: O clássico hook melódico com chorus analógico e delay ping-pong estéreo.
-  - **Pads de Cordas Analógicas**: Atmosfera escura e envolvente em Ré menor (`Dm` &rarr; `Bb` &rarr; `C` &rarr; `Dm`).
-* **Duração Otimizada (1.5x)**: **40 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
-* **Roteiro Ágil e Dinâmico**:
-  1. **UI Inicial do Chat** (4.6s): Apresentação da tela inicial com o urso polar, saudação, chips de atalhos e microfone.
-  2. **Digitação Ágil da Pergunta** (4.6s): Entrada rápida de texto com seleção do `deepseek-r1:1.5b`.
-  3. **Resultado Analítico DuckDB** (5.3s): Exibição dos dados de crédito corporativo em tabela estruturada.
-  4. **Aba do Diagrama Conceitual Mermaid** (5.3s): Modelo relacional ERD com as 7 entidades e conectores Crow's foot (`||--o{`).
-  5. **Popover de Observabilidade** (4.0s): Abertura do cockpit no cabeçalho com status de Langfuse, MinIO e MySQL.
-  6. **Cockpit Langfuse** (5.3s): Métricas de 1.482 traces, SLA P95 de 1.88s e confiabilidade dos sinks.
-  7. **Waterfall de Spans** (5.3s): Cascata de latências do ciclo de vida da consulta.
-  8. **Distribuição de Gastos de Tokens** (5.3s): Análise de consumo (contexto ontológico, CoT e SQL).
-
-### 2. 🎷 Opção Funky Upbeat Lo-Fi (112 BPM)
-* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4)
-* **Trilha Sonora**: [`video/soundtrack_funky_upbeat_lofi_40s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_funky_upbeat_lofi_40s.wav) (40s, 112 BPM, alegre e sincopada).
-
-### 3. ☕ Opção Relaxante Lo-Fi Chill Ambient (82 BPM)
-* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_lofi_chill.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_lofi_chill.mp4) (60s, piano Rhodes aveludado).
-
-### 4. 🌟 Vídeo Master: Jornada Completa do Usuário (GitHub &rarr; Terminal &rarr; Chat &rarr; Langfuse)
-* **Arquivo**: [`video/icepol_user_journey_langfuse_tokens.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_langfuse_tokens.mp4) (60s)
-* **Cockpit Langfuse**: [`video/langfuse_metrics_decision_tree.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/langfuse_metrics_decision_tree.mp4) (36s)
+### 1. 🕺 🌟 Vídeo Master: Jornada Completa do Usuário (Trilha Estilo 'Cheri Cheri Lady' - Modern Talking)
+* **Arquivo de Vídeo**: [`video/icepol_user_journey_cheri_cheri_lady.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_cheri_cheri_lady.mp4)
+* **Trilha Sonora Original**: [`video/soundtrack_cheri_cheri_lady_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_cheri_cheri_lady_60s.wav) — Composição Euro-Disco animada em **118 BPM** (G# menor / Sol sustenido menor), inspirada na clássica sonoridade synth-pop dos anos 80 de Dieter Bohlen e Thomas Anders (*Modern Talking*, 1985):
+  - **Bassline Oitavada Galloping em Semicolcheias (16th-note)**: Linha de baixo pulsante e dançante no sintetizador Moog/Roland TB-303.
+  - **Bateria Eletrônica Estilo LinnDrum / Simmons**: Batida 4-on-the-floor nítida com chimbais abertos (*open hi-hat*) nos contratempos sincopados e palmas estéreo.
+  - **Hook Principal de Lead / Synth Brass**: O clássico e inconfundível riff melódico do refrão de *Cheri Cheri Lady* com chorus estéreo e delay analógico.
+  - **Chords & Pads Roland Juno-106**: Progressão harmônica dançante (`G#m` &rarr; `C#m` &rarr; `F#` &rarr; `B` &rarr; `E` &rarr; `D#m`).
+* **Duração**: **60 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
+* **Roteiro da Jornada de Ponta a Ponta (10 Cenas)**:
+  1. **Navegação no Repositório GitHub** (6s): Acesso à página do projeto `Helfstein-one/icepol-semantic`, visualização do cabeçalho, tags de tecnologias, commits e modal com URL de clone HTTPS.
+  2. **Scroll da Página e Leitura da Arquitetura** (6s): Rolagem pelo README inspecionando o diagrama conceitual e garantias de *Zero Alucinação de Schema*.
+  3. **Terminal: Clone do Repositório** (6s): Execução de `git clone https://github.com/Helfstein-one/icepol-semantic.git` e `cd icepol-semantic`.
+  4. **Terminal: Seed de Dados e Subida dos Containers** (6s): Execução de `make seed` gerando os 7 Parquets sintéticos de crédito corporativo e `podman compose up -d` subindo MinIO, Polaris, MySQL 8, Postgres, Langfuse e Semantic Agent.
+  5. **Boas-Vindas no Chat da Camada Semântica** (6s): Interface web com logotipo do urso polar, seletor de modelos (`deepseek-r1:1.5b`), botões de upload `+`, microfone para pesquisa por voz e sugestões.
+  6. **Digitação da Pergunta de Crédito** (5s): Inserção do prompt: *"Qual a exposição total e alavancagem média por setor? Gere também o modelo relacional Mermaid"*.
+  7. **Resultado Analítico DuckDB em Tabela** (7s): Retorno ultrarrápido (180ms) com agregação de R$ 13,8 bilhões distribuídos por CNAE e métricas de risco.
+  8. **Modelagem Conceitual Mermaid ERD (Crow's Foot)** (6s): Renderização SVG das 7 entidades (`counterparts`, `facilities`, `collaterals`, `proposals`, `financial_statements`, `credit_limits`, `covenants`) com cardinalidade formal (`||--o{`).
+  9. **Langfuse Tracing: Waterfall de Spans** (6s): Visualização detalhada do trace `tr_icepol_8f492a` decomposto em parsing semântico (328ms), CoT DeepSeek-R1 (776ms), DuckDB (180ms) e auditoria MinIO/MySQL (108ms).
+  10. **Análise de Custos & Gastos de Tokens** (6s):
+      - **Maior Volume de Tokens**: *Contexto Ontológico* (63.7% / 218 tokens) — maior peso em bytes devido às regras canônicas das 7 tabelas.
+      - **Maior Custo em Tempo (Wall Time)**: *Raciocínio CoT do DeepSeek-R1* (52.0% / 776ms / 72 tokens) — maior esforço computacional devido à geração autorregressiva do bloco `<think>`.
+      - *Síntese SQL ANSI*: 15.3% / 52 tokens com scan DuckDB executado em apenas 180ms.
 
 ---
 

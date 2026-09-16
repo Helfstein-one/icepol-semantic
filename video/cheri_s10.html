@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: #0b0f19; color: #f1f5f9; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; }
+  header { height: 64px; background: #111827; border-bottom: 1px solid #1f2937; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
+  .brand { display: flex; align-items: center; gap: 14px; font-size: 18px; font-weight: 700; }
+  .brand svg { width: 28px; height: 28px; fill: #38bdf8; }
+
+  .content { flex: 1; padding: 36px 48px; display: flex; flex-direction: column; gap: 24px; }
+  .title-bar h2 { font-size: 28px; font-weight: 800; color: #ffffff; }
+  .title-bar p { font-size: 15px; color: #94a3b8; margin-top: 4px; }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .t-card { background: #111827; border: 1px solid #1e293b; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+  .t-head { font-size: 14px; font-weight: 600; color: #94a3b8; display: flex; justify-content: space-between; }
+  .t-num { font-size: 42px; font-weight: 900; margin: 12px 0; }
+  .t-desc { font-size: 13px; color: #64748b; line-height: 1.4; }
+
+  .breakdown-box { background: #111827; border: 1px solid #1e293b; border-radius: 14px; padding: 28px; flex: 1; display: flex; flex-direction: column; }
+  .box-title { font-size: 18px; font-weight: 700; color: #ffffff; margin-bottom: 16px; }
+  
+  .big-bar { width: 100%; height: 44px; border-radius: 8px; display: flex; overflow: hidden; margin-bottom: 24px; border: 1px solid #334155; }
+  .seg1 { width: 63.7%; background: linear-gradient(90deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #000; }
+  .seg2 { width: 21.0%; background: linear-gradient(90deg, #7c3aed, #a78bfa); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
+  .seg3 { width: 15.3%; background: linear-gradient(90deg, #059669, #34d399); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #000; }
+
+  .cost-summary { background: #0f172a; border: 1px solid #0284c7; border-radius: 10px; padding: 18px; font-size: 14px; color: #cbd5e1; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>Langfuse Token Intelligence: O que foi Mais Custoso na Consulta?</span>
+    </div>
+    <span style="color:#38bdf8; font-family:monospace; font-size:13px;">Modelo: deepseek-r1:1.5b • Total: 342 Tokens</span>
+  </header>
+
+  <div class="content">
+    <div class="title-bar">
+      <h2>Auditoria e Análise de Custos de Tokens</h2>
+      <p>Transparência total sobre onde cada token foi consumido e onde o tempo de processamento foi concentrado.</p>
+    </div>
+
+    <div class="cards-grid">
+      <div class="t-card" style="border-top: 4px solid #38bdf8;">
+        <div class="t-head"><span>Prompt Context (MAIS CUSTOSO EM TOKENS)</span><span>📥 63.7%</span></div>
+        <div class="t-num" style="color: #38bdf8;">218 Tokens</div>
+        <div class="t-desc">Esquema das 7 tabelas e regras YAML de crédito corporativo para blindagem semântica.</div>
+      </div>
+
+      <div class="t-card" style="border-top: 4px solid #a78bfa;">
+        <div class="t-head"><span>Reasoning CoT (MAIS CUSTOSO EM TEMPO)</span><span>🧠 21.0%</span></div>
+        <div class="t-num" style="color: #a78bfa;">72 Tokens</div>
+        <div class="t-desc">Cadeia de pensamento no bloco <code>&lt;think&gt;</code> validando integridade referencial (776ms).</div>
+      </div>
+
+      <div class="t-card" style="border-top: 4px solid #34d399;">
+        <div class="t-head"><span>Completion SQL Output</span><span>📤 15.3%</span></div>
+        <div class="t-num" style="color: #34d399;">52 Tokens</div>
+        <div class="t-desc">Código SQL ANSI canônico ultracompacto entregue para execução no DuckDB.</div>
+      </div>
+    </div>
+
+    <div class="breakdown-box">
+      <div class="box-title">Alocação de Tokens por Consulta (342 Tokens Totais)</div>
+      
+      <div class="big-bar">
+        <div class="seg1">Input Ontológico (63.7% - 218 Tokens)</div>
+        <div class="seg2">Raciocínio CoT (21.0% - 72 Tokens)</div>
+        <div class="seg3">SQL Output (15.3% - 52 Tokens)</div>
+      </div>
+
+      <div class="cost-summary">
+        <b>💡 Conclusão de Eficiência:</b> O maior volume de tokens está no <b>Contexto Ontológico de Entrada (63.7%)</b>, que é reutilizado via cache para baratear chamadas. Já a maior parcela de tempo de execução (52% / 776ms) ocorre no <b>Raciocínio CoT</b> do DeepSeek-R1, garantindo zero alucinações de schema.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

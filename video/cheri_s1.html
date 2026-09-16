@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  body { background: #0d1117; color: #c9d1d9; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; }
+  header { height: 68px; background: #161b22; border-bottom: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
+  .nav-left { display: flex; align-items: center; gap: 16px; }
+  .github-logo { fill: #ffffff; width: 34px; height: 34px; }
+  .repo-path { font-size: 20px; font-weight: 600; color: #58a6ff; }
+  .repo-path span { color: #8b949e; margin: 0 4px; }
+  .badge-public { border: 1px solid #30363d; border-radius: 20px; padding: 3px 10px; font-size: 12px; color: #8b949e; }
+  .nav-right { display: flex; gap: 12px; }
+  .btn-gh { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+  .btn-primary { background: #238636; border-color: #2ea043; color: #ffffff; }
+
+  .main-content { flex: 1; padding: 32px 50px; display: grid; grid-template-columns: 1fr 340px; gap: 32px; }
+  .repo-header { margin-bottom: 20px; }
+  .repo-desc { font-size: 17px; color: #c9d1d9; line-height: 1.5; font-weight: 400; }
+  .tags-row { display: flex; gap: 8px; margin-top: 12px; }
+  .tag { background: #1f242c; color: #58a6ff; font-size: 12px; padding: 4px 12px; border-radius: 12px; }
+
+  .file-box { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; margin-top: 16px; }
+  .file-header { background: #161b22; padding: 14px 20px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+  .file-row { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #21262d; font-size: 14px; }
+  .file-name { color: #c9d1d9; font-weight: 500; }
+
+  .clone-popover {
+    position: absolute; right: 410px; top: 120px; width: 440px; background: #161b22; border: 1px solid #30363d;
+    border-radius: 8px; padding: 18px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 10;
+  }
+  .clone-title { font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 10px; }
+  .clone-bar { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .clone-url { font-family: monospace; font-size: 13px; color: #58a6ff; }
+  
+  .side-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+  .side-title { font-size: 14px; font-weight: 600; color: #ffffff; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="nav-left">
+      <svg class="github-logo" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <div class="repo-path">Helfstein-one <span>/</span> <b>icepol-semantic</b></div>
+      <span class="badge-public">Public</span>
+    </div>
+    <div class="nav-right">
+      <button class="btn-gh">⭐ Star (54)</button>
+      <button class="btn-gh">🍴 Fork (15)</button>
+      <button class="btn-gh btn-primary">&lt;&gt; Code ▾</button>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div>
+      <div class="repo-header">
+        <div class="repo-desc">Ecossistema Local de Inteligência Analítica em Crédito Corporativo (Wholesale Banking) com Camada Semântica, DuckDB, Apache Iceberg, Langfuse Tracing e MySQL 8.</div>
+        <div class="tags-row">
+          <span class="tag">semantic-layer</span>
+          <span class="tag">apache-iceberg</span>
+          <span class="tag">duckdb</span>
+          <span class="tag">langfuse</span>
+          <span class="tag">deepseek-r1</span>
+          <span class="tag">mysql-audit</span>
+        </div>
+      </div>
+
+      <div class="file-box">
+        <div class="file-header">
+          <span><b>main</b> • 28 commits • Último commit: <i>feat: tracing waterfall & token spend analysis</i></span>
+          <span style="color:#58a6ff;">Commit 2dd6962</span>
+        </div>
+        <div class="file-row">
+          <div class="file-name">📁 core/</div>
+          <div style="color:#8b949e;">FastAPI agent, DuckDB engine, Langfuse tracer & MySQL logger</div>
+          <div style="color:#6e7681;">hoje</div>
+        </div>
+        <div class="file-row">
+          <div class="file-name">📁 semantic/</div>
+          <div style="color:#8b949e;">Ontologias YAML de Crédito Corporativo e compilador AST</div>
+          <div style="color:#6e7681;">hoje</div>
+        </div>
+        <div class="file-row">
+          <div class="file-name">📁 video/</div>
+          <div style="color:#8b949e;">Vídeos de demonstração da jornada completa</div>
+          <div style="color:#6e7681;">hoje</div>
+        </div>
+        <div class="file-row">
+          <div class="file-name">📄 docker-compose.yml</div>
+          <div style="color:#8b949e;">Pilha completa: MinIO, Polaris, MySQL 8, Postgres e Langfuse</div>
+          <div style="color:#6e7681;">hoje</div>
+        </div>
+        <div class="file-row">
+          <div class="file-name">📄 README.md</div>
+          <div style="color:#8b949e;">Documentação completa com diagramas de tracing e tokens</div>
+          <div style="color:#6e7681;">hoje</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="side-card">
+        <div class="side-title">About</div>
+        <p style="font-size:13px; color:#8b949e; line-height:1.4;">Data Lakehouse com Camada Semântica para Wholesale Banking e IA com auditoria regulatória contínua.</p>
+      </div>
+      <div class="side-card">
+        <div class="side-title">Releases</div>
+        <p style="font-size:13px; color:#58a6ff; font-weight:600;">v1.2.0 • Latest</p>
+        <p style="font-size:12px; color:#8b949e; margin-top:4px;">Suporte a DeepSeek-R1, Langfuse Tracing e Crow's foot ERD.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="clone-popover">
+    <div class="clone-title">Clone com HTTPS</div>
+    <div class="clone-bar">
+      <span class="clone-url">git clone https://github.com/Helfstein-one/icepol-semantic.git</span>
+      <span style="font-size:12px; background:#238636; color:#fff; padding:4px 8px; border-radius:4px; font-weight:bold;">COPY</span>
+    </div>
+  </div>
+</body>
+</html>

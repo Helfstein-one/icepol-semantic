@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  body { background: #0d1117; color: #c9d1d9; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; }
+  header { height: 68px; background: #161b22; border-bottom: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
+  .repo-path { font-size: 20px; font-weight: 600; color: #58a6ff; }
+  .repo-path span { color: #8b949e; margin: 0 4px; }
+
+  /* Scrolled View into README */
+  .readme-scroll { flex: 1; padding: 40px 180px; overflow: hidden; display: flex; flex-direction: column; gap: 24px; }
+  .readme-box { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 36px 48px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  h2 { font-size: 24px; font-weight: 700; color: #ffffff; border-bottom: 1px solid #21262d; padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  p { font-size: 15px; color: #8b949e; line-height: 1.6; margin-bottom: 20px; }
+  
+  .diagram-mock { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 24px; display: flex; justify-content: space-between; align-items: center; }
+  .node { background: #1f242c; border: 1px solid #38bdf8; color: #f1f5f9; padding: 14px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; }
+  .arrow { color: #38bdf8; font-size: 20px; font-weight: bold; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="repo-path">Helfstein-one <span>/</span> <b>icepol-semantic</b> • README.md (Visualização da Arquitetura)</div>
+    <div style="font-size: 13px; color: #10b981; font-weight: bold;">✔ Camada Semântica & Observabilidade</div>
+  </header>
+
+  <div class="readme-scroll">
+    <div class="readme-box">
+      <h2>🔍 Observabilidade Corporativa (Langfuse, MinIO S3 & MySQL 8.0)</h2>
+      <p>O Icepol integra uma pilha corporativa completa para auditoria regulatória, rastreabilidade de ponta a ponta e mitigação de alucinações em produção:</p>
+      
+      <div class="diagram-mock">
+        <div class="node">🗣️ Usuário / Prompt<br><span style="font-size:11px; color:#94a3b8;">Linguagem Natural</span></div>
+        <div class="arrow">➔</div>
+        <div class="node" style="border-color:#a78bfa;">📜 Camada Semântica<br><span style="font-size:11px; color:#94a3b8;">YAML & AST Compiler</span></div>
+        <div class="arrow">➔</div>
+        <div class="node" style="border-color:#f472b6;">🧠 DeepSeek-R1 (1.5B)<br><span style="font-size:11px; color:#94a3b8;">CoT &lt;think&gt; Raciocínio</span></div>
+        <div class="arrow">➔</div>
+        <div class="node" style="border-color:#34d399;">🦆 DuckDB In-Memory<br><span style="font-size:11px; color:#94a3b8;">Iceberg Parquet S3</span></div>
+        <div class="arrow">➔</div>
+        <div class="node" style="border-color:#fbbf24;">⚡ Langfuse & MySQL<br><span style="font-size:11px; color:#94a3b8;">Spans & Auditoria 100%</span></div>
+      </div>
+
+      <div style="margin-top: 24px; padding: 16px; background: #161b22; border-left: 4px solid #38bdf8; border-radius: 4px; font-size: 14px; color: #cbd5e1;">
+        <b>Zero Alucinação de Schema:</b> O modelo nunca acessa nomes de tabelas brutas diretamente; todas as métricas são regradas no dicionário semântico canônico.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

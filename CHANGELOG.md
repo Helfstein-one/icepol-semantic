@@ -20,14 +20,13 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
   - **Waterfall de Spans (Gráfico Gantt)**: Decomposição temporal precisa da latência total (1.492ms) evidenciando spans de ciclo de vida e tempo de resposta de cada serviço.
   - **Gráfico de Distribuição de Tokens (Pie Chart)**: Mapeamento da eficiência de 342 tokens (63.7% contexto ontológico, 21.0% raciocínio CoT e 15.3% síntese SQL ANSI).
 - **Produção de Vídeos Demonstrativos em Full HD 1080p e Novas Trilhas Sonoras**:
-  - `video/icepol_chat_ui_journey_1.5x_policy_of_truth.mp4` (40s): **Gravação Acelerada 1.5x com Trilha Estilo 'Policy of Truth' (Depeche Mode)** — 114 BPM em Ré menor (Dm), reproduzindo a clássica bassline analógica pulsante, bateria eletrônica industrial com gated snare, slide riff de guitarra com chorus e pads envolventes do álbum *Violator*.
-  - `video/soundtrack_policy_of_truth_dm_40s.wav`: Trilha sonora sintetizada de 40 segundos inspirada na estética sonora de Alan Wilder e Martin Gore.
-  - `video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4` (40s): Versão acelerada com trilha animada Funky Upbeat Lo-Fi (112 BPM).
-  - `video/icepol_chat_ui_journey_lofi_chill.mp4` (60s): Versão em velocidade normal com trilha relaxante Lo-Fi Ambient Rhodes (82 BPM).
-  - `video/icepol_user_journey_langfuse_tokens.mp4` (60s): Jornada completa com navegação e clone no GitHub, build de terminal, chat e Langfuse.
-  - `video/langfuse_metrics_decision_tree.mp4` (36s).
+  - `video/icepol_user_journey_cheri_cheri_lady.mp4` (60s): **Vídeo Master da Jornada do Usuário com Trilha Estilo 'Cheri Cheri Lady' (Modern Talking)** — 118 BPM em Sol sustenido menor (G#m), reproduzindo a clássica sonoridade Euro-Disco com bassline galloping em 16th-notes, bateria eletrônica LinnDrum com open hi-hats nos contratempos sincopados, hook melódico de synth brass do refrão e pads analógicos Roland Juno-106.
+  - Roteiro cobrindo navegação no repositório GitHub com scroll do README, clone no terminal, execução de `make seed` e subida com Podman Compose, chat com consultas de crédito corporativo, modelagem conceitual Mermaid ERD (Crow's foot com as 7 entidades), tracing detalhado no Langfuse e decomposição de custos de tokens (evidenciando contexto ontológico de 218 tokens como maior volume e raciocínio CoT de 776ms como maior tempo de execução).
+  - `video/soundtrack_cheri_cheri_lady_60s.wav`: Trilha sonora sintetizada de 60 segundos inspirada na composição clássica de Dieter Bohlen e Thomas Anders.
+  - `video/synth_cheri_cheri_lady.py`: Script gerador paramétrico em áudio PCM WAV estéreo 44.1kHz.
+  - `video/build_cheri_cheri_journey_video.py`: Pipeline automatizado de renderização headless Chrome e codificação FFmpeg H.264/AAC.
 - **Limpeza e Otimização do Repositório**:
-  - Remoção de scripts temporários e arquivos WAV/MP4 intermediários obsoletos, reduzindo o tamanho da pasta `video/`.
+  - Remoção de arquivos intermediários obsoletos e consolidação dos artefatos finais na pasta `video/`.
 
 ---
 

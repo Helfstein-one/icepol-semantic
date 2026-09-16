@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Fira Code', Menlo, monospace; }
+  body { background: #080c14; color: #38bdf8; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; padding: 40px 60px; }
+  .term-window { flex: 1; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); display: flex; flex-direction: column; overflow: hidden; }
+  .title-bar { height: 48px; background: #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #334155; }
+  .traffic-lights { display: flex; gap: 8px; }
+  .circle { width: 12px; height: 12px; border-radius: 50%; }
+  .red { background: #ef4444; } .yellow { background: #f59e0b; } .green { background: #10b981; }
+  .term-body { flex: 1; padding: 36px 44px; font-size: 16px; line-height: 1.8; color: #e2e8f0; }
+  .prompt { color: #10b981; font-weight: bold; }
+  .cmd { color: #f8fafc; font-weight: 600; }
+  .dim { color: #64748b; }
+  .success { color: #34d399; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="term-window">
+    <div class="title-bar">
+      <div class="traffic-lights"><div class="circle red"></div><div class="circle yellow"></div><div class="circle green"></div></div>
+      <div style="font-size:13px; color:#94a3b8; font-weight:600;">terminal: ~/dev (zsh) — Clonando o Repositório</div>
+      <div style="font-size:12px; color:#64748b;">1920x1080</div>
+    </div>
+    <div class="term-body">
+      <p><span class="prompt">➜  dev</span> <span class="cmd">git clone https://github.com/Helfstein-one/icepol-semantic.git</span></p>
+      <p class="dim">Cloning into 'icepol-semantic'...</p>
+      <p class="dim">remote: Enumerating objects: 412, done.</p>
+      <p class="dim">remote: Counting objects: 100% (412/412), done.</p>
+      <p class="dim">remote: Compressing objects: 100% (238/238), done.</p>
+      <p class="success">remote: Total 412 (delta 234), reused 390 (delta 218), pack-reused 0</p>
+      <p class="success">Receiving objects: 100% (412/412), 16.40 MiB | 24.12 MiB/s, done.</p>
+      <p class="success">Resolving deltas: 100% (234/234), done.</p>
+      <br>
+      <p><span class="prompt">➜  dev</span> <span class="cmd">cd icepol-semantic</span></p>
+      <p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd">ls -la</span></p>
+      <p class="dim">total 128</p>
+      <p class="dim">drwxr-xr-x   core/          (FastAPI Agent & DuckDB Engine)</p>
+      <p class="dim">drwxr-xr-x   semantic/      (Ontologias YAML de Crédito)</p>
+      <p class="dim">-rw-r--r--   docker-compose.yml</p>
+      <p class="dim">-rw-r--r--   requirements.txt</p>
+      <p class="dim">-rw-r--r--   Makefile</p>
+    </div>
+  </div>
+</body>
+</html>
