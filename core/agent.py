@@ -18,22 +18,23 @@ ONTOLOGY_DIR = os.getenv("ONTOLOGY_DIR", os.path.join(BASE_DIR, "semantic", "ont
 LLAMA_SERVER_URL = os.getenv("LLAMA_SERVER_URL", "http://localhost:11434")
 LLM_MODEL = os.getenv("LLM_MODEL", "llama3.2:3b")
 
-# Observability Configuration: MySQL & Langfuse
-MYSQL_HOST = os.getenv("MYSQL_HOST", "mysql-db")
-MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
-MYSQL_USER = os.getenv("MYSQL_USER", "icepol")
-MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "password123")
-MYSQL_DB = os.getenv("MYSQL_DB", "icepol_metrics")
+# Observability Configuration: PostgreSQL & Langfuse
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "postgres-langfuse")
+POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
+POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password123")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "langfuse")
 
 LANGFUSE_HOST = os.getenv("LANGFUSE_HOST", "http://langfuse:3000")
 LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY", "pk-lf-icepol")
 LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY", "sk-lf-icepol")
 
 try:
-    import pymysql
-    PYMYSQL_AVAILABLE = True
+    import psycopg2
+    from psycopg2 import extras
+    PSYCOPG2_AVAILABLE = True
 except ImportError:
-    PYMYSQL_AVAILABLE = False
+    PSYCOPG2_AVAILABLE = False
 
 try:
     from langfuse import Langfuse
@@ -53,58 +54,60 @@ if LANGFUSE_AVAILABLE and LANGFUSE_PUBLIC_KEY:
     except Exception as e:
         print(f"[Langfuse Init Warning] {e}", flush=True)
 
-def get_mysql_conn():
-    if not PYMYSQL_AVAILABLE:
+def get_postgres_conn():
+    if not PSYCOPG2_AVAILABLE:
         return None
     try:
-        return pymysql.connect(
-            host=MYSQL_HOST,
-            port=MYSQL_PORT,
-            user=MYSQL_USER,
-            password=MYSQL_PASSWORD,
-            database=MYSQL_DB,
-            charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor,
+        return psycopg2.connect(
+            host=POSTGRES_HOST,
+            port=POSTGRES_PORT,
+            user=POSTGRES_USER,
+            password=POSTGRES_PASSWORD,
+            dbname=POSTGRES_DB,
             connect_timeout=3
         )
     except Exception:
         return None
 
-def init_mysql_tables():
-    conn = get_mysql_conn()
+# Alias for backward compatibility
+get_mysql_conn = get_postgres_conn
+
+def init_postgres_tables():
+    conn = get_postgres_conn()
     if not conn:
         return False
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS query_metrics (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    id SERIAL PRIMARY KEY,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     session_id VARCHAR(64),
                     model_name VARCHAR(64),
                     prompt_text TEXT,
                     sql_query TEXT,
                     row_count INT DEFAULT 0,
-                    llm_latency_ms FLOAT DEFAULT 0.0,
-                    duckdb_latency_ms FLOAT DEFAULT 0.0,
+                    llm_latency_ms REAL DEFAULT 0.0,
+                    duckdb_latency_ms REAL DEFAULT 0.0,
                     tokens_estimated INT DEFAULT 0,
                     status VARCHAR(32) DEFAULT 'SUCCESS'
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                );
             """)
         conn.commit()
         return True
     except Exception as e:
-        print(f"[MySQL Init Warning] {e}", flush=True)
+        print(f"[PostgreSQL Init Warning] {e}", flush=True)
         return False
     finally:
         conn.close()
 
 # Try initial table setup
-init_mysql_tables()
+init_postgres_tables()
+init_mysql_tables = init_postgres_tables
 
-def log_metric_to_mysql(model: str, prompt: str, sql: Optional[str], row_count: int, llm_ms: float, duckdb_ms: float, tokens: int, status: str = "SUCCESS", session_id: str = "default"):
+def log_metric_to_postgres(model: str, prompt: str, sql: Optional[str], row_count: int, llm_ms: float, duckdb_ms: float, tokens: int, status: str = "SUCCESS", session_id: str = "default"):
     try:
-        conn = get_mysql_conn()
+        conn = get_postgres_conn()
         if not conn:
             return
         with conn.cursor() as cursor:
@@ -116,7 +119,10 @@ def log_metric_to_mysql(model: str, prompt: str, sql: Optional[str], row_count: 
         conn.commit()
         conn.close()
     except Exception as e:
-        print(f"[MySQL Log Warning] {e}", flush=True)
+        print(f"[PostgreSQL Log Warning] {e}", flush=True)
+
+# Alias for backward compatibility
+log_metric_to_mysql = log_metric_to_postgres
 
 def log_trace_to_langfuse(session_id: str, model: str, user_prompt: str, assistant_response: str, latency_s: float, tokens: int):
     if not langfuse_client:
@@ -397,11 +403,11 @@ def index_ui():
                     </div>
                 </div>
 
-                <!-- Interactive Observability Badge & Popover (Langfuse, MinIO, MySQL) -->
+                <!-- Interactive Observability Badge & Popover (Langfuse, MinIO, PostgreSQL) -->
                 <div class="relative">
                     <button type="button" id="header-obs-btn" onclick="toggleHeaderObsPopover(event)" 
                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 hover:border-purple-500/40 transition cursor-pointer shadow-sm group"
-                        title="Observabilidade & Métricas: Langfuse, MinIO e MySQL">
+                        title="Observabilidade & Métricas: Langfuse, MinIO e PostgreSQL">
                         <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
                         <span>Métricas & Traces</span>
                         <svg class="w-3 h-3 text-purple-400/80 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -456,16 +462,16 @@ def index_ui():
                                 </a>
                             </div>
 
-                            <!-- MySQL -->
+                            <!-- PostgreSQL -->
                             <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80 flex items-center justify-between">
                                 <div class="space-y-0.5">
-                                    <div class="flex items-center gap-1.5 font-semibold text-amber-300">
-                                        <span>🐬 MySQL 8.0 Audit</span>
-                                        <span class="text-[9px] px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded-full font-mono">:3306</span>
+                                    <div class="flex items-center gap-1.5 font-semibold text-sky-300">
+                                        <span>🐘 PostgreSQL 15 Audit</span>
+                                        <span class="text-[9px] px-1.5 py-0.2 bg-sky-500/20 text-sky-300 rounded-full font-mono">:5432</span>
                                     </div>
                                     <p class="text-[10px] text-slate-400">Tabela `query_metrics` sincronizada</p>
                                 </div>
-                                <span id="mysql-metrics-count" class="text-[10px] text-amber-400 font-mono font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                                <span id="postgres-metrics-count" class="text-[10px] text-sky-400 font-mono font-bold bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20">
                                     Carregando...
                                 </span>
                             </div>
@@ -705,9 +711,10 @@ def index_ui():
                     const res = await fetch('/api/observability/status');
                     if (res.ok) {
                         const data = await res.json();
-                        const mysqlCountEl = document.getElementById('mysql-metrics-count');
-                        if (mysqlCountEl && data.mysql) {
-                            mysqlCountEl.innerText = `${data.mysql.records} queries`;
+                        const pgCountEl = document.getElementById('postgres-metrics-count') || document.getElementById('mysql-metrics-count');
+                        const pgData = data.postgres || data.mysql;
+                        if (pgCountEl && pgData) {
+                            pgCountEl.innerText = `${pgData.records} queries`;
                         }
                     }
                 } catch (e) {
@@ -1823,17 +1830,17 @@ async def ping_llm():
 
 @app.get("/api/observability/status")
 def observability_status():
-    """Retorna status unificado de Langfuse, MinIO e MySQL."""
-    mysql_status = "desconectado"
-    mysql_count = 0
-    conn = get_mysql_conn()
+    """Retorna status unificado de Langfuse, MinIO e PostgreSQL."""
+    pg_status = "desconectado"
+    pg_count = 0
+    conn = get_postgres_conn()
     if conn:
         try:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT COUNT(*) as cnt FROM query_metrics")
+                cursor.execute("SELECT COUNT(*) FROM query_metrics;")
                 res = cursor.fetchone()
-                mysql_count = res["cnt"] if res else 0
-                mysql_status = "conectado"
+                pg_count = res[0] if res else 0
+                pg_status = "conectado"
         except Exception:
             pass
         finally:
@@ -1842,10 +1849,16 @@ def observability_status():
     langfuse_status = "conectado" if langfuse_client else "desconectado"
 
     return {
+        "postgres": {
+            "status": pg_status,
+            "records": pg_count,
+            "port": POSTGRES_PORT,
+            "table": "query_metrics"
+        },
         "mysql": {
-            "status": mysql_status,
-            "records": mysql_count,
-            "port": MYSQL_PORT,
+            "status": pg_status,
+            "records": pg_count,
+            "port": POSTGRES_PORT,
             "table": "query_metrics"
         },
         "minio": {
@@ -2070,7 +2083,7 @@ async def chat_completions(req: ChatCompletionRequest):
         print(f"[LLM Fallback] Erro ao consultar {target_model}: {err_msg}", flush=True)
         # Fallback se LLM não estiver acessível
         user_prompt_err = req.messages[-1].content if req.messages else ""
-        log_metric_to_mysql(
+        log_metric_to_postgres(
             model=target_model,
             prompt=user_prompt_err,
             sql=None,
@@ -2121,9 +2134,9 @@ async def chat_completions(req: ChatCompletionRequest):
     row_count = len(query_results) if query_results else 0
     tokens_est = len(assistant_content.split()) + len(user_prompt.split())
 
-    # 5. Observability: Asynchronously log to MySQL and Langfuse
+    # 5. Observability: Asynchronously log to PostgreSQL and Langfuse
     try:
-        log_metric_to_mysql(
+        log_metric_to_postgres(
             model=target_model,
             prompt=user_prompt,
             sql=sql_code,
@@ -2135,7 +2148,7 @@ async def chat_completions(req: ChatCompletionRequest):
             session_id="icepol-session"
         )
     except Exception as m_err:
-        print(f"[Observability MySQL Error] {m_err}", flush=True)
+        print(f"[Observability PostgreSQL Error] {m_err}", flush=True)
 
     try:
         log_trace_to_langfuse(

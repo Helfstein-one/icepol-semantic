@@ -12,7 +12,7 @@
 3. [O Pipeline de Compilação: Texto -> Intenção -> AST -> SQL Físico](#-o-pipeline-de-compilação-texto---intenção---ast---sql-físico)
 4. [Arquitetura da Solução Local & Observabilidade](#-arquitetura-da-solução-local)
 5. [Modelagem Ontológica do Domínio (7 Tabelas Físicas de Crédito)](#-modelagem-ontológica-do-domínio-7-tabelas-físicas-de-crédito)
-6. [Observabilidade Corporativa (Langfuse, MinIO S3 & MySQL 8.0)](#-observabilidade-corporativa-langfuse-minio-s3--mysql-80)
+6. [Observabilidade Corporativa (Langfuse, MinIO S3 & PostgreSQL 15)](#-observabilidade-corporativa-langfuse-minio-s3--postgresql-15)
 7. [Vídeos Demonstrativos & Mermaid Interativo](#-vídeos-demonstrativos--mermaid-interativo)
 8. [Como Executar e Utilizar](#-como-executar-e-utilizar)
 9. [Integração via Model Context Protocol (MCP)](#-integração-via-model-context-protocol-mcp)
@@ -255,7 +255,7 @@ erDiagram
 
 ---
 
-## 🔍 Observabilidade Corporativa (Langfuse, MinIO S3 & MySQL 8.0)
+## 🔍 Observabilidade Corporativa (Langfuse, MinIO S3 & PostgreSQL 15)
 
 O Icepol integra uma pilha corporativa completa de observabilidade para auditoria regulatória, rastreabilidade de ponta a ponta e mitigação de alucinações em produção:
 
@@ -269,12 +269,12 @@ flowchart LR
     subgraph Observability["📊 Pilha de Observabilidade & Auditoria"]
         LF["⚡ Langfuse v2 (:3001)"]
         MinIO["🪣 MinIO S3 (:9000/:9001)"]
-        MySQL["🐬 MySQL 8.0 (:3306)"]
+        PostgreSQL["🐘 PostgreSQL 15 (:5432)"]
     end
 
     Agent -.->|"Traces & Spans"| LF
     Agent -.->|"Raw Payloads / Blobs"| MinIO
-    Agent -.->|"Métricas & Audit Logs"| MySQL
+    Agent -.->|"Métricas & Audit Logs"| PostgreSQL
 ```
 
 ---
@@ -294,7 +294,7 @@ flowchart TD
     N2 -.->|"Trace Span 1 (328ms)"| LangfuseSpan["⚡ Langfuse Tracing (:3001)"]
     N3 -.->|"Trace Span 2 (776ms)"| LangfuseSpan
     N5 -.->|"Trace Span 3 (180ms)"| LangfuseSpan
-    N6 -.->|"Trace Span 4 (108ms)"| MySQLAudit["🐬 MySQL 8 Audit Log (:3306)"]
+    N6 -.->|"Trace Span 4 (108ms)"| PostgresAudit["🐘 PostgreSQL 15 Audit Log (:5432)"]
 ```
 
 ---
@@ -314,7 +314,7 @@ gantt
     SPAN 1: semantic_ontology_parsing    :done, 30, 358
     SPAN 2: deepseek_r1_sql_synthesis    :crit, active, 358, 1134
     SPAN 3: duckdb_columnar_query        :done, 1134, 1314
-    SPAN 4: audit_minio_mysql_sink       :done, 1314, 1422
+    SPAN 4: audit_minio_postgres_sink    :done, 1314, 1422
 ```
 
 | Span de Execução | Componente | Latência | % do Total | Ação Realizada |
@@ -323,7 +323,7 @@ gantt
 | **`SPAN 1: semantic_ontology_parsing`** | `semantic/parser.py` | **328,0 ms** | 22.0% | Token match no dicionário ontológico YAML (`corporate_credit.yaml`) |
 | **`SPAN 2: deepseek_r1_sql_synthesis`** | DeepSeek-R1 (Ollama) | **776,0 ms** | 52.0% | Raciocínio CoT (`<think>`) e síntese da consulta SQL estrita |
 | **`SPAN 3: duckdb_columnar_query`** | `core/engine.py` | **180,0 ms** | 12.1% | Leitura vetorizada dos dados Parquet no DuckDB via S3 |
-| **`SPAN 4: audit_minio_mysql_sink`** | MinIO & MySQL 8.0 | **108,4 ms** | 7.3% | Gravação assíncrona do payload bruto no MinIO e métricas no MySQL |
+| **`SPAN 4: audit_minio_postgres_sink`** | MinIO & PostgreSQL 15 | **108,4 ms** | 7.3% | Gravação assíncrona do payload bruto no MinIO e métricas no PostgreSQL |
 
 ---
 
@@ -350,8 +350,8 @@ pie title Distribuição Percentual de Gastos de Tokens por Consulta (342 Tokens
    - P95 de latência de 1.88s (abaixo do SLA estabelecido de 2.5s) e zero falhas de conformidade.
 2. **MinIO S3 (`http://localhost:9001`)**:
    - Bucket dedicado `/data/langfuse` para retenção permanente e auditoria forense de prompts e payloads completos.
-3. **MySQL 8.0 (`localhost:3306`)**:
-   - Banco `icepol_metrics`, tabela `query_metrics`:
+3. **PostgreSQL 15 (`localhost:5432`)**:
+   - Banco `langfuse` (unificado), tabela `query_metrics`:
      - `session_id`, `model_name`, `prompt_text`, `sql_query`, `row_count`, `llm_latency_ms`, `duckdb_latency_ms`, `tokens_estimated`, `status`.
 4. **Painel Interativo no Cabeçalho do Chat**:
    - Botão **`Métricas & Traces`** no topo da UI com popover dinâmico exibindo status de saúde ao vivo e atalhos diretos para os consoles.
@@ -454,7 +454,7 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 - **Langfuse LLM Observability Dashboard:** [http://localhost:3001](http://localhost:3001)
 - **MinIO Console (Storage S3):** [http://localhost:9001](http://localhost:9001) (`admin` / `password123`)
 - **Apache Polaris Iceberg Catalog:** [http://localhost:8181](http://localhost:8181)
-- **MySQL 8.0 Metrics DB:** `localhost:3306` (database `icepol_metrics`, user `icepol_user` / `icepol_pass`)
+- **PostgreSQL 15 Metrics & Langfuse DB:** `localhost:5432` (database `langfuse`, user `postgres` / `password123`)
 - **Ollama Engine (Host):** [http://localhost:11434](http://localhost:11434) (Modelos: `deepseek-r1:1.5b`, `llama3.2:3b`, `qwen2.5:1.5b`)
 
 #### 🛑 Parar e Limpar Containers:

@@ -2,6 +2,14 @@
 
 Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 
+## [v1.3.0] - 2026-09-16
+### Otimizado
+- **Consolidação de Banco de Dados no PostgreSQL 15**:
+  - Eliminação do container redundante `mysql:8.0` (`mysql-db`), liberando mais de 500 MB de memória RAM no host.
+  - Migração da tabela `query_metrics` para o PostgreSQL 15 (`postgres-langfuse`) nativo, unificando a persistência de observabilidade e telemetria em um único SGBD.
+  - Driver Python atualizado para `psycopg2-binary>=2.9.9` com queries compatíveis e resilientes.
+  - Interface Web atualizada com telemetria `🐘 PostgreSQL 15 Audit` na porta `:5432`.
+
 ## [v1.2.0] - 2026-09-16
 ### Adicionado
 - **Observabilidade Completa & Tracing (Langfuse v2)**:
