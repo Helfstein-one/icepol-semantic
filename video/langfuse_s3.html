@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; }
+  body { background: #0b0f19; color: #f1f5f9; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; }
+  header { height: 64px; background: #111827; border-bottom: 1px solid #1f2937; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand svg { width: 30px; height: 30px; fill: #38bdf8; }
+  .brand h1 { font-size: 20px; font-weight: 700; color: #f8fafc; }
+  
+  .container { flex: 1; padding: 36px 48px; display: flex; flex-direction: column; align-items: center; }
+  .heading { text-align: center; margin-bottom: 36px; }
+  .heading h2 { font-size: 32px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; }
+  .heading p { font-size: 16px; color: #94a3b8; margin-top: 8px; }
+
+  .tree-canvas {
+    width: 100%; max-width: 1760px; height: 740px; background: #111827; border: 1px solid #1e293b;
+    border-radius: 20px; position: relative; display: flex; justify-content: space-between; align-items: center; padding: 40px 60px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+
+  .tree-col { display: flex; flex-direction: column; gap: 24px; justify-content: center; height: 100%; z-index: 2; width: 280px; }
+  .node-box {
+    background: #1e293b; border: 2px solid #334155; border-radius: 12px; padding: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3); position: relative;
+  }
+  .node-step { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #38bdf8; margin-bottom: 6px; }
+  .node-title { font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px; }
+  .node-desc { font-size: 12px; color: #94a3b8; line-height: 1.4; }
+  .node-tag { display: inline-block; margin-top: 10px; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+
+  .active-blue { border-color: #0284c7; background: #0c4a6e22; box-shadow: 0 0 20px rgba(2, 132, 199, 0.4); }
+  .active-purple { border-color: #8b5cf6; background: #4c1d9522; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+  .active-pink { border-color: #ec4899; background: #83184322; box-shadow: 0 0 20px rgba(236, 72, 153, 0.4); }
+  .active-emerald { border-color: #10b981; background: #064e3b22; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+  .active-amber { border-color: #f59e0b; background: #78350f22; box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+
+  .tag-b { background: #0369a1; color: #e0f2fe; }
+  .tag-p { background: #6d28d9; color: #ede9fe; }
+  .tag-pk { background: #be185d; color: #fce7f3; }
+  .tag-e { background: #047857; color: #d1fae5; }
+  .tag-a { background: #b45309; color: #fef3c7; }
+
+  .flow-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #38bdf8; font-size: 28px; font-weight: bold; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <h1>Langfuse Trace Tree: End-to-End Decision Graph (DAG)</h1>
+    </div>
+    <span style="color:#94a3b8; font-size:14px;">Inference Path: <b>User Query &rarr; DeepSeek-R1 &rarr; DuckDB &rarr; MinIO/MySQL</b></span>
+  </header>
+
+  <div class="container">
+    <div class="heading">
+      <h2>Autonomous Semantic Execution Pipeline</h2>
+      <p>Every query follows an audited directed acyclic graph (DAG) tracked with span-level telemetry in Langfuse.</p>
+    </div>
+
+    <div class="tree-canvas">
+      <div class="tree-col">
+        <div class="node-box active-blue">
+          <div class="node-step">1. Ingestion Node</div>
+          <div class="node-title">Natural Language Prompt</div>
+          <div class="node-desc">"Exposição total por setor e alavancagem por grupo econômico"</div>
+          <span class="node-tag tag-b">FastAPI Gateway</span>
+        </div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="tree-col">
+        <div class="node-box active-purple">
+          <div class="node-step">2. Semantic Layer</div>
+          <div class="node-title">Ontology & Schema Resolution</div>
+          <div class="node-desc">Maps natural terms to verified corporate credit dimensions (CNAE, Facilities, Debt).</div>
+          <span class="node-tag tag-p">Zero Hallucination</span>
+        </div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="tree-col">
+        <div class="node-box active-pink">
+          <div class="node-step">3. Reasoning Engine</div>
+          <div class="node-title">DeepSeek-R1 (1.5B)</div>
+          <div class="node-desc">Generates deterministic DuckDB SQL with validated Crow foot cardinality.</div>
+          <span class="node-tag tag-pk">Ollama Local GPU/CPU</span>
+        </div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="tree-col">
+        <div class="node-box active-emerald">
+          <div class="node-step">4. OLAP Execution</div>
+          <div class="node-title">DuckDB In-Memory</div>
+          <div class="node-desc">Scans Iceberg Parquet partitions via Apache Polaris catalog in 180ms.</div>
+          <span class="node-tag tag-e">Columnar Vectorized</span>
+        </div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="tree-col">
+        <div class="node-box active-amber">
+          <div class="node-step">5. Observability Sinks</div>
+          <div class="node-title">MinIO S3 & MySQL 8</div>
+          <div class="node-desc">Persists raw payload traces to MinIO and queries/latencies to MySQL audit table.</div>
+          <span class="node-tag tag-a">Audit & Compliance</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

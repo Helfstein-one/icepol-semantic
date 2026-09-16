@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Icepol - Diagrama Visual Mermaid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.8/dist/mermaid.min.js"></script>
+</head>
+<body class="bg-[#0e1117] text-slate-100 font-sans min-h-screen p-8 antialiased flex flex-col justify-center items-center">
+    <div class="w-full max-w-5xl bg-[#090d16] border border-slate-700/80 rounded-3xl p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 text-xs font-mono">
+            <span class="flex items-center gap-2 text-sky-400 font-bold text-sm">
+                <span>📐</span> Diagrama Visual Mermaid — Modelo Relacional Canônico
+            </span>
+            <span class="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
+                ✓ 7 Entidades Conectadas (Crow's Foot)
+            </span>
+        </div>
+
+        <div class="mermaid flex justify-center py-2">
+erDiagram
+    counterparts ||--o{ facilities : "possui"
+    facilities ||--o{ collaterals : "garantido_por"
+    counterparts ||--o{ proposals : "solicita"
+    counterparts ||--o{ financial_statements : "declara"
+    counterparts ||--o{ credit_limits : "possui"
+    facilities ||--o{ covenants : "sujeito_a"
+
+    counterparts {
+        string counterpart_id PK
+        string nm_counterpart
+        string nm_economic_group
+        string ds_cnae_sector
+        string cd_rating_agency
+    }
+    facilities {
+        string facility_id PK
+        string counterpart_id FK
+        string tp_operation
+        string st_operation
+        float limit_amount
+    }
+    collaterals {
+        string collateral_id PK
+        string facility_id FK
+        string tp_collateral
+        string st_collateral
+    }
+    proposals {
+        string proposal_id PK
+        string counterpart_id FK
+        string st_decision
+        string nm_committee
+    }
+    financial_statements {
+        string statement_id PK
+        string counterpart_id FK
+        string nr_fiscal_year
+        string st_audited
+    }
+    credit_limits {
+        string limit_id PK
+        string counterpart_id FK
+        string tp_limit
+        string st_limit
+    }
+    covenants {
+        string covenant_id PK
+        string facility_id FK
+        string tp_covenant
+        string st_compliance
+    }
+        </div>
+    </div>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                darkMode: true,
+                background: '#090d16',
+                primaryColor: '#1e293b',
+                primaryTextColor: '#f8fafc',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#38bdf8',
+                secondaryColor: '#0f172a',
+                tertiaryColor: '#1e1b4b'
+            }
+        });
+    </script>
+</body>
+</html>
