@@ -371,14 +371,18 @@ O projeto conta com vídeos demonstrativos e **gravação real da tela** (*scree
   - **Bateria Eletrônica LinnDrum**: Bumbo rápido four-on-the-floor, caixa com estalo gated, chimbais rápidos em semicolcheias e open hi-hats nos contratempos.
 * **Duração**: **60 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
 
-### 2. 🎹 🌟 Opção Hipnótica Synth-Pop: 'Sweet Dreams' (Eurythmics)
-* **Arquivo de Vídeo**: [`video/icepol_user_journey_sweet_dreams.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_sweet_dreams.mp4)
-* **Trilha Sonora Original**: [`video/soundtrack_sweet_dreams_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_sweet_dreams_60s.wav) — Composição synthpop analógica em **125 BPM** (Dó menor / C minor), inspirada no clássico atemporal do Eurythmics (Annie Lennox & Dave Stewart, 1983):
-  - **Arpejo Hipnótico de Sintetizador Analógico**: O lendário riff de sequenciador de 2 compassos no Roland SH-101 (`Cm` &rarr; `Ab` &rarr; `G`) com saturação quente de fita e pulso ressonante.
-  - **Bateria Industrial Gated**: Bumbo encorpado em 44Hz, caixa com estalo gated anos 80 e pratos metálicos em semicolcheias.
-  - **Camadas de Cordas Analógicas Solina**: Sustentação harmônica envolvente em Dó menor.
-  - **Linha Vocal Sintetizada**: A melodia inconfundível de *"Sweet dreams are made of this / Who am I to disagree..."* com stabs de metais no bridge.
+### 2. 🤖 🌟 Opção French House / Nu-Disco: 'Around the World / Harder Better Faster' (Daft Punk)
+* **Arquivo de Vídeo**: [`video/icepol_user_journey_daft_punk.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_daft_punk.mp4)
+* **Trilha Sonora Original**: [`video/soundtrack_daft_punk_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_daft_punk_60s.wav) — Composição French House refinada em **123 BPM** (Mi menor / E minor), inspirada no estilo icônico do Daft Punk (*Discovery* & *Homework*):
+  - **Bassline Funk Slap (Estilo Chic / Bernard Edwards)**: Linha de baixo dançante e groovada com modulação de envelope filter e sidechain característico.
+  - **Bateria Roland TR-909 Pumping**: Bumbo four-on-the-floor pulsante, palmas analógicas estéreo nos tempos 2 e 4, e chimbais abertos nos contratempos sincopados.
+  - **Guitarras e Clavinet Disco Funk**: Stabs de guitarra e clavinet com phaser marcando o contratempo.
+  - **Vocoder Robótico**: O lendário hook de voz sintética combinando *"Around the world, around the world"* com *"Work it, make it, do it, makes us / Harder, better, faster, stronger"*.
 * **Duração**: **60 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
+
+### 3. 🎹 Opção Hipnótica Synth-Pop: 'Sweet Dreams' (Eurythmics)
+* **Arquivo de Vídeo**: [`video/icepol_user_journey_sweet_dreams.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_sweet_dreams.mp4)
+* **Trilha Sonora Original**: [`video/soundtrack_sweet_dreams_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_sweet_dreams_60s.wav) (60s, 125 BPM em Dó menor, arpejo Roland SH-101 e cordas Solina).
 
 ### 📋 Roteiro da Gravação da Tela (Passo a Passo da Jornada):
 1. **Navegação Real no Repositório GitHub** (0s - 13s): Acesso à página oficial `Helfstein-one/icepol-semantic`, clique no botão `<> Code` exibindo o popover de clone HTTPS, clique no botão de cópia e rolagem suave por todo o README inspecionando o diagrama arquitetural e o isolamento de tabelas físicas.

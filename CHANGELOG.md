@@ -20,7 +20,10 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
   - **Waterfall de Spans (Gráfico Gantt)**: Decomposição temporal precisa da latência total (1.492ms) evidenciando spans de ciclo de vida e tempo de resposta de cada serviço.
   - **Gráfico de Distribuição de Tokens (Pie Chart)**: Mapeamento da eficiência de 342 tokens (63.7% contexto ontológico, 21.0% raciocínio CoT e 15.3% síntese SQL ANSI).
 - **Produção de Vídeos Demonstrativos em Full HD 1080p e Novas Trilhas Sonoras**:
-  - `video/icepol_user_journey_sweet_dreams.mp4` (60s): **Gravação Real da Tela com Trilha Estilo 'Sweet Dreams' (Eurythmics)** — 125 BPM em Dó menor (Cm), reproduzindo fielmente o arpejo analógico hipnótico no Roland SH-101, bateria industrial com gated snare, pads de cordas Solina e melodia vocal de Annie Lennox.
+  - `video/icepol_user_journey_daft_punk.mp4` (60s): **Gravação Real da Tela com Trilha Estilo 'Around the World / Harder Better Faster' (Daft Punk)** — 123 BPM em Mi menor (Em), reproduzindo a estética French House com baixo funk slap (Chic style), batida 909 com open hi-hats sincopados nos contratempos, stabs de guitarra disco funk com phaser e vocoder robótico.
+  - `video/soundtrack_daft_punk_60s.wav`: Trilha sonora sintetizada de 60 segundos com arranjo paramétrico em áudio PCM 44.1kHz.
+  - `video/synth_daft_punk.py`: Script gerador paramétrico em áudio WAV estéreo.
+  - `video/icepol_user_journey_sweet_dreams.mp4` (60s): **Gravação Real da Tela com Trilha Estilo 'Sweet Dreams' (Eurythmics)** — 125 BPM em Dó menor (Cm), com arpejo analógico no Roland SH-101 e bateria industrial.
   - `video/soundtrack_sweet_dreams_60s.wav`: Trilha sonora sintetizada de 60 segundos com arranjo paramétrico em áudio PCM 44.1kHz.
   - `video/synth_sweet_dreams.py`: Script gerador paramétrico em áudio WAV estéreo.
   - `video/icepol_user_journey.mp4` (60s): **Gravação Real da Tela (Screen Recording) com Trilha Estilo 'Take On Me' (A-ha)** — 168 BPM em Si menor (Bm), gravado em tempo real com automação de cursor do mouse, efeito visual ripple de cliques, scroll fluido pelo GitHub oficial, digitação humana no terminal e no chat da camada semântica e inspeção do Langfuse.
