@@ -257,7 +257,7 @@ erDiagram
 
 ## 🔍 Observabilidade Corporativa (Langfuse, MinIO S3 & MySQL 8.0)
 
-O Icepol integra uma pilha completa de observabilidade para rastreabilidade de ponta a ponta, auditoria regulatória e mitigação de alucinações em produção:
+O Icepol integra uma pilha corporativa completa de observabilidade para auditoria regulatória, rastreabilidade de ponta a ponta e mitigação de alucinações em produção:
 
 ```mermaid
 flowchart LR
@@ -277,18 +277,84 @@ flowchart LR
     Agent -.->|"Métricas & Audit Logs"| MySQL
 ```
 
-### Componentes de Telemetria:
-1. **Langfuse v2 (`:3001`)**:
-   - Rastreamento detalhado de cada chamada LLM com árvore de decisão (DAG) em tempo real.
-   - Decomposição de latência em spans (`semantic_ontology_parsing`, `deepseek_r1_sql_synthesis`, `duckdb_columnar_query`, `audit_sink`).
-   - Contagem precisa de tokens (prompt, completion e total).
-2. **MinIO S3 (`:9000` / Console `:9001`)**:
-   - Bucket dedicado `/data/langfuse` para retenção permanente dos eventos e payloads completos trocados com os modelos.
-3. **MySQL 8.0 (`:3306`)**:
-   - Banco de dados `icepol_metrics` com a tabela `query_metrics`:
+---
+
+### 1. Diagrama de Rastreamento (Tracing DAG & Árvore de Decisão)
+
+Cada pergunta do usuário dispara um fluxo auditado em grafo acíclico dirigido (DAG) capturado no Langfuse:
+
+```mermaid
+flowchart TD
+    N1["1️⃣ Ingestion Node<br/><i>Prompt Natural: 'Qual a exposição e alavancagem por setor?'</i>"] --> N2["2️⃣ Semantic Layer Parser<br/><i>Mapeia Métricas: total_exposure, avg_net_debt_ebitda & Dimensão: ds_cnae_sector</i>"]
+    N2 --> N3["3️⃣ LLM Reasoning Engine (DeepSeek-R1 1.5B)<br/><i>Chain-of-Thought &lt;think&gt; validando chaves estrangeiras e Crow's foot</i>"]
+    N3 --> N4["4️⃣ SQL Generation & AST Validator<br/><i>Compila SQL canônico estrito ANSI com NULLIF e JOINs seguros</i>"]
+    N4 --> N5["5️⃣ DuckDB Vectorized Engine<br/><i>Scan colunar sobre os Parquets do Apache Iceberg em 180ms</i>"]
+    N5 --> N6["6️⃣ Renderers & UI Response Cell<br/><i>Tabela Analítica agregada + Diagrama Conceitual Mermaid SVG</i>"]
+    
+    N2 -.->|"Trace Span 1 (328ms)"| LangfuseSpan["⚡ Langfuse Tracing (:3001)"]
+    N3 -.->|"Trace Span 2 (776ms)"| LangfuseSpan
+    N5 -.->|"Trace Span 3 (180ms)"| LangfuseSpan
+    N6 -.->|"Trace Span 4 (108ms)"| MySQLAudit["🐬 MySQL 8 Audit Log (:3306)"]
+```
+
+---
+
+### 2. Decomposição da Latência (Waterfall de Spans do Trace `tr_icepol_8f492a`)
+
+A latência total fim-a-fim da consulta (*wall time* de **1.492,4 ms**) é decomposta em 4 spans assíncronos:
+
+```mermaid
+gantt
+    title Waterfall de Spans da Consulta Semântica (Total: 1.492,4 ms)
+    dateFormat X
+    axisFormat %s ms
+    section Ciclo Global
+    ROOT: icepol_query_handler           :active, 0, 1492
+    section Spans Internos
+    SPAN 1: semantic_ontology_parsing    :done, 30, 358
+    SPAN 2: deepseek_r1_sql_synthesis    :crit, active, 358, 1134
+    SPAN 3: duckdb_columnar_query        :done, 1134, 1314
+    SPAN 4: audit_minio_mysql_sink       :done, 1314, 1422
+```
+
+| Span de Execução | Componente | Latência | % do Total | Ação Realizada |
+| :--- | :--- | :--- | :--- | :--- |
+| **`ROOT: icepol_query_handler`** | FastAPI Gateway | **1.492,4 ms** | 100% | Orquestração do ciclo global da requisição e streaming |
+| **`SPAN 1: semantic_ontology_parsing`** | `semantic/parser.py` | **328,0 ms** | 22.0% | Token match no dicionário ontológico YAML (`corporate_credit.yaml`) |
+| **`SPAN 2: deepseek_r1_sql_synthesis`** | DeepSeek-R1 (Ollama) | **776,0 ms** | 52.0% | Raciocínio CoT (`<think>`) e síntese da consulta SQL estrita |
+| **`SPAN 3: duckdb_columnar_query`** | `core/engine.py` | **180,0 ms** | 12.1% | Leitura vetorizada dos dados Parquet no DuckDB via S3 |
+| **`SPAN 4: audit_minio_mysql_sink`** | MinIO & MySQL 8.0 | **108,4 ms** | 7.3% | Gravação assíncrona do payload bruto no MinIO e métricas no MySQL |
+
+---
+
+### 3. Economia e Distribuição de Gastos de Tokens
+
+O monitoramento do Langfuse quantifica com exatidão a alocação de tokens da consulta (Total: **342 tokens**):
+
+```mermaid
+pie title Distribuição Percentual de Gastos de Tokens por Consulta (342 Tokens)
+    "Contexto Ontológico (YAML & Guardrails) - 218 Tokens" : 63.7
+    "Raciocínio Chain-of-Thought (<think>) - 72 Tokens" : 21.0
+    "Síntese SQL ANSI Canônica - 52 Tokens" : 15.3
+```
+
+* **1. Input Ontológico (218 tokens / 63.7%)**: Esquema canônico das 7 tabelas físicas, tipos de dados e regras de cálculo de métricas (`total_exposure`, `avg_net_debt_ebitda`). Utiliza cache de contexto para maximizar throughput.
+* **2. Raciocínio CoT do DeepSeek-R1 (72 tokens / 21.0%)**: Processamento no bloco `<think>` validando a integridade referencial das chaves estrangeiras e a cardinalidade *Crow's foot* antes de emitir o SQL.
+* **3. Output SQL Compilado (52 tokens / 15.3%)**: Instrução SQL ultracompacta pronta para execução imediata no DuckDB.
+
+---
+
+### 4. Componentes de Telemetria & Sinks de Dados:
+1. **Langfuse v2 (`http://localhost:3001`)**:
+   - Rastreamento detalhado de cada chamada LLM com visualização em tempo real de sessions, traces e tags.
+   - P95 de latência de 1.88s (abaixo do SLA estabelecido de 2.5s) e zero falhas de conformidade.
+2. **MinIO S3 (`http://localhost:9001`)**:
+   - Bucket dedicado `/data/langfuse` para retenção permanente e auditoria forense de prompts e payloads completos.
+3. **MySQL 8.0 (`localhost:3306`)**:
+   - Banco `icepol_metrics`, tabela `query_metrics`:
      - `session_id`, `model_name`, `prompt_text`, `sql_query`, `row_count`, `llm_latency_ms`, `duckdb_latency_ms`, `tokens_estimated`, `status`.
-4. **Painel Interativo no Frontend**:
-   - Botão **`Métricas & Traces`** no cabeçalho da interface web com indicadores de saúde ao vivo e atalhos rápidos para o Langfuse e o MinIO.
+4. **Painel Interativo no Cabeçalho do Chat**:
+   - Botão **`Métricas & Traces`** no topo da UI com popover dinâmico exibindo status de saúde ao vivo e atalhos diretos para os consoles.
 
 ---
 

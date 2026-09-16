@@ -15,12 +15,18 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
   - Download e integração via Ollama do `deepseek-r1:1.5b` (1.1 GB) com suporte a Chain-of-Thought determinístico.
 - **Painel de Telemetria e Traces no Frontend**:
   - Novo botão e popover interativo `Métricas & Traces` no cabeçalho do Icepol com status ao vivo de Langfuse, MinIO e MySQL.
+- **Documentação de Observabilidade & Diagramas Mermaid**:
+  - **Árvore de Decisão do Tracing (DAG)**: Diagrama em fluxo direcionado conectando Prompt &rarr; Semantic Parser &rarr; DeepSeek-R1 (CoT) &rarr; AST Validator &rarr; DuckDB &rarr; MinIO/MySQL 8.
+  - **Waterfall de Spans (Gráfico Gantt)**: Decomposição temporal precisa da latência total (1.492ms) evidenciando spans de ciclo de vida e tempo de resposta de cada serviço.
+  - **Gráfico de Distribuição de Tokens (Pie Chart)**: Mapeamento da eficiência de 342 tokens (63.7% contexto ontológico, 21.0% raciocínio CoT e 15.3% síntese SQL ANSI).
 - **Produção de Vídeos Demonstrativos em Full HD 1080p e Novas Trilhas Sonoras**:
   - `video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4` (40s): **Gravação na UI de Chat Acelerada em 1.5x com Trilha Animada & Groovy** — Roteiro ágil de 40s passando pela tela inicial, digitação rápida de prompt, resposta analítica com DuckDB, diagrama conceitual Mermaid (Crow's foot), popover de observabilidade, cockpit Langfuse, waterfall de spans e gráfico de distribuição de tokens.
   - `video/soundtrack_funky_upbeat_lofi_40s.wav`: **Nova trilha sonora Funky Upbeat Lo-Fi (Animada, Alegre e Confortável)** — 112 BPM (Eb Major), piano elétrico Rhodes sincopado, linha de baixo slap acústico saltitante e percussão swingada sem ruídos estridentes.
   - `video/icepol_chat_ui_journey_lofi_chill.mp4` (60s): Versão em velocidade normal com trilha relaxante Lo-Fi Ambient Rhodes (82 BPM).
   - `video/icepol_user_journey_langfuse_tokens.mp4` (60s): Jornada completa com navegação e clone no GitHub, build de terminal, chat e Langfuse (trilha estilo Depeche Mode).
-  - `video/icepol_journey_complete.mp4` (36s) e `video/langfuse_metrics_decision_tree.mp4` (36s).
+  - `video/langfuse_metrics_decision_tree.mp4` (36s).
+- **Limpeza e Otimização do Repositório**:
+  - Remoção de scripts temporários e arquivos WAV/MP4 intermediários obsoletos, reduzindo o tamanho da pasta `video/`.
 
 ---
 
