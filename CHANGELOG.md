@@ -15,10 +15,11 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
   - Download e integração via Ollama do `deepseek-r1:1.5b` (1.1 GB) com suporte a Chain-of-Thought determinístico.
 - **Painel de Telemetria e Traces no Frontend**:
   - Novo botão e popover interativo `Métricas & Traces` no cabeçalho do Icepol com status ao vivo de Langfuse, MinIO e MySQL.
-- **Produção de 2 Vídeos Demonstrativos em Full HD 1080p (36s)**:
-  - `video/icepol_journey_complete.mp4`: Jornada completa do usuário (build de terminal, novo seletor de modelos, popover de observabilidade, query DuckDB e diagrama conceitual Mermaid com Crow's foot).
-  - `video/langfuse_metrics_decision_tree.mp4`: Dashboard de telemetria do Langfuse, decomposição de waterfall de spans e visualização interativa do grafo da árvore de decisão (DAG).
-  - Trilha sonora original sintetizada estilo eletrônica synthwave anos 80 (Depeche Mode).
+- **Produção de Vídeos Demonstrativos em Full HD 1080p com Trilha Sonora Synthwave 80s**:
+  - `video/icepol_user_journey_langfuse_tokens.mp4` (60s): **Vídeo Master de Jornada do Usuário** — Acessando repositório no GitHub, clonando via terminal, executando `make seed` e `podman compose up -d`, interagindo com o chat Icepol, compilando SQL e visualizando o diagrama relacional Mermaid com cardinalidade Crow's foot, navegando para o Langfuse (`:3001`), detalhando a árvore de decisão, waterfall de spans e análise detalhada de onde o modelo gasta tokens (input context vs reasoning CoT vs SQL output).
+  - `video/icepol_journey_complete.mp4` (36s): Jornada do usuário com build de terminal, troca de modelos, busca semântica e ERD Mermaid.
+  - `video/langfuse_metrics_decision_tree.mp4` (36s): Dashboard de telemetria do Langfuse, decomposição de waterfall de spans e visualização da árvore de decisão (DAG).
+  - Trilha sonora original sintetizada estilo eletrônica anos 80 Depeche Mode.
 
 ---
 

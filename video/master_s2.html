@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Fira Code', 'Menlo', 'Monaco', monospace; }
+  body { background: #080c14; color: #38bdf8; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; padding: 36px 48px; }
+  
+  .terminal-window {
+    flex: 1; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.8); display: flex; flex-direction: column; overflow: hidden;
+  }
+  .title-bar {
+    height: 48px; background: #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+    border-bottom: 1px solid #334155;
+  }
+  .traffic-lights { display: flex; gap: 8px; }
+  .circle { width: 12px; height: 12px; border-radius: 50%; }
+  .red { background: #ef4444; } .yellow { background: #f59e0b; } .green { background: #10b981; }
+  .term-title { font-size: 13px; color: #94a3b8; font-weight: 600; }
+
+  .term-body { flex: 1; padding: 28px 36px; font-size: 15px; line-height: 1.6; color: #e2e8f0; overflow: hidden; }
+  .prompt { color: #10b981; font-weight: bold; }
+  .cmd { color: #f8fafc; font-weight: 600; }
+  .success { color: #34d399; }
+  .info { color: #60a5fa; }
+  .highlight { color: #fbbf24; }
+  .dim { color: #64748b; }
+</style>
+</head>
+<body>
+  <div class="terminal-window">
+    <div class="title-bar">
+      <div class="traffic-lights">
+        <div class="circle red"></div>
+        <div class="circle yellow"></div>
+        <div class="circle green"></div>
+      </div>
+      <div class="term-title">mauriciohelfstein@macbook-air: ~/dev/icepol-semantic (zsh)</div>
+      <div style="font-size: 12px; color: #64748b;">1920x1080 Session</div>
+    </div>
+
+    <div class="term-body">
+      <p><span class="prompt">➜  dev</span> <span class="cmd">git clone https://github.com/Helfstein-one/icepol-semantic.git</span></p>
+      <p class="dim">Cloning into 'icepol-semantic'...</p>
+      <p class="dim">remote: Enumerating objects: 382, done.</p>
+      <p class="dim">remote: Total 382 (delta 214), reused 364 (delta 198), pack-reused 0</p>
+      <p class="success">Receiving objects: 100% (382/382), 14.82 MiB | 22.40 MiB/s, done.</p>
+      <br>
+      <p><span class="prompt">➜  dev</span> <span class="cmd">cd icepol-semantic && make seed</span></p>
+      <p class="info">🌱 [SEED] Gerando 7 tabelas físicas sintéticas de Crédito Corporativo em Parquet...</p>
+      <p class="dim">  ✔ counterparts.parquet (1,000 registros, CNAE, Ratings, Grupos Econômicos)</p>
+      <p class="dim">  ✔ facilities.parquet (3,500 operações de crédito, rotativo, capital de giro)</p>
+      <p class="dim">  ✔ collaterals.parquet (4,200 garantias reais, hipotecas, recebíveis)</p>
+      <p class="dim">  ✔ proposals.parquet (2,800 comitês de risco e aprovações)</p>
+      <p class="dim">  ✔ financial_statements.parquet (Dívida Líquida, EBITDA, Balanços auditados)</p>
+      <p class="dim">  ✔ credit_limits.parquet (Limites globais aprovados e tomados)</p>
+      <p class="dim">  ✔ covenants.parquet (Cláusulas de desenquadramento e indicadores)</p>
+      <p class="success">✨ 7 Tabelas registradas no Apache Polaris REST Catalog e MinIO S3!</p>
+      <br>
+      <p><span class="prompt">➜  icepol-semantic</span> <span class="cmd">podman compose up -d</span></p>
+      <p class="dim">Starting containers in background...</p>
+      <p><span class="success">✔ Container minio-storage</span>    <span class="highlight">Running</span> (S3 API :9000, Console :9001)</p>
+      <p><span class="success">✔ Container polaris-catalog</span>  <span class="highlight">Running</span> (Apache Iceberg REST :8181)</p>
+      <p><span class="success">✔ Container mysql-db</span>         <span class="highlight">Running</span> (Metrics & Audit Database :3306)</p>
+      <p><span class="success">✔ Container postgres-langfuse</span><span class="highlight">Running</span> (Metadata Storage :5432)</p>
+      <p><span class="success">✔ Container langfuse-server</span>  <span class="highlight">Running</span> (LLM Observability Dashboard :3001)</p>
+      <p><span class="success">✔ Container semantic-agent</span>   <span class="highlight">Running</span> (FastAPI + DuckDB Engine :8000)</p>
+      <br>
+      <p><span class="prompt">➜  icepol-semantic</span> <span class="cmd">open http://localhost:8000</span></p>
+      <p class="info">🚀 Abrindo o Icepol Semantic Layer no navegador padrão...</p>
+    </div>
+  </div>
+</body>
+</html>
