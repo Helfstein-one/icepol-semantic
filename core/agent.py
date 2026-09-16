@@ -1006,7 +1006,8 @@ async def chat_completions(req: ChatCompletionRequest):
         "2. Sempre use as tabelas qualificadas com o schema (ex: `corporate_credit.facilities`, `corporate_credit.counterparts`).\n"
         "3. Ao combinar métricas de uma entidade com dimensões de outra, utilize JOIN explícito usando as relações indicadas em 'Joins' (ex: `JOIN corporate_credit.counterparts c ON f.counterpart_id = c.counterpart_id`).\n"
         "4. Se o usuário anexou arquivos (como CSVs ou relatórios), correlacione os dados fornecidos com o modelo analítico.\n"
-        "5. Se for apenas conversa genérica, pesquisa conceitual ou saudação, responda normalmente em português.\n"
+        "5. Para listar tabelas ou consultar metadados no DuckDB, utilize `SHOW TABLES IN corporate_credit;` ou `SELECT table_name, table_schema FROM information_schema.tables WHERE table_schema = 'corporate_credit';` (a coluna padrão SQL de schema é `table_schema`, não `schema_name`).\n"
+        "6. Se for apenas conversa genérica, pesquisa conceitual ou saudação, responda normalmente em português.\n"
     )
 
     llm_messages = [{"role": "system", "content": system_prompt}]

@@ -1,4 +1,5 @@
 import os
+import re
 import duckdb
 from typing import Optional, Any, Dict, List
 
@@ -101,7 +102,32 @@ class DuckDBIcebergEngine:
         """Executa uma query no DuckDB e retorna resultados como lista de dicionários."""
         if not self.con:
             self.connect()
-        rel = self.con.sql(sql_query)
+
+        try:
+            rel = self.con.sql(sql_query)
+        except Exception as err:
+            err_str = str(err)
+            # Auto-healing para erros comuns de metadados onde LLMs usam schema_name em vez de table_schema
+            if "schema_name" in err_str or ("schema_name" in sql_query and "information_schema" in sql_query.lower()):
+                fixed_query = re.sub(
+                    r'\binformation_schema\.tables\b',
+                    '(SELECT *, table_schema AS schema_name FROM information_schema.tables)',
+                    sql_query,
+                    flags=re.IGNORECASE
+                )
+                fixed_query = re.sub(
+                    r'\binformation_schema\.columns\b',
+                    '(SELECT *, table_schema AS schema_name FROM information_schema.columns)',
+                    fixed_query,
+                    flags=re.IGNORECASE
+                )
+                try:
+                    rel = self.con.sql(fixed_query)
+                except Exception:
+                    raise err
+            else:
+                raise err
+
         if rel is None:
             return []
         df = rel.df()
