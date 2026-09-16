@@ -362,9 +362,13 @@ pie title Distribuição Percentual de Gastos de Tokens por Consulta (342 Tokens
 
 O projeto conta com vídeos demonstrativos de alta definição gravados com trilha sonora original estilo **synthwave anos 80 (Depeche Mode style)**:
 
-### 1. 🚀 🌟 Vídeo da Jornada na UI de Chat (Velocidade 1.5x & Funky Upbeat Lo-Fi)
-* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4)
-* **Trilha Sonora Animada & Confortável**: [`video/soundtrack_funky_upbeat_lofi_40s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_funky_upbeat_lofi_40s.wav) — Composição animada, dançante e alegre em **112 BPM** (Eb Major), com piano Rhodes sincopado (acordes nona/décima terceira), baixo slap acústico saltitante e bateria swing groovy (sem ruídos estridentes).
+### 1. 🎹 🌟 Vídeo da Jornada na UI de Chat (1.5x Speed & Estilo 'Policy of Truth' Depeche Mode)
+* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_1.5x_policy_of_truth.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_1.5x_policy_of_truth.mp4)
+* **Trilha Sonora Original**: [`video/soundtrack_policy_of_truth_dm_40s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_policy_of_truth_dm_40s.wav) — Composição animada em **114 BPM** (D minor) fielmente inspirada na lendária *Policy of Truth* do Depeche Mode (*Violator*, 1990):
+  - **Bassline Sincopada de 16 notas**: Linha analógica pulsante com saltos de oitava e modulação de filtro ressonante (Alan Wilder / Minimoog).
+  - **Bateria Eletrônica Industrial**: Batida 4-on-the-floor enérgica, caixa com efeito *gated reverb* e chimbais mecânicos dançantes.
+  - **Riff de Guitarra / Lead Sintetizado com Slide**: O clássico hook melódico com chorus analógico e delay ping-pong estéreo.
+  - **Pads de Cordas Analógicas**: Atmosfera escura e envolvente em Ré menor (`Dm` &rarr; `Bb` &rarr; `C` &rarr; `Dm`).
 * **Duração Otimizada (1.5x)**: **40 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
 * **Roteiro Ágil e Dinâmico**:
   1. **UI Inicial do Chat** (4.6s): Apresentação da tela inicial com o urso polar, saudação, chips de atalhos e microfone.
@@ -376,16 +380,16 @@ O projeto conta com vídeos demonstrativos de alta definição gravados com tril
   7. **Waterfall de Spans** (5.3s): Cascata de latências do ciclo de vida da consulta.
   8. **Distribuição de Gastos de Tokens** (5.3s): Análise de consumo (contexto ontológico, CoT e SQL).
 
-### 2. ☕ Vídeo da Jornada em Velocidade Normal (Lo-Fi Chill & Ambient Rhodes)
-* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_lofi_chill.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_lofi_chill.mp4)
-* **Trilha Sonora Calmante**: [`video/soundtrack_lofi_chill_ambient_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_lofi_chill_ambient_60s.wav) (82 BPM, 60s, clima relaxante).
+### 2. 🎷 Opção Funky Upbeat Lo-Fi (112 BPM)
+* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4)
+* **Trilha Sonora**: [`video/soundtrack_funky_upbeat_lofi_40s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_funky_upbeat_lofi_40s.wav) (40s, 112 BPM, alegre e sincopada).
 
-### 3. 🌟 Vídeo Master: Jornada Completa (GitHub, Clone, Chat & Langfuse)
+### 3. ☕ Opção Relaxante Lo-Fi Chill Ambient (82 BPM)
+* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_lofi_chill.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_lofi_chill.mp4) (60s, piano Rhodes aveludado).
+
+### 4. 🌟 Vídeo Master: Jornada Completa do Usuário (GitHub &rarr; Terminal &rarr; Chat &rarr; Langfuse)
 * **Arquivo**: [`video/icepol_user_journey_langfuse_tokens.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_langfuse_tokens.mp4) (60s)
-
-### 3. Vídeos Curtos de Demonstração Rápida
-* **Jornada Rápida**: [`video/icepol_journey_complete.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_journey_complete.mp4) (36s)
-* **Árvore de Decisão no Langfuse**: [`video/langfuse_metrics_decision_tree.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/langfuse_metrics_decision_tree.mp4) (36s)
+* **Cockpit Langfuse**: [`video/langfuse_metrics_decision_tree.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/langfuse_metrics_decision_tree.mp4) (36s)
 
 ---
 

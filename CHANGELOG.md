@@ -20,10 +20,11 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
   - **Waterfall de Spans (Gráfico Gantt)**: Decomposição temporal precisa da latência total (1.492ms) evidenciando spans de ciclo de vida e tempo de resposta de cada serviço.
   - **Gráfico de Distribuição de Tokens (Pie Chart)**: Mapeamento da eficiência de 342 tokens (63.7% contexto ontológico, 21.0% raciocínio CoT e 15.3% síntese SQL ANSI).
 - **Produção de Vídeos Demonstrativos em Full HD 1080p e Novas Trilhas Sonoras**:
-  - `video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4` (40s): **Gravação na UI de Chat Acelerada em 1.5x com Trilha Animada & Groovy** — Roteiro ágil de 40s passando pela tela inicial, digitação rápida de prompt, resposta analítica com DuckDB, diagrama conceitual Mermaid (Crow's foot), popover de observabilidade, cockpit Langfuse, waterfall de spans e gráfico de distribuição de tokens.
-  - `video/soundtrack_funky_upbeat_lofi_40s.wav`: **Nova trilha sonora Funky Upbeat Lo-Fi (Animada, Alegre e Confortável)** — 112 BPM (Eb Major), piano elétrico Rhodes sincopado, linha de baixo slap acústico saltitante e percussão swingada sem ruídos estridentes.
+  - `video/icepol_chat_ui_journey_1.5x_policy_of_truth.mp4` (40s): **Gravação Acelerada 1.5x com Trilha Estilo 'Policy of Truth' (Depeche Mode)** — 114 BPM em Ré menor (Dm), reproduzindo a clássica bassline analógica pulsante, bateria eletrônica industrial com gated snare, slide riff de guitarra com chorus e pads envolventes do álbum *Violator*.
+  - `video/soundtrack_policy_of_truth_dm_40s.wav`: Trilha sonora sintetizada de 40 segundos inspirada na estética sonora de Alan Wilder e Martin Gore.
+  - `video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4` (40s): Versão acelerada com trilha animada Funky Upbeat Lo-Fi (112 BPM).
   - `video/icepol_chat_ui_journey_lofi_chill.mp4` (60s): Versão em velocidade normal com trilha relaxante Lo-Fi Ambient Rhodes (82 BPM).
-  - `video/icepol_user_journey_langfuse_tokens.mp4` (60s): Jornada completa com navegação e clone no GitHub, build de terminal, chat e Langfuse (trilha estilo Depeche Mode).
+  - `video/icepol_user_journey_langfuse_tokens.mp4` (60s): Jornada completa com navegação e clone no GitHub, build de terminal, chat e Langfuse.
   - `video/langfuse_metrics_decision_tree.mp4` (36s).
 - **Limpeza e Otimização do Repositório**:
   - Remoção de scripts temporários e arquivos WAV/MP4 intermediários obsoletos, reduzindo o tamanho da pasta `video/`.
