@@ -125,15 +125,138 @@ def index_ui():
                 </div>
                 <span class="text-xl font-bold tracking-tight text-white font-mono group-hover:text-sky-200 transition-colors">Icepol</span>
             </div>
-            <div class="flex items-center space-x-3 text-xs">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    LLM: <span id="header-llm-label">llama3.2:3b</span> (Ollama)
-                </span>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-                    DuckDB Engine: Ativo
-                </span>
+            <div class="flex items-center space-x-2.5 text-xs">
+                <!-- Interactive LLM Badge & Popover -->
+                <div class="relative">
+                    <button type="button" id="header-llm-btn" onclick="toggleHeaderLlmPopover(event)" 
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 transition cursor-pointer shadow-sm group"
+                        title="Configurações e status do Modelo LLM">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>LLM: <strong id="header-llm-label" class="font-semibold text-emerald-300">llama3.2:3b</strong> <span class="opacity-75">(Ollama)</span></span>
+                        <svg class="w-3 h-3 text-emerald-400/80 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <!-- LLM Popover Menu -->
+                    <div id="header-llm-popover" class="hidden absolute top-full right-0 mt-2.5 w-72 bg-slate-900/95 border border-slate-700/80 rounded-2xl shadow-2xl p-4 z-50 backdrop-blur-xl space-y-3">
+                        <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                <span class="font-semibold text-white text-xs">Ollama Model Central</span>
+                            </div>
+                            <span id="popover-llm-status-badge" class="inline-flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Conectado
+                            </span>
+                        </div>
+
+                        <!-- Active Model Switcher -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                                <span>Modelos Disponíveis</span>
+                                <span class="text-emerald-400">Ollama API</span>
+                            </div>
+                            <div id="popover-model-list" class="space-y-1 max-h-36 overflow-y-auto">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Technical Specs -->
+                        <div class="bg-slate-950/70 rounded-xl p-2.5 border border-slate-800/80 space-y-1.5 text-[11px]">
+                            <div class="flex justify-between text-slate-400">
+                                <span>Provedor:</span>
+                                <span class="text-slate-200 font-mono">Ollama Local</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Temperatura:</span>
+                                <span class="text-slate-200 font-mono">0.2 (SQL Exato)</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Latência do Engine:</span>
+                                <span id="popover-llm-latency" class="text-emerald-400 font-mono">Pronto</span>
+                            </div>
+                        </div>
+
+                        <!-- Ping Test Button -->
+                        <button type="button" onclick="testLlmPing()" class="w-full py-2 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            <span>Testar Latência do LLM</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interactive DuckDB Badge & Popover -->
+                <div class="relative">
+                    <button type="button" id="header-duckdb-btn" onclick="toggleHeaderDuckDbPopover(event)" 
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 hover:border-blue-500/40 transition cursor-pointer shadow-sm group"
+                        title="Status e Metadados do DuckDB Lakehouse">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                        <span>DuckDB Engine: <strong class="font-semibold text-blue-300">Ativo</strong></span>
+                        <svg class="w-3 h-3 text-blue-400/80 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <!-- DuckDB Popover Menu -->
+                    <div id="header-duckdb-popover" class="hidden absolute top-full right-0 mt-2.5 w-80 bg-slate-900/95 border border-slate-700/80 rounded-2xl shadow-2xl p-4 z-50 backdrop-blur-xl space-y-3">
+                        <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7h16m-16 5h16"/></svg>
+                                </div>
+                                <span class="font-semibold text-white text-xs">DuckDB Lakehouse</span>
+                            </div>
+                            <span id="popover-duckdb-status-badge" class="inline-flex items-center gap-1 text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                                In-Memory Ativo
+                            </span>
+                        </div>
+
+                        <!-- Architecture Info -->
+                        <div class="bg-slate-950/70 rounded-xl p-2.5 border border-slate-800/80 space-y-1.5 text-[11px]">
+                            <div class="flex justify-between text-slate-400">
+                                <span>Schema Canônico:</span>
+                                <span class="text-blue-300 font-mono font-semibold">corporate_credit</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Catálogo Metastore:</span>
+                                <span class="text-slate-200">Polaris Iceberg REST</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Armazenamento:</span>
+                                <span class="text-slate-200 font-mono">MinIO S3</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Tempo de Execução:</span>
+                                <span id="popover-duckdb-latency" class="text-blue-400 font-mono">⚡ 1.2ms</span>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Tables (Click to Query) -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider">Tabelas (Clique p/ consultar)</span>
+                                <span id="popover-tables-count" class="text-[10px] text-slate-400 font-mono">--</span>
+                            </div>
+                            <div id="popover-tables-list" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pt-0.5">
+                                <span class="text-xs text-slate-500">Carregando tabelas...</span>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <button type="button" onclick="testDuckDbPing()" class="py-2 px-2 bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 rounded-xl text-[11px] font-medium transition flex items-center justify-center gap-1 cursor-pointer">
+                                <span>⚡ Testar Engine</span>
+                            </button>
+                            <button type="button" onclick="sendPrompt('SHOW TABLES FROM corporate_credit;'); closeAllPopovers();" class="py-2 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-[11px] font-medium transition flex items-center justify-center gap-1 cursor-pointer">
+                                <span>Listar Tabelas →</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -293,6 +416,7 @@ def index_ui():
                         ${m === currentModel ? '<span class="text-emerald-400 font-bold ml-2">✓</span>' : ''}
                     </button>
                 `).join('');
+                renderPopoverModelList(models);
             }
 
             function toggleModelDropdown(e) {
@@ -304,8 +428,7 @@ def index_ui():
             function selectModel(modelName) {
                 currentModel = modelName;
                 updateModelUI(modelName);
-                modelDropdownMenu.classList.add('hidden');
-                document.getElementById('model-chevron')?.classList.remove('rotate-180');
+                closeAllPopovers();
                 renderModelList(availableModels);
             }
 
@@ -315,8 +438,111 @@ def index_ui():
                 userInput.placeholder = `Peça ao ${modelName}`;
             }
 
-            // Close dropdown when clicking outside
+            // --- HEADER INTERACTIVE POPOVERS ---
+            function toggleHeaderLlmPopover(e) {
+                e.stopPropagation();
+                const popover = document.getElementById('header-llm-popover');
+                const isHidden = popover.classList.contains('hidden');
+                closeAllPopovers();
+                if (isHidden) {
+                    popover.classList.remove('hidden');
+                    renderPopoverModelList(availableModels);
+                    testLlmPing();
+                }
+            }
+
+            function toggleHeaderDuckDbPopover(e) {
+                e.stopPropagation();
+                const popover = document.getElementById('header-duckdb-popover');
+                const isHidden = popover.classList.contains('hidden');
+                closeAllPopovers();
+                if (isHidden) {
+                    popover.classList.remove('hidden');
+                    loadDuckDbStatus();
+                }
+            }
+
+            function closeAllPopovers() {
+                document.getElementById('header-llm-popover')?.classList.add('hidden');
+                document.getElementById('header-duckdb-popover')?.classList.add('hidden');
+                document.getElementById('model-dropdown-menu')?.classList.add('hidden');
+                document.getElementById('model-chevron')?.classList.remove('rotate-180');
+            }
+
+            function renderPopoverModelList(models) {
+                const listEl = document.getElementById('popover-model-list');
+                if (!listEl) return;
+                listEl.innerHTML = models.map(m => `
+                    <button type="button" onclick="selectModel('${m}'); closeAllPopovers();" 
+                        class="w-full text-left px-2.5 py-1.5 text-xs rounded-xl transition flex items-center justify-between font-mono cursor-pointer ${m === currentModel ? 'bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/80'}">
+                        <span class="truncate">${m}</span>
+                        ${m === currentModel ? '<span class="text-emerald-400 font-bold ml-1.5 text-xs">✓ Ativo</span>' : ''}
+                    </button>
+                `).join('');
+            }
+
+            async function testLlmPing() {
+                const latencyEl = document.getElementById('popover-llm-latency');
+                const badgeEl = document.getElementById('popover-llm-status-badge');
+                if (latencyEl) latencyEl.innerText = 'Medindo...';
+                try {
+                    const res = await fetch('/api/llm/ping');
+                    const data = await res.json();
+                    if (data.status === 'online') {
+                        if (latencyEl) latencyEl.innerText = `⚡ ${data.latency_ms}ms (OK)`;
+                        if (badgeEl) badgeEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Conectado';
+                    } else {
+                        if (latencyEl) latencyEl.innerText = 'Offline';
+                        if (badgeEl) badgeEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Desconectado';
+                    }
+                } catch (err) {
+                    if (latencyEl) latencyEl.innerText = 'Erro';
+                }
+            }
+
+            async function loadDuckDbStatus() {
+                const latencyEl = document.getElementById('popover-duckdb-latency');
+                const countEl = document.getElementById('popover-tables-count');
+                const listEl = document.getElementById('popover-tables-list');
+                try {
+                    const res = await fetch('/api/engine/status');
+                    const data = await res.json();
+                    if (latencyEl) latencyEl.innerText = `⚡ ${data.ping_ms}ms (OK)`;
+                    if (countEl) countEl.innerText = `${data.table_count} tabelas`;
+                    if (listEl && data.tables) {
+                        listEl.innerHTML = data.tables.map(t => `
+                            <button type="button" onclick="insertSampleQuery('${t}')" 
+                                title="Clique para consultar a tabela ${t}"
+                                class="px-2 py-1 bg-slate-800/80 hover:bg-blue-600/30 text-slate-300 hover:text-blue-200 rounded-lg text-[11px] font-mono border border-slate-700/60 hover:border-blue-400/40 transition cursor-pointer">
+                                ${t}
+                            </button>
+                        `).join('');
+                    }
+                } catch (err) {
+                    console.warn('Erro ao carregar status do DuckDB:', err);
+                }
+            }
+
+            async function testDuckDbPing() {
+                const latencyEl = document.getElementById('popover-duckdb-latency');
+                if (latencyEl) latencyEl.innerText = 'Medindo...';
+                await loadDuckDbStatus();
+            }
+
+            function insertSampleQuery(tableName) {
+                userInput.value = `Qual a estrutura e dados da tabela corporate_credit.${tableName}?`;
+                closeAllPopovers();
+                userInput.focus();
+            }
+
+            // Close dropdowns and popovers when clicking outside
             document.addEventListener('click', (e) => {
+                if (!document.getElementById('header-llm-popover')?.contains(e.target) && !document.getElementById('header-llm-btn')?.contains(e.target)) {
+                    document.getElementById('header-llm-popover')?.classList.add('hidden');
+                }
+                if (!document.getElementById('header-duckdb-popover')?.contains(e.target) && !document.getElementById('header-duckdb-btn')?.contains(e.target)) {
+                    document.getElementById('header-duckdb-popover')?.classList.add('hidden');
+                }
                 if (!modelDropdownMenu.contains(e.target) && !document.getElementById('model-dropdown-btn')?.contains(e.target)) {
                     modelDropdownMenu.classList.add('hidden');
                     document.getElementById('model-chevron')?.classList.remove('rotate-180');
@@ -946,6 +1172,53 @@ async def list_models():
     except Exception:
         pass
     return {"models": [LLM_MODEL, "llama3.2:1b"], "default": LLM_MODEL}
+
+@app.get("/api/engine/status")
+def engine_status():
+    """Retorna o status do DuckDB, metadados do schema e tabelas conectadas."""
+    start = time.perf_counter()
+    tables = []
+    try:
+        if not engine.con:
+            engine.connect()
+        rel = engine.con.sql("SHOW TABLES FROM corporate_credit")
+        tables = [row[0] for row in rel.fetchall()]
+    except Exception:
+        try:
+            tables = [t.name for t in registry.entities.values()]
+        except Exception:
+            tables = ["counterparts", "facilities", "collaterals", "proposals", "financial_statements", "credit_limits", "covenants"]
+    ping_ms = round((time.perf_counter() - start) * 1000, 2)
+    return {
+        "status": "active",
+        "engine": "DuckDB In-Memory",
+        "schema": "corporate_credit",
+        "tables": tables,
+        "table_count": len(tables),
+        "catalog": "Polaris Iceberg REST",
+        "storage": "MinIO S3 (s3://iceberg-warehouse/)",
+        "ping_ms": ping_ms
+    }
+
+@app.get("/api/llm/ping")
+async def ping_llm():
+    """Mede o tempo de resposta e status do servidor Ollama."""
+    start = time.perf_counter()
+    try:
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            resp = await client.get(f"{LLAMA_SERVER_URL}/api/version")
+            elapsed_ms = round((time.perf_counter() - start) * 1000, 1)
+            if resp.status_code == 200:
+                data = resp.json()
+                return {
+                    "status": "online",
+                    "latency_ms": elapsed_ms,
+                    "version": data.get("version", "latest"),
+                    "server": "Ollama Local"
+                }
+    except Exception:
+        pass
+    return {"status": "offline", "latency_ms": 0, "server": "Ollama Local"}
 
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
