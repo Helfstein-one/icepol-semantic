@@ -362,8 +362,8 @@ pie title Distribuição Percentual de Gastos de Tokens por Consulta (342 Tokens
 
 O projeto conta com vídeos demonstrativos e **gravação real da tela** (*screen recording* com automação de cursor, digitação e interação ao vivo) em Full HD 1080p:
 
-### 1. 🎥 ⚡ 🌟 Gravação Real da Tela: Jornada Completa (Trilha 'Take On Me' - A-ha)
-* **Arquivo de Vídeo**: [`video/icepol_screen_recording_take_on_me.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_screen_recording_take_on_me.mp4)
+### 1. 🎥 ⚡ 🌟 Gravação Real da Tela: Jornada Completa (Trilha Oficial 'Take On Me' - A-ha)
+* **Arquivo de Vídeo Principal**: [`video/icepol_user_journey.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey.mp4) (ou [`video/icepol_screen_recording_take_on_me.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_screen_recording_take_on_me.mp4))
 * **Gravação Real de Tela**: Captura contínua de 60 segundos com movimentação fluida de cursor do mouse, clique com efeito visual ripple, rolagem suave da página oficial do GitHub, digitação em tempo real no terminal e interação direta no chat local (`http://localhost:8000`) e no cockpit do Langfuse (`:3001`).
 * **Trilha Sonora Original**: [`video/soundtrack_take_on_me_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_take_on_me_60s.wav) — Composição synth-pop super animada e enérgica em **168 BPM** (B minor / Si menor), inspirada no clássico do A-ha:
   - **Hook Inconfundível de Teclado**: Riff melódico icônico sintetizado com onda híbrida square/sawtooth brilhante, delay estéreo em colcheias e chorus vintage Roland Juno.
