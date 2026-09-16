@@ -41,36 +41,50 @@ NOTE_D5 = 74
 NOTE_E5 = 76
 NOTE_FSH5 = 78
 
-# --- 1. DRUMS (LinnDrum style @ 168 BPM) ---
-num_beats = int(DURATION / BEAT_DUR)
-for b in range(num_beats):
-    beat_t = b * BEAT_DUR
-    idx = int(beat_t * SAMPLE_RATE)
+# --- 1. DRUMS (Authentic Take On Me LinnDrum Groove @ 168 BPM) ---
+# Signature groove: Kick on 1, Snare on 2, Kick on 3, Syncopated Kick on 3.5 (& of 3), Snare on 4
+# Open Hi-Hat on & of 4
+num_bars = int(DURATION / (BEAT_DUR * 4)) + 1
+for bar in range(num_bars):
+    bar_start_t = bar * BEAT_DUR * 4
     
-    # Kick: beats 1, 2, 3, 4 (pumping four-on-the-floor synth-pop)
-    kick_len = int(0.18 * SAMPLE_RATE)
-    if idx + kick_len < TOTAL_SAMPLES:
-        kt = np.linspace(0, 0.18, kick_len, endpoint=False)
-        k_env = np.exp(-kt * 28.0)
-        k_freq = 150.0 * np.exp(-kt * 32.0) + 42.0
-        k_phase = 2 * np.pi * np.cumsum(k_freq) / SAMPLE_RATE
-        kick_sound = 0.55 * np.sin(k_phase) * k_env
-        # slight punch distortion
-        kick_sound = np.clip(kick_sound * 1.3, -0.6, 0.6)
-        left[idx:idx+kick_len] += kick_sound
-        right[idx:idx+kick_len] += kick_sound
+    def trigger_kick(b_offset, vol=0.62):
+        kt_time = bar_start_t + b_offset * BEAT_DUR
+        idx = int(kt_time * SAMPLE_RATE)
+        kick_len = int(0.18 * SAMPLE_RATE)
+        if idx + kick_len < TOTAL_SAMPLES and idx >= 0:
+            kt = np.linspace(0, 0.18, kick_len, endpoint=False)
+            k_env = np.exp(-kt * 26.0)
+            k_freq = 160.0 * np.exp(-kt * 35.0) + 45.0
+            k_phase = 2 * np.pi * np.cumsum(k_freq) / SAMPLE_RATE
+            k_snd = vol * np.sin(k_phase) * k_env
+            k_snd = np.clip(k_snd * 1.25, -0.65, 0.65)
+            left[idx:idx+kick_len] += k_snd
+            right[idx:idx+kick_len] += k_snd
 
-    # Snare: beats 2 and 4 (punchy 80s gated snare)
-    if b % 2 == 1:
-        snare_len = int(0.20 * SAMPLE_RATE)
-        if idx + snare_len < TOTAL_SAMPLES:
-            st = np.linspace(0, 0.20, snare_len, endpoint=False)
-            s_env = np.exp(-st * 18.0)
+    def trigger_snare(b_offset, vol=0.45):
+        st_time = bar_start_t + b_offset * BEAT_DUR
+        idx = int(st_time * SAMPLE_RATE)
+        snare_len = int(0.22 * SAMPLE_RATE)
+        if idx + snare_len < TOTAL_SAMPLES and idx >= 0:
+            st = np.linspace(0, 0.22, snare_len, endpoint=False)
+            s_env = np.exp(-st * 16.0)
             noise = (np.random.rand(snare_len) * 2.0 - 1.0) * s_env
-            body = np.sin(2 * np.pi * 210 * st) * np.exp(-st * 30.0)
-            snare_sound = 0.38 * (noise * 0.75 + body * 0.45)
-            left[idx:idx+snare_len] += snare_sound * 0.95
-            right[idx:idx+snare_len] += snare_sound * 1.05
+            body = np.sin(2 * np.pi * 215 * st) * np.exp(-st * 28.0)
+            s_snd = vol * (noise * 0.75 + body * 0.45)
+            left[idx:idx+snare_len] += s_snd * 0.95
+            right[idx:idx+snare_len] += s_snd * 1.05
+
+    # Beat 1: Kick
+    trigger_kick(0.0, vol=0.62)
+    # Beat 2: Snare (gated 80s hit)
+    trigger_snare(1.0, vol=0.48)
+    # Beat 3: Kick
+    trigger_kick(2.0, vol=0.55)
+    # Beat 3.5: Syncopated Kick (The signature "Take On Me" gallop!)
+    trigger_kick(2.5, vol=0.58)
+    # Beat 4: Snare
+    trigger_snare(3.0, vol=0.50)
 
 # 16th Hi-hats & Tambourine
 num_sixteenths = int(DURATION / SIXTEENTH)
