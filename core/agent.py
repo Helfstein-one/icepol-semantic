@@ -99,96 +99,80 @@ def index_ui():
         <!-- Main Chat Stream -->
         <main class="flex-1 overflow-y-auto px-4 md:px-8 py-8" id="chat-container">
             <div class="max-w-5xl mx-auto space-y-6" id="chat-box">
-                <!-- Welcome Executive Card -->
-                <div id="welcome-card" class="bg-gradient-to-b from-slate-900/90 via-slate-900/60 to-slate-950/80 border border-slate-800/90 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl">
+                <!-- Minimalist Gemini Centered Welcome View -->
+                <div id="welcome-view" class="py-14 md:py-20 flex flex-col items-center justify-center text-center space-y-6">
                     <div class="space-y-2">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold tracking-wide uppercase">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                            Wholesale Banking Semantic Copilot
-                        </div>
-                        <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight">Central de Inteligência Analítica em Crédito Corporativo</h2>
-                        <p class="text-sm text-slate-400 leading-relaxed max-w-3xl">
-                            Consulte métricas analíticas e carteiras corporativas em linguagem natural. A camada semântica mapeia ontologias canônicas imutáveis, compila o plano de execução AST e processa queries analíticas diretamente no <strong>DuckDB Lakehouse</strong> com zero adivinhação de schema.
+                        <h1 class="text-4xl md:text-5xl font-medium tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+                            Olá, Mauricio
+                        </h1>
+                        <p class="text-xl md:text-2xl text-slate-400 font-normal">
+                            Como posso ajudar com crédito corporativo hoje?
                         </p>
                     </div>
 
-                    <!-- Ontological Highlights Pills -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                        <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col gap-1">
-                            <span class="text-slate-400">Entidades de Negócio</span>
-                            <span class="text-white font-semibold font-mono text-sm">7 Tabelas Físicas</span>
-                        </div>
-                        <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col gap-1">
-                            <span class="text-slate-400">Métricas Canônicas</span>
-                            <span class="text-white font-semibold font-mono text-sm">12 Métricas (EAD/NPL)</span>
-                        </div>
-                        <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col gap-1">
-                            <span class="text-slate-400">Motor de Execução</span>
-                            <span class="text-white font-semibold font-mono text-sm">DuckDB In-Memory</span>
-                        </div>
-                        <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col gap-1">
-                            <span class="text-slate-400">Storage & Metadados</span>
-                            <span class="text-white font-semibold font-mono text-sm">MinIO S3 / Iceberg</span>
-                        </div>
-                    </div>
-
-                    <!-- Categorized Prompts Grid -->
-                    <div class="space-y-3 pt-2">
-                        <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider block">Sugestões de Consultas Analíticas:</span>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <!-- Categoria 1 -->
-                            <div onclick="sendPrompt('Qual a exposição total (total_exposure) por setor (sector)?')" class="group text-left p-4 rounded-2xl bg-slate-950/50 hover:bg-slate-850 border border-slate-800/80 hover:border-blue-500/50 transition-all cursor-pointer flex flex-col gap-1.5 shadow-sm">
-                                <div class="flex items-center justify-between text-xs font-semibold text-blue-400">
-                                    <span>📊 Carteira & Exposição</span>
-                                    <span class="text-slate-500 group-hover:text-blue-400 group-hover:translate-x-0.5 transition font-normal">Executar →</span>
-                                </div>
-                                <div class="text-xs text-slate-200">Qual a exposição total (total_exposure) por setor (sector)?</div>
-                            </div>
-
-                            <!-- Categoria 2 -->
-                            <div onclick="sendPrompt('Qual a alavancagem média (avg_net_debt_ebitda) por grupo econômico (economic_group)?')" class="group text-left p-4 rounded-2xl bg-slate-950/50 hover:bg-slate-850 border border-slate-800/80 hover:border-emerald-500/50 transition-all cursor-pointer flex flex-col gap-1.5 shadow-sm">
-                                <div class="flex items-center justify-between text-xs font-semibold text-emerald-400">
-                                    <span>⚖️ Risco & Alavancagem</span>
-                                    <span class="text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition font-normal">Executar →</span>
-                                </div>
-                                <div class="text-xs text-slate-200">Qual a alavancagem média (avg_net_debt_ebitda) por grupo econômico?</div>
-                            </div>
-
-                            <!-- Categoria 3 -->
-                            <div onclick="sendPrompt('Qual o volume de garantias por tipo de colateral e status?')" class="group text-left p-4 rounded-2xl bg-slate-950/50 hover:bg-slate-850 border border-slate-800/80 hover:border-amber-500/50 transition-all cursor-pointer flex flex-col gap-1.5 shadow-sm">
-                                <div class="flex items-center justify-between text-xs font-semibold text-amber-400">
-                                    <span>🛡️ Colaterais & Garantias</span>
-                                    <span class="text-slate-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition font-normal">Executar →</span>
-                                </div>
-                                <div class="text-xs text-slate-200">Qual o volume de garantias por tipo de colateral e status?</div>
-                            </div>
-
-                            <!-- Categoria 4 -->
-                            <div onclick="sendPrompt('Quais contratos possuem descumprimento de covenants ou estão desenquadrados?')" class="group text-left p-4 rounded-2xl bg-slate-950/50 hover:bg-slate-850 border border-slate-800/80 hover:border-purple-500/50 transition-all cursor-pointer flex flex-col gap-1.5 shadow-sm">
-                                <div class="flex items-center justify-between text-xs font-semibold text-purple-400">
-                                    <span>📜 Covenants & Contratos</span>
-                                    <span class="text-slate-500 group-hover:text-purple-400 group-hover:translate-x-0.5 transition font-normal">Executar →</span>
-                                </div>
-                                <div class="text-xs text-slate-200">Quais contratos possuem descumprimento de covenants?</div>
-                            </div>
-                        </div>
+                    <!-- Clean Minimalist Gemini Prompt Chips -->
+                    <div class="flex flex-wrap items-center justify-center gap-2.5 max-w-2xl pt-2">
+                        <button onclick="sendPrompt('Qual a exposição total (total_exposure) por setor (sector)?')" 
+                            class="px-4 py-2.5 rounded-full bg-[#1e1f20] hover:bg-[#282a2c] text-slate-300 hover:text-white border border-slate-700/60 transition text-xs md:text-sm font-medium shadow-sm">
+                            Exposição total por setor
+                        </button>
+                        <button onclick="sendPrompt('Qual a alavancagem média (avg_net_debt_ebitda) por grupo econômico?')" 
+                            class="px-4 py-2.5 rounded-full bg-[#1e1f20] hover:bg-[#282a2c] text-slate-300 hover:text-white border border-slate-700/60 transition text-xs md:text-sm font-medium shadow-sm">
+                            Alavancagem por grupo econômico
+                        </button>
+                        <button onclick="sendPrompt('Qual o volume de garantias por tipo de colateral e status?')" 
+                            class="px-4 py-2.5 rounded-full bg-[#1e1f20] hover:bg-[#282a2c] text-slate-300 hover:text-white border border-slate-700/60 transition text-xs md:text-sm font-medium shadow-sm">
+                            Garantias por colateral
+                        </button>
+                        <button onclick="sendPrompt('Quais contratos possuem descumprimento de covenants?')" 
+                            class="px-4 py-2.5 rounded-full bg-[#1e1f20] hover:bg-[#282a2c] text-slate-300 hover:text-white border border-slate-700/60 transition text-xs md:text-sm font-medium shadow-sm">
+                            Descumprimento de covenants
+                        </button>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- Fixed Footer Input -->
-        <footer class="border-t border-slate-800/80 bg-slate-900/70 backdrop-blur-md px-4 md:px-8 py-4 sticky bottom-0 z-20">
-            <div class="max-w-5xl mx-auto">
-                <form id="chat-form" onsubmit="handleSubmit(event)" class="flex gap-3 items-center">
-                    <input id="user-input" type="text" placeholder="Pergunte sobre crédito corporativo, garantias, covenants, limites, balanços..." 
-                        class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-2xl px-5 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 text-slate-100 placeholder-slate-500 transition shadow-inner">
-                    <button type="submit" id="send-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3.5 rounded-2xl text-sm transition shadow-sm shrink-0 flex items-center gap-2">
-                        <span>Enviar</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        <!-- Gemini Pill Floating Footer Input (Exact Perspective) -->
+        <footer class="px-4 md:px-8 py-5 sticky bottom-0 z-20">
+            <div class="max-w-4xl mx-auto">
+                <form id="chat-form" onsubmit="handleSubmit(event)" class="relative flex items-center bg-[#1e1f20] hover:bg-[#26282c] focus-within:bg-[#1e1f20] border border-slate-700/70 focus-within:border-slate-500 rounded-full px-3.5 py-2.5 md:py-3 shadow-2xl transition-all duration-200">
+                    
+                    <!-- Left + Button (Actions / Tools) -->
+                    <button type="button" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition shrink-0" title="Ações e ferramentas">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                     </button>
+
+                    <!-- Text input with 'Peça ao Gemini' placeholder -->
+                    <input id="user-input" type="text" placeholder="Peça ao Gemini" 
+                        class="flex-1 bg-transparent border-0 text-white placeholder-slate-400 text-sm md:text-base focus:ring-0 focus:outline-none px-3 font-sans">
+
+                    <!-- Right Items: Flash Model Dropdown & Microphone -->
+                    <div class="flex items-center space-x-1.5 shrink-0 pr-1">
+                        <!-- Model badge dropdown (Flash) -->
+                        <div class="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/10 transition cursor-pointer font-sans" title="Modelo selecionado">
+                            <span>Flash</span>
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+
+                        <!-- Microphone button -->
+                        <button type="button" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition" title="Entrada por voz">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 02-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                        </button>
+
+                        <!-- Send button -->
+                        <button type="submit" id="send-btn" class="w-9 h-9 rounded-full bg-white hover:bg-slate-200 text-slate-900 flex items-center justify-center transition shadow shrink-0" title="Enviar">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
                 </form>
             </div>
         </footer>
@@ -489,12 +473,15 @@ def index_ui():
                 const q = userInput.value.trim();
                 if (!q) return;
 
+                const welcomeEl = document.getElementById('welcome-view');
+                if (welcomeEl) welcomeEl.remove();
+
                 appendUserMessage(q);
                 messages.push({role: 'user', content: q});
                 userInput.value = '';
                 userInput.disabled = true;
                 sendBtn.disabled = true;
-                sendBtn.innerHTML = '<span>Processando...</span>';
+                sendBtn.innerHTML = '<svg class="w-4 h-4 animate-spin text-slate-900" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>';
 
                 const stopTimer = showProcessingStepper();
 
@@ -530,7 +517,7 @@ def index_ui():
                 } finally {
                     userInput.disabled = false;
                     sendBtn.disabled = false;
-                    sendBtn.innerHTML = '<span>Enviar</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>';
+                    sendBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"/></svg>';
                     userInput.focus();
                 }
             }
