@@ -20,14 +20,13 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
   - **Waterfall de Spans (Gráfico Gantt)**: Decomposição temporal precisa da latência total (1.492ms) evidenciando spans de ciclo de vida e tempo de resposta de cada serviço.
   - **Gráfico de Distribuição de Tokens (Pie Chart)**: Mapeamento da eficiência de 342 tokens (63.7% contexto ontológico, 21.0% raciocínio CoT e 15.3% síntese SQL ANSI).
 - **Produção de Vídeos Demonstrativos em Full HD 1080p e Novas Trilhas Sonoras**:
-  - `video/icepol_screen_recording_take_on_me.mp4` (60s): **Gravação Real da Tela (Screen Recording) com Trilha Estilo 'Take On Me' (A-ha)** — 168 BPM em Si menor (Bm), gravado em tempo real com automação de cursor do mouse, efeito visual ripple de cliques, scroll fluido pelo GitHub oficial, digitação humana no terminal e no chat da camada semântica e inspeção do Langfuse.
-  - `video/icepol_screen_recording_cheri_cheri_lady.mp4` (60s): Gravação real da tela com trilha Euro-Disco clássica 'Cheri Cheri Lady' (Modern Talking, 118 BPM em G# menor).
+  - `video/icepol_user_journey.mp4` (60s): **Gravação Real da Tela (Screen Recording) com Trilha Estilo 'Take On Me' (A-ha)** — 168 BPM em Si menor (Bm), gravado em tempo real com automação de cursor do mouse, efeito visual ripple de cliques, scroll fluido pelo GitHub oficial, digitação humana no terminal e no chat da camada semântica e inspeção do Langfuse.
   - `video/soundtrack_take_on_me_60s.wav`: Trilha sonora sintetizada de 60 segundos com arranjo paramétrico fiel ao clássico do A-ha.
   - `video/synth_take_on_me.py`: Script gerador paramétrico em áudio PCM WAV estéreo 44.1kHz.
   - `video/recorder/record_live_screen.js`: Script de automação e gravação contínua de tela em 1080p via Playwright e Chromium.
   - Roteiro cobrindo navegação no repositório GitHub com scroll do README, clone no terminal, execução de `make seed` e subida com Podman Compose, chat com consultas de crédito corporativo, modelagem conceitual Mermaid ERD (Crow's foot com as 7 entidades), tracing detalhado no Langfuse e decomposição de custos de tokens (evidenciando contexto ontológico de 218 tokens como maior volume e raciocínio CoT de 776ms como maior tempo de execução).
 - **Limpeza e Otimização do Repositório**:
-  - Remoção de arquivos intermediários obsoletos e consolidação dos artefatos finais na pasta `video/`.
+  - Remoção definitiva de todos os vídeos antigos e intermediários, mantendo unicamente o vídeo oficial gravado em tela [`video/icepol_user_journey.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey.mp4).
 
 ---
 
