@@ -64,6 +64,7 @@ def index_ui():
                 startOnLoad: false,
                 theme: 'dark',
                 securityLevel: 'loose',
+                suppressErrorRendering: true,
                 themeVariables: {
                     darkMode: true,
                     background: '#020617',
@@ -935,6 +936,155 @@ def index_ui():
                 return () => clearInterval(timerInterval);
             }
 
+            function sanitizeMermaidCode(raw) {
+                if (!raw) return "";
+                let code = raw.trim();
+                code = code.replace(/^```(?:mermaid)?/i, "").replace(/```$/, "").trim();
+
+                // Check if ER diagram
+                if (/erDiagram/i.test(code)) {
+                    let lines = code.split("\n");
+                    let insideEntity = false;
+                    let sanitizedLines = ["erDiagram"];
+                    const knownTypes = new Set([
+                        "string", "str", "varchar", "text", "int", "integer", "bigint", "float", 
+                        "double", "number", "numeric", "decimal", "date", "datetime", "timestamp", 
+                        "boolean", "bool", "uuid"
+                    ]);
+
+                    for (let i = 0; i < lines.length; i++) {
+                        let line = lines[i];
+                        let trimmed = line.trim();
+                        if (!trimmed) continue;
+                        if (/^\s*erDiagram/i.test(trimmed)) continue;
+
+                        // Comments
+                        if (trimmed.startsWith("#") || trimmed.startsWith("//")) {
+                            sanitizedLines.push("    %% " + trimmed.replace(/^[#/]+\s*/, ""));
+                            continue;
+                        }
+
+                        // Entity start: e.g. PART OF "counterparts" { or counterparts {
+                        if (trimmed.includes("{")) {
+                            insideEntity = true;
+                            let entName = trimmed.replace(/PART\s+OF\s+/gi, "").replace(/["'{}]/g, "").trim().split(/\s+/)[0];
+                            if (entName) {
+                                sanitizedLines.push(`    ${entName} {`);
+                            }
+                            continue;
+                        }
+
+                        // Entity end
+                        if (trimmed === "}") {
+                            insideEntity = false;
+                            sanitizedLines.push("    }");
+                            continue;
+                        }
+
+                        if (insideEntity) {
+                            // Split line if multiple attributes (e.g. separated by commas, semicolons, or multiple '=' assignments)
+                            let subAttributes = trimmed.split(/\s+(?=[a-zA-Z0-9_]+\s*=)|[,;]+/);
+                            for (let subAttr of subAttributes) {
+                                let item = subAttr.trim();
+                                if (!item) continue;
+
+                                // Clean quotes and symbols
+                                let clean = item.replace(/[=:'"]/g, " ").replace(/\s+/g, " ").trim();
+                                let parts = clean.split(" ").filter(p => p.length > 0);
+                                if (parts.length === 0) continue;
+
+                                let type = "string";
+                                let col = "";
+                                let key = "";
+
+                                let filtered = [];
+                                for (let p of parts) {
+                                    let up = p.toUpperCase();
+                                    if (up === "PK" || up === "FK" || up === "UK") {
+                                        key = up;
+                                    } else {
+                                        filtered.push(p);
+                                    }
+                                }
+
+                                if (filtered.length === 1) {
+                                    col = filtered[0].replace(/[^a-zA-Z0-9_]/g, "");
+                                } else if (filtered.length >= 2) {
+                                    let p0Low = filtered[0].toLowerCase();
+                                    let p1Low = filtered[1].toLowerCase();
+                                    if (knownTypes.has(p0Low)) {
+                                        type = p0Low;
+                                        col = filtered[1].replace(/[^a-zA-Z0-9_]/g, "");
+                                    } else if (knownTypes.has(p1Low)) {
+                                        type = p1Low;
+                                        col = filtered[0].replace(/[^a-zA-Z0-9_]/g, "");
+                                    } else {
+                                        if (p0Low.includes("_") || p0Low.endsWith("id") || p0Low.startsWith("nm_") || p0Low.startsWith("dt_") || p0Low.startsWith("vl_")) {
+                                            col = filtered[0].replace(/[^a-zA-Z0-9_]/g, "");
+                                            type = (p1Low === "id" || p1Low === "key") ? "string" : (p1Low.length <= 8 ? p1Low : "string");
+                                        } else {
+                                            type = p0Low.length <= 8 ? p0Low : "string";
+                                            col = filtered[1].replace(/[^a-zA-Z0-9_]/g, "");
+                                        }
+                                    }
+                                }
+
+                                if (col) {
+                                    sanitizedLines.push(`        ${type} ${col}${key ? " " + key : ""}`);
+                                }
+                            }
+                        } else {
+                            // Relationship line outside entity
+                            let cleanRel = trimmed.replace(/PART\s+OF\s+/gi, "").replace(/["']/g, "");
+                            cleanRel = cleanRel.replace(/\*--\*/g, "}|--|{")
+                                               .replace(/<-->/g, "}|--|{")
+                                               .replace(/-->/g, "||--o{")
+                                               .replace(/<--/g, "}o--||")
+                                               .replace(/\s+--\s+/g, " ||--|| ");
+
+                            if (/(\|\|--[o|]\{|--|\|\|--\|\||\}\|--\|\{|\}\|--o\{)/.test(cleanRel)) {
+                                if (!cleanRel.includes(":")) {
+                                    cleanRel += ' : "relaciona"';
+                                } else {
+                                    let parts = cleanRel.split(":");
+                                    let relPart = parts[0].trim();
+                                    let labelPart = parts.slice(1).join(":").trim().replace(/^["']|["']$/g, "");
+                                    cleanRel = `${relPart} : "${labelPart || "relaciona"}"`;
+                                }
+                                sanitizedLines.push("    " + cleanRel);
+                            }
+                        }
+                    }
+                    return sanitizedLines.join("\n");
+                }
+
+                return code;
+            }
+
+            function fallbackToGraph(code) {
+                const lines = code.split('\n');
+                const nodes = new Set();
+                const edges = [];
+                for (const l of lines) {
+                    const match = l.match(/([a-zA-Z0-9_]+)\s*(?:\|\|--[o|]\{|--|->|-->|\|\|--\|\||\}\|--\|\{|\}\|--o\{)\s*([a-zA-Z0-9_]+)(?:\s*:\s*"?([^"]*)"?)?/);
+                    if (match) {
+                        nodes.add(match[1]);
+                        nodes.add(match[2]);
+                        const label = match[3] ? `|"${match[3].trim()}"| ` : '';
+                        edges.push(`    ${match[1]} --> ${label}${match[2]}`);
+                    } else {
+                        const entMatch = l.match(/^\s*(?:entity\s+)?([a-zA-Z0-9_]+)\s*\{?/i);
+                        if (entMatch && !["erdiagram", "graph", "flowchart", "classdiagram"].includes(entMatch[1].toLowerCase())) {
+                            nodes.add(entMatch[1]);
+                        }
+                    }
+                }
+                if (nodes.size > 0) {
+                    return "graph TD\n" + Array.from(nodes).map(n => `    ${n}["${n}"]`).join("\n") + (edges.length ? "\n" + edges.join("\n") : "");
+                }
+                return null;
+            }
+
             function renderMarkdownWithMermaid(content) {
                 if (!content) return '';
                 const rawHtml = marked.parse(content);
@@ -1100,17 +1250,40 @@ def index_ui():
                     hljs.highlightElement(block);
                 });
 
-                // Render all Mermaid diagram elements
+                // Render all Mermaid diagram elements with auto-healing and fallback
                 wrapper.querySelectorAll('.mermaid-diagram-code').forEach(async (el) => {
+                    const encoded = el.getAttribute('data-mermaid-code');
+                    const rawCode = encoded ? decodeURIComponent(encoded) : el.textContent;
+                    const sanitized = sanitizeMermaidCode(rawCode);
+
                     try {
                         const id = 'mermaid-' + Math.random().toString(36).substring(2, 9);
-                        const encoded = el.getAttribute('data-mermaid-code');
-                        const code = encoded ? decodeURIComponent(encoded) : el.textContent;
-                        const { svg } = await mermaid.render(id, code);
+                        const { svg } = await mermaid.render(id, sanitized);
                         el.innerHTML = svg;
-                    } catch (err) {
-                        console.warn('Mermaid render error:', err);
-                        el.innerHTML = `<div class="text-xs text-amber-300/90 p-3 bg-amber-950/30 border border-amber-800/40 rounded-xl font-mono">⚠️ Erro ao desenhar Mermaid: ${err.message}</div>`;
+                    } catch (err1) {
+                        console.warn('Mermaid primary render failed, attempting fallback to graph:', err1);
+                        document.querySelectorAll('[id^="dmermaid"]').forEach(n => n.remove());
+
+                        const fallbackGraph = fallbackToGraph(sanitized);
+                        if (fallbackGraph) {
+                            try {
+                                const idFb = 'mermaid-fb-' + Math.random().toString(36).substring(2, 9);
+                                const { svg } = await mermaid.render(idFb, fallbackGraph);
+                                el.innerHTML = svg;
+                                return;
+                            } catch (err2) {
+                                console.warn('Mermaid fallback graph failed:', err2);
+                                document.querySelectorAll('[id^="dmermaid"]').forEach(n => n.remove());
+                            }
+                        }
+                        el.innerHTML = `
+                            <div class="space-y-2 w-full text-left">
+                                <div class="text-xs text-amber-300/90 p-3 bg-amber-950/30 border border-amber-800/40 rounded-xl font-mono">
+                                    ⚠️ Diagrama renderizado em formato textual (formato não reconhecido pela biblioteca gráfica):
+                                </div>
+                                <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono text-slate-300 overflow-x-auto"><code>${sanitized}</code></pre>
+                            </div>
+                        `;
                     }
                 });
 
@@ -1393,7 +1566,28 @@ async def chat_completions(req: ChatCompletionRequest):
         "4. Se o usuário anexou arquivos (como CSVs ou relatórios), correlacione os dados fornecidos com o modelo analítico.\n"
         "5. Para listar tabelas ou consultar metadados no DuckDB, utilize `SHOW TABLES FROM corporate_credit;` (atenção: DuckDB utiliza FROM, não utilize IN) ou `SELECT table_name, table_schema FROM information_schema.tables WHERE table_schema = 'corporate_credit';` (a coluna padrão SQL de schema é `table_schema`, não `schema_name`).\n"
         "6. Se for apenas conversa genérica, pesquisa conceitual ou saudação, responda normalmente em português.\n"
-        "7. Quando o usuário solicitar modelo de dados, relações entre entidades (ERD), arquitetura, linhagem ou diagramas de fluxo, você DEVE gerar um diagrama Mermaid válido dentro de um bloco ```mermaid ... ``` (por exemplo: erDiagram, graph TD ou sequenceDiagram) ilustrando com clareza as conexões ontológicas das tabelas de corporate_credit.\n"
+        "7. Quando o usuário solicitar modelo de dados, relações entre entidades (ERD), arquitetura, linhagem ou diagramas de fluxo, você DEVE gerar um diagrama Mermaid válido dentro de um bloco ```mermaid ... ```.\n"
+        "   ATENÇÃO CRÍTICA À SINTAXE DO MERMAID ERDIAGRAM:\n"
+        "   - Dentro de cada entidade { }, os atributos devem ser estritamente: `tipo nome_coluna [PK/FK]` (ex: `string counterpart_id PK`).\n"
+        "   - NUNCA use sinal de igual `=` ou aspas dentro da entidade (ex: NUNCA escreva `id = \"string\"` ou `col = \"id\"`).\n"
+        "   - Toda relação entre entidades DEVE ter um rótulo com dois pontos e aspas (ex: `counterparts ||--o{ facilities : \"possui\"`).\n"
+        "   - NUNCA use `PART OF`. Use diretamente o nome da entidade (ex: `counterparts`, `facilities`, `collaterals`, `proposals`).\n"
+        "   Exemplo canônico de erDiagram:\n"
+        "   ```mermaid\n"
+        "   erDiagram\n"
+        "       counterparts ||--o{ facilities : \"possui\"\n"
+        "       facilities ||--o{ collaterals : \"garantido_por\"\n"
+        "       counterparts {\n"
+        "           string counterpart_id PK\n"
+        "           string nm_counterpart\n"
+        "           string sector\n"
+        "       }\n"
+        "       facilities {\n"
+        "           string facility_id PK\n"
+        "           string counterpart_id FK\n"
+        "           float limit_amount\n"
+        "       }\n"
+        "   ```\n"
     )
 
     llm_messages = [{"role": "system", "content": system_prompt}]
