@@ -965,8 +965,11 @@ def index_ui():
                             continue;
                         }
 
-                        // Entity start: e.g. PART OF "counterparts" { or counterparts {
-                        if (trimmed.includes("{")) {
+                        // Relationship line check
+                        const isRel = /(?:\\|\\|--[o|]\\{|--|->|-->|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{|\\}o--o\\{|\\}o--\\|\\||\\*--\\*|<-->|<--)/.test(trimmed);
+
+                        // Entity start: e.g. counterparts { or entity counterparts { (must not be a relationship)
+                        if (!isRel && /\\{[\\s]*$/.test(trimmed)) {
                             insideEntity = true;
                             let entName = trimmed.replace(/PART[\\s]+OF[\\s]+/gi, "").replace(/["'{}]/g, "").trim().split(/[\\s]+/)[0];
                             if (entName) {
@@ -976,7 +979,7 @@ def index_ui():
                         }
 
                         // Entity end
-                        if (trimmed === "}") {
+                        if (!isRel && (trimmed === "}" || trimmed.endsWith("}"))) {
                             insideEntity = false;
                             sanitizedLines.push("    }");
                             continue;
@@ -1037,13 +1040,12 @@ def index_ui():
                         } else {
                             // Relationship line outside entity
                             let cleanRel = trimmed.replace(/PART[\\s]+OF[\\s]+/gi, "").replace(/["']/g, "");
-                            cleanRel = cleanRel.replace(/\\*--\\*/g, "}|--|{")
-                                               .replace(/<-->/g, "}|--|{")
-                                               .replace(/-->/g, "||--o{")
-                                               .replace(/<--/g, "}o--||")
-                                               .replace(/[\\s]+--[\\s]+/g, " ||--|| ");
+                            cleanRel = cleanRel.replaceAll("*--*", "}|--|{")
+                                               .replaceAll("<-->", "}|--|{")
+                                               .replaceAll("-->", "||--o{")
+                                               .replaceAll("<--", "}o--||");
 
-                            if (/(?:\\|\\|--[o|]\\{|--|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{)/.test(cleanRel)) {
+                            if (/(?:\\|\\|--[o|]\\{|--|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{|\\}o--o\\{|\\}o--\\|\\|)/.test(cleanRel)) {
                                 if (!cleanRel.includes(":")) {
                                     cleanRel += ' : "relaciona"';
                                 } else {
@@ -1067,18 +1069,34 @@ def index_ui():
                 const lines = code.split(nl);
                 const nodes = new Set();
                 const edges = [];
+                let inEntity = false;
+
                 for (const l of lines) {
-                    const match = l.match(/([a-zA-Z0-9_]+)[\\s]*(?:\\|\\|--[o|]\\{|--|->|-->|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{)[\\s]*([a-zA-Z0-9_]+)(?:[\\s]*:[\\s]*"?([^"]*)"?)?/);
+                    const trimmed = l.trim();
+                    if (!trimmed) continue;
+
+                    // Match relationships e.g. A ||--o{ B : "label" or A --> B
+                    const match = trimmed.match(/^([a-zA-Z0-9_]+)[\\s]*(?:\\|\\|--[o|]\\{|--|->|-->|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{|\\}o--o\\{|\\}o--\\|\\|)[\\s]*([a-zA-Z0-9_]+)(?:[\\s]*:[\\s]*"?([^"]*)"?)?/);
                     if (match) {
                         nodes.add(match[1]);
                         nodes.add(match[2]);
                         const label = match[3] ? `|"${match[3].trim()}"| ` : '';
                         edges.push(`    ${match[1]} --> ${label}${match[2]}`);
-                    } else {
-                        const entMatch = l.match(/^[\\s]*(?:entity[\\s]+)?([a-zA-Z0-9_]+)[\\s]*\\{?/i);
+                        continue;
+                    }
+
+                    if (trimmed.endsWith("{")) {
+                        inEntity = true;
+                        const entMatch = trimmed.match(/^([a-zA-Z0-9_]+)[\\s]*\\{/);
                         if (entMatch && !["erdiagram", "graph", "flowchart", "classdiagram"].includes(entMatch[1].toLowerCase())) {
                             nodes.add(entMatch[1]);
                         }
+                        continue;
+                    }
+
+                    if (trimmed === "}") {
+                        inEntity = false;
+                        continue;
                     }
                 }
                 if (nodes.size > 0) {
