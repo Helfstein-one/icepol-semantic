@@ -2,6 +2,14 @@
 
 Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 
+## [v1.4.0] - 2026-09-16
+### Limpeza & Otimização
+- **Consolidação do Vídeo Oficial & Limpeza Total de Mídia**:
+  - Remoção de todos os arquivos temporários do recorder (`video/recorder/`), sintetizadores Python (`synth_*.py`), trilhas brutas não compactadas (`soundtrack_*.wav`) e vídeos intermediários.
+  - Manutenção exclusiva de [`video/icepol_user_journey.mp4`](video/icepol_user_journey.mp4) como o vídeo oficial e definitivo do projeto.
+  - Gravação estendida de 85 segundos em Full HD 1080p, cobrindo a navegação completa no GitHub até o rodapé, terminal com `make seed`, Chat UI com seletor de modelos e diagrama Mermaid ERD, e login no Langfuse com a Árvore de Decisão / DAG e decomposição de custos de tokens.
+  - Trilha sonora Eurodance 90s (*What Is Love* a 125 BPM) integrada em áudio AAC de alta fidelidade.
+
 ## [v1.3.0] - 2026-09-16
 ### Otimizado
 - **Consolidação de Banco de Dados no PostgreSQL 15**:
@@ -9,10 +17,6 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
   - Migração da tabela `query_metrics` para o PostgreSQL 15 (`postgres-langfuse`) nativo, unificando a persistência de observabilidade e telemetria em um único SGBD.
   - Driver Python atualizado para `psycopg2-binary>=2.9.9` com queries compatíveis e resilientes.
   - Interface Web atualizada com telemetria `🐘 PostgreSQL 15 Audit` na porta `:5432`.
-- **Nova Gravação Real da Tela & Trilha Sonora Eurodance 90s ('What Is Love' - Haddaway)**:
-  - `video/icepol_user_journey_what_is_love.mp4` (e `video/icepol_user_journey.mp4`): Nova gravação contínua da tela em 1080p Full HD exibindo a arquitetura unificada com PostgreSQL 15.
-  - `video/soundtrack_what_is_love_60s.wav`: Trilha sonora de 60 segundos com arranjo Eurodance contagiante a **125 BPM** (Sol menor / G minor), sintetizando a batida 909 pumping com open hi-hats offbeat, rolling bassline em oitavas, stabs de órgão Korg M1 e o icônico hook de sintetizador (*"What is love? Baby don't hurt me, don't hurt me, no more"*).
-  - `video/synth_what_is_love.py`: Gerador de áudio paramétrico PCM estéreo 44.1kHz.
 
 ## [v1.2.0] - 2026-09-16
 ### Adicionado

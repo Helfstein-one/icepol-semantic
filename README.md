@@ -358,45 +358,19 @@ pie title Distribuição Percentual de Gastos de Tokens por Consulta (342 Tokens
 
 ---
 
-## 🎬 Vídeos Demonstrativos & Gravação Real da Tela
+## 🎬 Vídeo Demonstrativo & Gravação Real da Tela
 
-O projeto conta com vídeos demonstrativos e **gravação real da tela** (*screen recording* com automação de cursor, digitação e interação ao vivo) em Full HD 1080p:
+O projeto conta com o vídeo oficial de **gravação real da tela** (*screen recording* com automação de cursor, digitação e interação ao vivo) em Full HD 1080p:
 
-### 1. 🕺 ⚡ 🌟 Gravação Real da Tela: Jornada Completa (Trilha Eurodance 90s 'What Is Love' - Haddaway)
-* **Arquivo de Vídeo**: [`video/icepol_user_journey_what_is_love.mp4`](video/icepol_user_journey_what_is_love.mp4) (e [`video/icepol_user_journey.mp4`](video/icepol_user_journey.mp4))
-* **Gravação Real de Tela**: Captura contínua de 60 segundos com navegação no repositório GitHub com scroll do README e arquitetura, clone no terminal com `make seed` e inicialização de containers, chat analítico interativo na porta `:8000` com geração de diagrama Mermaid, inspeção do painel de telemetria `🐘 PostgreSQL 15 Audit` (:5432) e cockpit do Langfuse (:3001) com decomposição de custos de tokens.
-* **Trilha Sonora Original**: [`video/soundtrack_what_is_love_60s.wav`](video/soundtrack_what_is_love_60s.wav) — Arranjo Eurodance ultra animado e contagiante em **125 BPM** (Sol menor / G minor), reproduzindo a energia do clássico de Haddaway:
-  - **Bateria Roland TR-909 Pumping**: Bumbo four-on-the-floor pesado, palmas estéreo estaladas nos tempos 2 e 4, e chimbais abertos pulsantes em todos os contratempos.
-  - **Rolling Eurodance Bassline**: Baixo em semicolcheias com saltos de oitava rápidos (`Gm` &rarr; `Bb` &rarr; `Eb` &rarr; `F`) e filtro analógico ressonante.
-  - **Stabs de Órgão Korg M1 (House Organ 2)**: Acordes percussivos sincopados nos contratempos com chorus estéreo envolvente.
-  - **Hook Principal de Sintetizador**: Melodia inconfundível (*"What is love? Baby don't hurt me, don't hurt me, no more"*) em supersaw analógica com vibrato e ping-pong delay.
-* **Duração**: **60 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
-
-### 2. 🎥 ⚡ Opção Synth-Pop 80s: 'Take On Me' (A-ha)
-* **Arquivo de Vídeo**: [`video/icepol_user_journey_take_on_me.mp4`](video/icepol_user_journey_take_on_me.mp4)
-* **Trilha Sonora Original**: [`video/soundtrack_take_on_me_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_take_on_me_60s.wav) (60s, 168 BPM em Si menor, LinnDrum e DX7 Solid Bass).
-
-### 3. 🤖 🌟 Opção French House / Nu-Disco: 'Around the World / Harder Better Faster' (Daft Punk)
-* **Arquivo de Vídeo**: [`video/icepol_user_journey_daft_punk.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_daft_punk.mp4)
-* **Trilha Sonora Original**: [`video/soundtrack_daft_punk_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_daft_punk_60s.wav) — Composição French House refinada em **123 BPM** (Mi menor / E minor), inspirada no estilo icônico do Daft Punk (*Discovery* & *Homework*):
-  - **Bassline Funk Slap (Estilo Chic / Bernard Edwards)**: Linha de baixo dançante e groovada com modulação de envelope filter e sidechain característico.
-  - **Bateria Roland TR-909 Pumping**: Bumbo four-on-the-floor pulsante, palmas analógicas estéreo nos tempos 2 e 4, e chimbais abertos nos contratempos sincopados.
-  - **Guitarras e Clavinet Disco Funk**: Stabs de guitarra e clavinet com phaser marcando o contratempo.
-  - **Vocoder Robótico**: O lendário hook de voz sintética combinando *"Around the world, around the world"* com *"Work it, make it, do it, makes us / Harder, better, faster, stronger"*.
-* **Duração**: **60 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
-
-### 3. 🎹 Opção Hipnótica Synth-Pop: 'Sweet Dreams' (Eurythmics)
-* **Arquivo de Vídeo**: [`video/icepol_user_journey_sweet_dreams.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_sweet_dreams.mp4)
-* **Trilha Sonora Original**: [`video/soundtrack_sweet_dreams_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_sweet_dreams_60s.wav) (60s, 125 BPM em Dó menor, arpejo Roland SH-101 e cordas Solina).
-
-### 📋 Roteiro da Gravação da Tela (Passo a Passo da Jornada):
-1. **Navegação Real no Repositório GitHub** (0s - 13s): Acesso à página oficial `Helfstein-one/icepol-semantic`, clique no botão `<> Code` exibindo o popover de clone HTTPS, clique no botão de cópia e rolagem suave por todo o README inspecionando o diagrama arquitetural e o isolamento de tabelas físicas.
-2. **Terminal em Ação** (13s - 23s): Digitação em tempo real dos comandos `git clone`, entrada no diretório, execução do `make seed` (gerando os 7 Parquets analíticos de crédito) e subida da pilha completa via `podman compose up -d`.
-3. **Interação com a UI do Chat da Camada Semântica** (23s - 45s): Navegação para `http://localhost:8000`, movimentação do cursor até o input, digitação humana da consulta de crédito corporativo, envio da mensagem, exibição da resposta com tabela DuckDB (180ms), clique na aba `📐 Diagrama Mermaid` exibindo o modelo ERD com Crow's foot (`||--o{`) e clique no botão `⚡ Métricas & Traces` no cabeçalho.
-4. **Cockpit Langfuse & Decomposição de Custos de Tokens** (45s - 60s): Inspeção da cascata de spans do trace `tr_icepol_8f492a` e foco no consumo de tokens:
-    - **O que foi mais custoso em tokens?** O **Contexto Ontológico (63.7% / 218 tokens)**, devido à injeção do catálogo canônico das 7 tabelas.
-    - **O que foi mais custoso em tempo de máquina (*wall time*)?** O **Raciocínio CoT do DeepSeek-R1 (52.0% / 776ms / 72 tokens)**, processando as deduções lógicas no bloco `<think>`.
-    - **Execução Analítica DuckDB**: Scan vetorizado instantâneo de **180ms** com apenas **52 tokens (15.3%)** de SQL final.
+### 🕺 ⚡ 🌟 Gravação Real da Tela: Jornada Completa (85s)
+* **Arquivo de Vídeo Oficial**: [`video/icepol_user_journey.mp4`](video/icepol_user_journey.mp4)
+* **Gravação Real de Tela**: Captura contínua de 85 segundos cobrindo:
+  1. **Navegação no Repositório GitHub (0s - 22s)**: Acesso à página oficial `Helfstein-one/icepol-semantic`, clique no botão `<> Code` exibindo o popover de clone, e rolagem suave por todo o README inspecionando arquitetura, entidades e observabilidade até o rodapé.
+  2. **Terminal & Setup Completo (22s - 40s)**: Execução animada de `git clone`, `pip install`, `make seed` (gerando as 7 tabelas de crédito corporativo em Iceberg/MinIO), inicialização de containers (`podman compose up -d`) e verificação do PostgreSQL 15 (`/api/observability/status`).
+  3. **Jornada no Chat Semântico (40s - 63s)**: Seleção do modelo `deepseek-r1:1.5b` no dropdown, envio da consulta analítica, geração da tabela colunar DuckDB, visualização do **Diagrama Mermaid ERD** interativo e inspeção do popover de auditoria do PostgreSQL 15.
+  4. **Langfuse Tracing & Árvore de Decisão (63s - 85s)**: Login no Langfuse (`:3001`), inspeção visual da **🌳 Árvore de Decisão / DAG de Execução** (`Ingestion ➔ Semantic Parser ➔ DeepSeek-R1 CoT ➔ DuckDB Columnar ➔ PostgreSQL 15 Audit`), waterfall de spans de latência e análise de custo de tokens.
+* **Trilha Sonora Integrada**: Arranjo Eurodance animado em **125 BPM** (*What Is Love* - Haddaway) com bumbo TR-909, baixo synth FM e stabs de piano rave, perfeitamente sincronizado com as transições de cena.
+* **Duração**: **85 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
 
 ---
 
