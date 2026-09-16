@@ -16,9 +16,9 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 - **Painel de Telemetria e Traces no Frontend**:
   - Novo botão e popover interativo `Métricas & Traces` no cabeçalho do Icepol com status ao vivo de Langfuse, MinIO e MySQL.
 - **Produção de Vídeos Demonstrativos em Full HD 1080p e Novas Trilhas Sonoras**:
-  - `video/icepol_chat_ui_journey_lofi_chill.mp4` (60s): **Gravação Focada 100% na UI de Chat com Trilha Calmante Anti-Fadiga** — Tela inicial, digitação interativa, retorno da resposta com tabela analítica DuckDB, aba do diagrama relacional Mermaid com notação Crow's foot, popover de observabilidade aberto no chat com status ao vivo, transição para o Langfuse (`:3001`), waterfall de spans e análise detalhada de consumo de tokens.
-  - `video/soundtrack_lofi_chill_ambient_60s.wav`: **Nova trilha sonora Lo-Fi Chill / Ambient Rhodes (Anti-Fadiga Auditiva)** — 82 BPM, piano elétrico Fender Rhodes com acordes de jazz suaves (`Dmaj9`, `Bm9`, `Gmaj7`, `Asus4`), baixo aveludado sem distorção e percussão orgânica acolhedora (rimshot de madeira e bumbo abafado).
-  - `video/icepol_chat_ui_journey_cyberpunk.mp4` (60s): Versão alternativa com trilha Cyberpunk Synthwave (126 BPM).
+  - `video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4` (40s): **Gravação na UI de Chat Acelerada em 1.5x com Trilha Animada & Groovy** — Roteiro ágil de 40s passando pela tela inicial, digitação rápida de prompt, resposta analítica com DuckDB, diagrama conceitual Mermaid (Crow's foot), popover de observabilidade, cockpit Langfuse, waterfall de spans e gráfico de distribuição de tokens.
+  - `video/soundtrack_funky_upbeat_lofi_40s.wav`: **Nova trilha sonora Funky Upbeat Lo-Fi (Animada, Alegre e Confortável)** — 112 BPM (Eb Major), piano elétrico Rhodes sincopado, linha de baixo slap acústico saltitante e percussão swingada sem ruídos estridentes.
+  - `video/icepol_chat_ui_journey_lofi_chill.mp4` (60s): Versão em velocidade normal com trilha relaxante Lo-Fi Ambient Rhodes (82 BPM).
   - `video/icepol_user_journey_langfuse_tokens.mp4` (60s): Jornada completa com navegação e clone no GitHub, build de terminal, chat e Langfuse (trilha estilo Depeche Mode).
   - `video/icepol_journey_complete.mp4` (36s) e `video/langfuse_metrics_decision_tree.mp4` (36s).
 

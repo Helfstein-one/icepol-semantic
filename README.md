@@ -296,27 +296,26 @@ flowchart LR
 
 O projeto conta com vídeos demonstrativos de alta definição gravados com trilha sonora original estilo **synthwave anos 80 (Depeche Mode style)**:
 
-### 1. ☕ 🌟 Vídeo da Jornada 100% na UI de Chat (Lo-Fi Chill & Ambient Rhodes)
+### 1. 🚀 🌟 Vídeo da Jornada na UI de Chat (Velocidade 1.5x & Funky Upbeat Lo-Fi)
+* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_1.5x_funky_upbeat.mp4)
+* **Trilha Sonora Animada & Confortável**: [`video/soundtrack_funky_upbeat_lofi_40s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_funky_upbeat_lofi_40s.wav) — Composição animada, dançante e alegre em **112 BPM** (Eb Major), com piano Rhodes sincopado (acordes nona/décima terceira), baixo slap acústico saltitante e bateria swing groovy (sem ruídos estridentes).
+* **Duração Otimizada (1.5x)**: **40 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
+* **Roteiro Ágil e Dinâmico**:
+  1. **UI Inicial do Chat** (4.6s): Apresentação da tela inicial com o urso polar, saudação, chips de atalhos e microfone.
+  2. **Digitação Ágil da Pergunta** (4.6s): Entrada rápida de texto com seleção do `deepseek-r1:1.5b`.
+  3. **Resultado Analítico DuckDB** (5.3s): Exibição dos dados de crédito corporativo em tabela estruturada.
+  4. **Aba do Diagrama Conceitual Mermaid** (5.3s): Modelo relacional ERD com as 7 entidades e conectores Crow's foot (`||--o{`).
+  5. **Popover de Observabilidade** (4.0s): Abertura do cockpit no cabeçalho com status de Langfuse, MinIO e MySQL.
+  6. **Cockpit Langfuse** (5.3s): Métricas de 1.482 traces, SLA P95 de 1.88s e confiabilidade dos sinks.
+  7. **Waterfall de Spans** (5.3s): Cascata de latências do ciclo de vida da consulta.
+  8. **Distribuição de Gastos de Tokens** (5.3s): Análise de consumo (contexto ontológico, CoT e SQL).
+
+### 2. ☕ Vídeo da Jornada em Velocidade Normal (Lo-Fi Chill & Ambient Rhodes)
 * **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_lofi_chill.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_lofi_chill.mp4)
-* **Trilha Sonora Calmante (Relaxante / Anti-Fadiga)**: [`video/soundtrack_lofi_chill_ambient_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_lofi_chill_ambient_60s.wav) — Composição relaxante em 82 BPM, com piano elétrico vintage Fender Rhodes tocando tétrades de jazz suave (`Dmaj9`, `Bm9`, `Gmaj7`, `Asus4`), baixo aveludado e bateria orgânica suave (rimshots de madeira e bumbo abafado sem frequências estridentes).
-* **Duração**: 60 segundos | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
-* **Foco Total na Experiência do Chat**:
-  1. **UI Inicial do Chat**: Apresentação da tela inicial com logo do urso polar, saudação, chips de sugestões, microfone e upload.
-  2. **Digitação ao Vivo na Barra de Prompt**: Usuário digitando em tempo real com seleção do modelo `deepseek-r1:1.5b`.
-  3. **Célula de Resposta com Tabela DuckDB**: Visualização do resultado tabular analítico de crédito por setor e tags de auditoria.
-  4. **Aba do Diagrama Conceitual Mermaid**: Renderização do modelo de dados relacional completo em SVG com cardinalidade Crow's foot (`||--o{`).
-  5. **Popover de Observabilidade Aberto no Chat**: Usuário clicando no botão do cabeçalho e inspecionando os links ao vivo do Langfuse, MinIO e MySQL.
-  6. **Dashboard de Métricas do Langfuse**: Monitoramento de traces (1.482), P95 SLA (1.88s) e integridade dos sinks.
-  7. **Waterfall de Spans**: Detalhamento visual da latência de cada etapa da execução.
-  8. **Distribuição de Gastos de Tokens**: Gráfico analítico evidenciando o consumo em Input Ontológico (218 tokens), Raciocínio CoT (72 tokens) e SQL Output (52 tokens).
+* **Trilha Sonora Calmante**: [`video/soundtrack_lofi_chill_ambient_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_lofi_chill_ambient_60s.wav) (82 BPM, 60s, clima relaxante).
 
-### 2. ⚡ Vídeo da Jornada Alternativo (Cyberpunk Dark Synthwave)
-* **Arquivo**: [`video/icepol_chat_ui_journey_cyberpunk.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_cyberpunk.mp4)
-* **Trilha Sonora**: [`video/soundtrack_cyberpunk_synthwave_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_cyberpunk_synthwave_60s.wav) (126 BPM, sintetizador enérgico estilo anos 80).
-
-### 2. 🌟 Vídeo Master: Jornada Completa (GitHub, Clone, Chat & Langfuse)
-* **Arquivo**: [`video/icepol_user_journey_langfuse_tokens.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_langfuse_tokens.mp4)
-* **Duração**: 60 segundos | **Resolução**: 1920x1080 Full HD (Depeche Mode 80s Soundtrack)
+### 3. 🌟 Vídeo Master: Jornada Completa (GitHub, Clone, Chat & Langfuse)
+* **Arquivo**: [`video/icepol_user_journey_langfuse_tokens.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_langfuse_tokens.mp4) (60s)
 
 ### 3. Vídeos Curtos de Demonstração Rápida
 * **Jornada Rápida**: [`video/icepol_journey_complete.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_journey_complete.mp4) (36s)
