@@ -76,8 +76,8 @@ services:
       - POSTGRES_PASSWORD=password123
       - POSTGRES_DB=langfuse
       - LANGFUSE_HOST=http://langfuse:3000
-      - LANGFUSE_PUBLIC_KEY=pk-lf-icepol
-      - LANGFUSE_SECRET_KEY=sk-lf-icepol
+      - LANGFUSE_PUBLIC_KEY=pk-lf-ad22c6fb-23b2-4215-a60b-cd20a8184b28
+      - LANGFUSE_SECRET_KEY=sk-lf-252b637e-3da3-4863-b16f-c0af1f935e49
     depends_on:
       - minio
       - polaris

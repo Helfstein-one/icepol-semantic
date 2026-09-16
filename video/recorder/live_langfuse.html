@@ -40,6 +40,28 @@
 </style>
 </head>
 <body>
+  <!-- Langfuse Login Overlay -->
+  <div id="langfuse-login-overlay" style="position:fixed; inset:0; background:#080c14; z-index:999999; display:flex; align-items:center; justify-content:center; transition:opacity 0.6s ease, visibility 0.6s ease;">
+    <div style="background:#111827; border:1px solid #1f2937; border-radius:18px; padding:38px 44px; width:440px; box-shadow:0 25px 60px rgba(0,0,0,0.8); text-align:center;">
+      <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:18px;">
+        <svg style="width:36px; height:36px; fill:#38bdf8;" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <h1 style="font-size:26px; font-weight:800; color:#fff; letter-spacing:-0.5px;">Langfuse</h1>
+      </div>
+      <p style="font-size:13px; color:#94a3b8; margin-bottom:24px;">Sign in to your LLM Observability Cockpit</p>
+      <div style="text-align:left; margin-bottom:14px;">
+        <label style="font-size:11px; font-weight:600; color:#64748b; text-transform:uppercase;">Email</label>
+        <input id="login-email" type="text" value="admin@icepol.ai" readonly style="width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:10px 14px; color:#f1f5f9; font-size:13px; margin-top:4px;">
+      </div>
+      <div style="text-align:left; margin-bottom:22px;">
+        <label style="font-size:11px; font-weight:600; color:#64748b; text-transform:uppercase;">Password</label>
+        <input id="login-pass" type="password" value="••••••••••••" readonly style="width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:10px 14px; color:#f1f5f9; font-size:13px; margin-top:4px;">
+      </div>
+      <button id="login-btn" onclick="doLogin()" style="width:100%; background:linear-gradient(90deg,#0284c7,#0369a1); border:none; border-radius:8px; padding:12px; color:#fff; font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(2,132,199,0.4); transition:all 0.2s;">
+        Sign in to Project
+      </button>
+    </div>
+  </div>
+
   <header>
     <div class="brand">
       <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -78,6 +100,40 @@
     </div>
 
     <div class="panel-wf">
+      <!-- Árvore de Decisão / DAG Visual -->
+      <div style="margin-bottom:18px; padding:14px 18px; background:#0f172a; border:1px solid #1e293b; border-radius:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:12px; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.5px;">🌳 Árvore de Decisão / DAG de Execução do Modelo</span>
+          <span style="font-size:11px; color:#10b981; font-weight:600;">Status: 200 OK • Instrumentação Completa</span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:11px;">
+          <div style="background:#1e293b; border:1px solid #3b82f6; border-radius:8px; padding:8px 10px; text-align:center; flex:1;">
+            <div style="color:#60a5fa; font-weight:700;">1. Ingestion</div>
+            <div style="color:#94a3b8; font-size:10px;">Prompt Natural</div>
+          </div>
+          <span style="color:#64748b; font-weight:bold;">➔</span>
+          <div style="background:#1e293b; border:1px solid #8b5cf6; border-radius:8px; padding:8px 10px; text-align:center; flex:1;">
+            <div style="color:#a78bfa; font-weight:700;">2. Semantic Parser</div>
+            <div style="color:#94a3b8; font-size:10px;">Ontologias (328ms)</div>
+          </div>
+          <span style="color:#64748b; font-weight:bold;">➔</span>
+          <div style="background:#1e293b; border:1px solid #ec4899; border-radius:8px; padding:8px 10px; text-align:center; flex:1.2; box-shadow:0 0 15px rgba(236,72,153,0.3);">
+            <div style="color:#f472b6; font-weight:700;">3. DeepSeek-R1 (CoT)</div>
+            <div style="color:#94a3b8; font-size:10px;">&lt;think&gt; Raciocínio (776ms)</div>
+          </div>
+          <span style="color:#64748b; font-weight:bold;">➔</span>
+          <div style="background:#1e293b; border:1px solid #10b981; border-radius:8px; padding:8px 10px; text-align:center; flex:1;">
+            <div style="color:#34d399; font-weight:700;">4. DuckDB Columnar</div>
+            <div style="color:#94a3b8; font-size:10px;">Scan Iceberg (180ms)</div>
+          </div>
+          <span style="color:#64748b; font-weight:bold;">➔</span>
+          <div style="background:#1e293b; border:1px solid #38bdf8; border-radius:8px; padding:8px 10px; text-align:center; flex:1;">
+            <div style="color:#38bdf8; font-weight:700;">5. PostgreSQL 15</div>
+            <div style="color:#94a3b8; font-size:10px;">Audit Log (108ms)</div>
+          </div>
+        </div>
+      </div>
+
       <div class="wf-head">
         <h2>Decomposição da Latência em Spans (Wall Time)</h2>
         <span style="font-size:12px; color:#94a3b8;">100% dos spans instrumentados</span>
@@ -145,5 +201,18 @@
       </div>
     </div>
   </div>
+  <script>
+    function doLogin() {
+      const btn = document.getElementById('login-btn');
+      btn.innerText = 'Signing in...';
+      btn.style.background = '#059669';
+      setTimeout(() => {
+        const overlay = document.getElementById('langfuse-login-overlay');
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+        setTimeout(() => overlay.style.visibility = 'hidden', 600);
+      }, 500);
+    }
+  </script>
 </body>
 </html>

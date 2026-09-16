@@ -37,15 +37,21 @@
     const term = document.getElementById('term-content');
     const steps = [
       { text: '<p><span class="prompt">➜  dev</span> <span class="cmd" id="typing-cmd-1"></span><span class="cursor" id="c1"></span></p>', delay: 100 },
-      { type: 'cmd1', str: 'git clone https://github.com/Helfstein-one/icepol-semantic.git', speed: 45 },
-      { text: '<p class="dim">Cloning into "icepol-semantic"...</p><p class="dim">remote: Enumerating objects: 412, done.</p><p class="success">remote: Total 412 (delta 234), reused 390 (delta 218)</p><p class="success">Receiving objects: 100% (412/412), 16.40 MiB | 24.12 MiB/s, done.</p><br>', delay: 800 },
-      { text: '<p><span class="prompt">➜  dev</span> <span class="cmd" id="typing-cmd-2"></span><span class="cursor" id="c2"></span></p>', delay: 300 },
-      { type: 'cmd2', str: 'cd icepol-semantic && make seed', speed: 50 },
-      { text: '<p class="info">🌱 [SEED] Gerando 7 tabelas físicas sintéticas de Crédito Corporativo...</p><p class="dim">  ✔ counterparts.parquet (1,000 tomadores de crédito, CNAE, Ratings)</p><p class="dim">  ✔ facilities.parquet (3,500 operações ativas de crédito)</p><p class="dim">  ✔ collaterals.parquet (4,200 garantias reais e recebíveis)</p><p class="dim">  ✔ proposals.parquet (2,800 deliberações de comitês)</p><p class="dim">  ✔ financial_statements.parquet (Dívida Líquida, EBITDA, Balanços)</p><p class="dim">  ✔ credit_limits.parquet (Limites globais aprovados e tomados)</p><p class="dim">  ✔ covenants.parquet (Cláusulas de desenquadramento financeiro)</p><p class="success">✨ 7 Tabelas registradas no Apache Polaris REST Catalog e MinIO S3!</p><br>', delay: 1000 },
-      { text: '<p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd" id="typing-cmd-3"></span><span class="cursor" id="c3"></span></p>', delay: 300 },
-      { type: 'cmd3', str: 'podman compose up -d', speed: 55 },
-      { text: '<p><span class="success">✔ Container minio-storage</span>     <span class="highlight">Running</span> (S3 API :9000, Console :9001)</p><p><span class="success">✔ Container polaris-catalog</span>   <span class="highlight">Running</span> (Apache Iceberg REST :8181)</p><p><span class="success">✔ Container postgres-langfuse</span> <span class="highlight">Running</span> (PostgreSQL 15 & Métricas :5432)</p><p><span class="success">✔ Container langfuse-server</span>   <span class="highlight">Running</span> (LLM Observability Dashboard :3001)</p><p><span class="success">✔ Container semantic-agent</span>    <span class="highlight">Running</span> (FastAPI Web Chat :8000)</p><br>', delay: 800 },
-      { text: '<p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd">open http://localhost:8000</span><span class="cursor"></span></p>', delay: 500 }
+      { type: 'cmd1', str: 'git clone https://github.com/Helfstein-one/icepol-semantic.git && cd icepol-semantic', speed: 38 },
+      { text: '<p class="dim">Cloning into "icepol-semantic"...</p><p class="success">remote: Total 420 (delta 240), reused 400 (delta 225), pack-reused 0</p><p class="success">Receiving objects: 100% (420/420), 16.50 MiB | 28.10 MiB/s, done.</p><br>', delay: 600 },
+      { text: '<p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd" id="typing-cmd-pip"></span><span class="cursor" id="cpip"></span></p>', delay: 200 },
+      { type: 'cmdpip', str: 'pip install -r requirements.txt', speed: 40 },
+      { text: '<p class="dim">Installing: duckdb, pyiceberg, psycopg2-binary, langfuse, fastapi, uvicorn...</p><p class="success">Successfully installed duckdb-1.5.5 pyiceberg-0.12.0 psycopg2-binary-2.9.13 langfuse-2.60.10</p><br>', delay: 700 },
+      { text: '<p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd" id="typing-cmd-2"></span><span class="cursor" id="c2"></span></p>', delay: 200 },
+      { type: 'cmd2', str: 'make seed', speed: 45 },
+      { text: '<p class="info">🌱 [SEED] Gerando 7 tabelas físicas sintéticas de Crédito Corporativo...</p><p class="dim">  ✔ counterparts.parquet (1,000 tomadores de crédito, CNAE, Ratings)</p><p class="dim">  ✔ facilities.parquet (3,500 operações ativas de crédito)</p><p class="dim">  ✔ collaterals.parquet (4,200 garantias reais e recebíveis)</p><p class="dim">  ✔ proposals.parquet (2,800 deliberações de comitês)</p><p class="dim">  ✔ financial_statements.parquet (Dívida Líquida, EBITDA, Balanços)</p><p class="dim">  ✔ credit_limits.parquet (Limites globais aprovados e tomados)</p><p class="dim">  ✔ covenants.parquet (Cláusulas de desenquadramento financeiro)</p><p class="success">✨ 7 Tabelas registradas no Apache Polaris REST Catalog e MinIO S3!</p><br>', delay: 800 },
+      { text: '<p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd" id="typing-cmd-3"></span><span class="cursor" id="c3"></span></p>', delay: 200 },
+      { type: 'cmd3', str: 'podman compose up -d', speed: 45 },
+      { text: '<p><span class="success">✔ Container minio-storage</span>     <span class="highlight">Running</span> (S3 API :9000, Console :9001)</p><p><span class="success">✔ Container polaris-catalog</span>   <span class="highlight">Running</span> (Apache Iceberg REST :8181)</p><p><span class="success">✔ Container postgres-langfuse</span> <span class="highlight">Running</span> (PostgreSQL 15 & Métricas :5432)</p><p><span class="success">✔ Container langfuse-server</span>   <span class="highlight">Running</span> (LLM Observability Dashboard :3001)</p><p><span class="success">✔ Container semantic-agent</span>    <span class="highlight">Running</span> (FastAPI Web Chat :8000)</p><br>', delay: 700 },
+      { text: '<p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd" id="typing-cmd-4"></span><span class="cursor" id="c4"></span></p>', delay: 200 },
+      { type: 'cmd4', str: 'curl -s http://localhost:8000/api/observability/status | jq .postgres', speed: 40 },
+      { text: '<p class="info">{ "status": "conectado", "port": 5432, "table": "query_metrics" }</p><br>', delay: 600 },
+      { text: '<p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd">open http://localhost:8000</span><span class="cursor"></span></p>', delay: 400 }
     ];
 
     async function runTerminal() {
@@ -53,27 +59,16 @@
         if (s.text) {
           term.insertAdjacentHTML('beforeend', s.text);
           await new Promise(r => setTimeout(r, s.delay || 300));
-        } else if (s.type === 'cmd1') {
-          const el = document.getElementById('typing-cmd-1');
-          for (let i = 0; i < s.str.length; i++) {
-            el.textContent += s.str[i];
-            await new Promise(r => setTimeout(r, s.speed));
+        } else if (s.type.startsWith('cmd')) {
+          const el = document.getElementById(`typing-${s.type}`);
+          if (el) {
+            for (let i = 0; i < s.str.length; i++) {
+              el.textContent += s.str[i];
+              await new Promise(r => setTimeout(r, s.speed));
+            }
           }
-          document.getElementById('c1').remove();
-        } else if (s.type === 'cmd2') {
-          const el = document.getElementById('typing-cmd-2');
-          for (let i = 0; i < s.str.length; i++) {
-            el.textContent += s.str[i];
-            await new Promise(r => setTimeout(r, s.speed));
-          }
-          document.getElementById('c2').remove();
-        } else if (s.type === 'cmd3') {
-          const el = document.getElementById('typing-cmd-3');
-          for (let i = 0; i < s.str.length; i++) {
-            el.textContent += s.str[i];
-            await new Promise(r => setTimeout(r, s.speed));
-          }
-          document.getElementById('c3').remove();
+          const cursorId = s.type === 'cmd1' ? 'c1' : s.type === 'cmdpip' ? 'cpip' : s.type === 'cmd2' ? 'c2' : s.type === 'cmd3' ? 'c3' : 'c4';
+          document.getElementById(cursorId)?.remove();
         }
       }
     }

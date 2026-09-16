@@ -41,3 +41,4 @@ video/recorder/node_modules/
 .pytest_cache/
 .coverage
 htmlcov/
+video/recorder/raw_recordings/

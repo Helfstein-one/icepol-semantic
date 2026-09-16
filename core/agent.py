@@ -25,9 +25,17 @@ POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password123")
 POSTGRES_DB = os.getenv("POSTGRES_DB", "langfuse")
 
-LANGFUSE_HOST = os.getenv("LANGFUSE_HOST", "http://langfuse:3000")
-LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY", "pk-lf-icepol")
-LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY", "sk-lf-icepol")
+LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY", "pk-lf-ad22c6fb-23b2-4215-a60b-cd20a8184b28")
+LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY", "sk-lf-252b637e-3da3-4863-b16f-c0af1f935e49")
+
+# Auto-detect host: inside container use http://langfuse:3000, outside use http://localhost:3001
+default_langfuse_host = "http://langfuse:3000" if (os.path.exists("/.dockerenv") or os.getenv("CONTAINER")) else "http://localhost:3001"
+LANGFUSE_HOST = os.getenv("LANGFUSE_HOST", default_langfuse_host)
+
+# Ensure os.environ is populated for any automated decorators
+os.environ["LANGFUSE_PUBLIC_KEY"] = LANGFUSE_PUBLIC_KEY
+os.environ["LANGFUSE_SECRET_KEY"] = LANGFUSE_SECRET_KEY
+os.environ["LANGFUSE_HOST"] = LANGFUSE_HOST
 
 try:
     import psycopg2
@@ -50,7 +58,7 @@ if LANGFUSE_AVAILABLE and LANGFUSE_PUBLIC_KEY:
             secret_key=LANGFUSE_SECRET_KEY,
             host=LANGFUSE_HOST
         )
-        print(f"[Langfuse] Conectado ao host: {LANGFUSE_HOST}", flush=True)
+        print(f"[Langfuse] Conectado com sucesso ao host: {LANGFUSE_HOST}", flush=True)
     except Exception as e:
         print(f"[Langfuse Init Warning] {e}", flush=True)
 
@@ -124,23 +132,57 @@ def log_metric_to_postgres(model: str, prompt: str, sql: Optional[str], row_coun
 # Alias for backward compatibility
 log_metric_to_mysql = log_metric_to_postgres
 
-def log_trace_to_langfuse(session_id: str, model: str, user_prompt: str, assistant_response: str, latency_s: float, tokens: int):
+def log_trace_to_langfuse(
+    session_id: str,
+    model: str,
+    user_prompt: str,
+    assistant_response: str,
+    latency_s: float,
+    tokens: int,
+    sql: Optional[str] = None,
+    duckdb_time_ms: float = 0.0,
+    row_count: int = 0,
+    status: str = "SUCCESS",
+    error: Optional[str] = None
+):
     if not langfuse_client:
         return
     try:
         trace = langfuse_client.trace(
-            name="icepol_query",
+            name="icepol_semantic_query",
             session_id=session_id,
-            metadata={"model": model, "domain": "corporate_credit"}
+            input=user_prompt,
+            output=assistant_response,
+            metadata={
+                "model": model,
+                "domain": "corporate_credit",
+                "has_sql": sql is not None,
+                "status": status
+            },
+            tags=[model, status.lower(), "corporate_credit"]
         )
-        trace.generation(
-            name="llm_completion",
+        gen = trace.generation(
+            name="llm_synthesis",
             model=model,
             input=user_prompt,
             output=assistant_response,
             usage={"total_tokens": tokens},
-            latency=latency_s
+            latency=latency_s,
+            metadata={"sql": sql, "error": error} if (error or sql) else None
         )
+        if status == "ERROR":
+            gen.update(level="ERROR", status_message=error or "LLM generation failure")
+            trace.update(level="ERROR", status_message=error or "Execution error")
+        if sql and duckdb_time_ms > 0:
+            trace.span(
+                name="duckdb_columnar_query",
+                input=sql,
+                output={"rows_returned": row_count, "duckdb_ms": duckdb_time_ms},
+                metadata={"engine": "DuckDB-Iceberg", "s3": "MinIO"},
+                latency=duckdb_time_ms / 1000.0
+            )
+        # Flush immediately so that traces appear on the dashboard in real-time
+        langfuse_client.flush()
     except Exception as e:
         print(f"[Langfuse Trace Warning] {e}", flush=True)
 
@@ -2094,6 +2136,19 @@ async def chat_completions(req: ChatCompletionRequest):
             status="ERROR",
             session_id="icepol-session"
         )
+        try:
+            log_trace_to_langfuse(
+                session_id="icepol-session",
+                model=target_model,
+                user_prompt=user_prompt_err,
+                assistant_response=err_msg,
+                latency_s=total_time_ms / 1000.0,
+                tokens=0,
+                status="ERROR",
+                error=err_msg
+            )
+        except Exception:
+            pass
         return {
             "id": "chatcmpl-fallback",
             "object": "chat.completion",
@@ -2157,7 +2212,11 @@ async def chat_completions(req: ChatCompletionRequest):
             user_prompt=user_prompt,
             assistant_response=assistant_content,
             latency_s=total_time_ms / 1000.0,
-            tokens=tokens_est
+            tokens=tokens_est,
+            sql=sql_code,
+            duckdb_time_ms=duckdb_time_ms,
+            row_count=row_count,
+            status="SUCCESS"
         )
     except Exception as lf_err:
         print(f"[Observability Langfuse Error] {lf_err}", flush=True)

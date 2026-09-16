@@ -3,7 +3,7 @@ import wave
 import struct
 
 SAMPLE_RATE = 44100
-DURATION = 60.0
+DURATION = 85.0
 TOTAL_SAMPLES = int(SAMPLE_RATE * DURATION)
 BPM = 125.0
 BEAT_DUR = 60.0 / BPM          # 0.48 s
@@ -284,7 +284,7 @@ lead_theme = [
 
 theme_duration = 8 * BAR_DUR
 
-for rep in range(4):
+for rep in range(6):
     rep_offset = rep * theme_duration
     if rep_offset >= DURATION:
         break
@@ -319,11 +319,11 @@ interleaved = np.empty((TOTAL_SAMPLES * 2,), dtype=np.int16)
 interleaved[0::2] = left_int16
 interleaved[1::2] = right_int16
 
-out_path = "video/soundtrack_what_is_love_60s.wav"
+out_path = "video/soundtrack_what_is_love_85s.wav"
 with wave.open(out_path, "wb") as wf:
     wf.setnchannels(2)
     wf.setsampwidth(2)
     wf.setframerate(SAMPLE_RATE)
     wf.writeframes(interleaved.tobytes())
 
-print(f"Successfully generated 60-second Eurodance 'What Is Love' soundtrack: {out_path}")
+print(f"Successfully generated 85-second Eurodance 'What Is Love' soundtrack: {out_path}")
