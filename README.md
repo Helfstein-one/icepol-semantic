@@ -358,32 +358,31 @@ pie title Distribuição Percentual de Gastos de Tokens por Consulta (342 Tokens
 
 ---
 
-## 🎬 Vídeos Demonstrativos & Mermaid Interativo
+## 🎬 Vídeos Demonstrativos & Gravação Real da Tela
 
-O projeto conta com vídeos demonstrativos de alta definição (1080p Full HD) documentando a jornada completa de ponta a ponta:
+O projeto conta com vídeos demonstrativos e **gravação real da tela** (*screen recording* com automação de cursor, digitação e interação ao vivo) em Full HD 1080p:
 
-### 1. 🕺 🌟 Vídeo Master: Jornada Completa do Usuário (Trilha Estilo 'Cheri Cheri Lady' - Modern Talking)
-* **Arquivo de Vídeo**: [`video/icepol_user_journey_cheri_cheri_lady.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_cheri_cheri_lady.mp4)
-* **Trilha Sonora Original**: [`video/soundtrack_cheri_cheri_lady_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_cheri_cheri_lady_60s.wav) — Composição Euro-Disco animada em **118 BPM** (G# menor / Sol sustenido menor), inspirada na clássica sonoridade synth-pop dos anos 80 de Dieter Bohlen e Thomas Anders (*Modern Talking*, 1985):
-  - **Bassline Oitavada Galloping em Semicolcheias (16th-note)**: Linha de baixo pulsante e dançante no sintetizador Moog/Roland TB-303.
-  - **Bateria Eletrônica Estilo LinnDrum / Simmons**: Batida 4-on-the-floor nítida com chimbais abertos (*open hi-hat*) nos contratempos sincopados e palmas estéreo.
-  - **Hook Principal de Lead / Synth Brass**: O clássico e inconfundível riff melódico do refrão de *Cheri Cheri Lady* com chorus estéreo e delay analógico.
-  - **Chords & Pads Roland Juno-106**: Progressão harmônica dançante (`G#m` &rarr; `C#m` &rarr; `F#` &rarr; `B` &rarr; `E` &rarr; `D#m`).
+### 1. 🎥 ⚡ 🌟 Gravação Real da Tela: Jornada Completa (Trilha 'Take On Me' - A-ha)
+* **Arquivo de Vídeo**: [`video/icepol_screen_recording_take_on_me.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_screen_recording_take_on_me.mp4)
+* **Gravação Real de Tela**: Captura contínua de 60 segundos com movimentação fluida de cursor do mouse, clique com efeito visual ripple, rolagem suave da página oficial do GitHub, digitação em tempo real no terminal e interação direta no chat local (`http://localhost:8000`) e no cockpit do Langfuse (`:3001`).
+* **Trilha Sonora Original**: [`video/soundtrack_take_on_me_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_take_on_me_60s.wav) — Composição synth-pop super animada e enérgica em **168 BPM** (B minor / Si menor), inspirada no clássico do A-ha:
+  - **Hook Inconfundível de Teclado**: Riff melódico icônico sintetizado com onda híbrida square/sawtooth brilhante, delay estéreo em colcheias e chorus vintage Roland Juno.
+  - **Bassline Bouncing em Oitavas**: Linha de baixo pulsante em colcheias staccato saltando oitavas em alta velocidade (`Bm` &rarr; `E` &rarr; `A` &rarr; `D` / `F#m`).
+  - **Bateria Eletrônica LinnDrum**: Bumbo rápido four-on-the-floor, caixa com estalo gated, chimbais rápidos em semicolcheias e open hi-hats nos contratempos.
 * **Duração**: **60 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
-* **Roteiro da Jornada de Ponta a Ponta (10 Cenas)**:
-  1. **Navegação no Repositório GitHub** (6s): Acesso à página do projeto `Helfstein-one/icepol-semantic`, visualização do cabeçalho, tags de tecnologias, commits e modal com URL de clone HTTPS.
-  2. **Scroll da Página e Leitura da Arquitetura** (6s): Rolagem pelo README inspecionando o diagrama conceitual e garantias de *Zero Alucinação de Schema*.
-  3. **Terminal: Clone do Repositório** (6s): Execução de `git clone https://github.com/Helfstein-one/icepol-semantic.git` e `cd icepol-semantic`.
-  4. **Terminal: Seed de Dados e Subida dos Containers** (6s): Execução de `make seed` gerando os 7 Parquets sintéticos de crédito corporativo e `podman compose up -d` subindo MinIO, Polaris, MySQL 8, Postgres, Langfuse e Semantic Agent.
-  5. **Boas-Vindas no Chat da Camada Semântica** (6s): Interface web com logotipo do urso polar, seletor de modelos (`deepseek-r1:1.5b`), botões de upload `+`, microfone para pesquisa por voz e sugestões.
-  6. **Digitação da Pergunta de Crédito** (5s): Inserção do prompt: *"Qual a exposição total e alavancagem média por setor? Gere também o modelo relacional Mermaid"*.
-  7. **Resultado Analítico DuckDB em Tabela** (7s): Retorno ultrarrápido (180ms) com agregação de R$ 13,8 bilhões distribuídos por CNAE e métricas de risco.
-  8. **Modelagem Conceitual Mermaid ERD (Crow's Foot)** (6s): Renderização SVG das 7 entidades (`counterparts`, `facilities`, `collaterals`, `proposals`, `financial_statements`, `credit_limits`, `covenants`) com cardinalidade formal (`||--o{`).
-  9. **Langfuse Tracing: Waterfall de Spans** (6s): Visualização detalhada do trace `tr_icepol_8f492a` decomposto em parsing semântico (328ms), CoT DeepSeek-R1 (776ms), DuckDB (180ms) e auditoria MinIO/MySQL (108ms).
-  10. **Análise de Custos & Gastos de Tokens** (6s):
-      - **Maior Volume de Tokens**: *Contexto Ontológico* (63.7% / 218 tokens) — maior peso em bytes devido às regras canônicas das 7 tabelas.
-      - **Maior Custo em Tempo (Wall Time)**: *Raciocínio CoT do DeepSeek-R1* (52.0% / 776ms / 72 tokens) — maior esforço computacional devido à geração autorregressiva do bloco `<think>`.
-      - *Síntese SQL ANSI*: 15.3% / 52 tokens com scan DuckDB executado em apenas 180ms.
+
+### 2. 🕺 Versão Gravação de Tela com Trilha Euro-Disco 'Cheri Cheri Lady' (Modern Talking)
+* **Arquivo de Vídeo**: [`video/icepol_screen_recording_cheri_cheri_lady.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_screen_recording_cheri_cheri_lady.mp4)
+* **Trilha Sonora**: [`video/soundtrack_cheri_cheri_lady_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_cheri_cheri_lady_60s.wav) (60s, 118 BPM em G# menor, galloping bass e brass lead hook).
+
+### 📋 Roteiro da Gravação da Tela (Passo a Passo da Jornada):
+1. **Navegação Real no Repositório GitHub** (0s - 13s): Acesso à página oficial `Helfstein-one/icepol-semantic`, clique no botão `<> Code` exibindo o popover de clone HTTPS, clique no botão de cópia e rolagem suave por todo o README inspecionando o diagrama arquitetural e o isolamento de tabelas físicas.
+2. **Terminal em Ação** (13s - 23s): Digitação em tempo real dos comandos `git clone`, entrada no diretório, execução do `make seed` (gerando os 7 Parquets analíticos de crédito) e subida da pilha completa via `podman compose up -d`.
+3. **Interação com a UI do Chat da Camada Semântica** (23s - 45s): Navegação para `http://localhost:8000`, movimentação do cursor até o input, digitação humana da consulta de crédito corporativo, envio da mensagem, exibição da resposta com tabela DuckDB (180ms), clique na aba `📐 Diagrama Mermaid` exibindo o modelo ERD com Crow's foot (`||--o{`) e clique no botão `⚡ Métricas & Traces` no cabeçalho.
+4. **Cockpit Langfuse & Decomposição de Custos de Tokens** (45s - 60s): Inspeção da cascata de spans do trace `tr_icepol_8f492a` e foco no consumo de tokens:
+    - **O que foi mais custoso em tokens?** O **Contexto Ontológico (63.7% / 218 tokens)**, devido à injeção do catálogo canônico das 7 tabelas.
+    - **O que foi mais custoso em tempo de máquina (*wall time*)?** O **Raciocínio CoT do DeepSeek-R1 (52.0% / 776ms / 72 tokens)**, processando as deduções lógicas no bloco `<think>`.
+    - **Execução Analítica DuckDB**: Scan vetorizado instantâneo de **180ms** com apenas **52 tokens (15.3%)** de SQL final.
 
 ---
 

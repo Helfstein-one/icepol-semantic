@@ -32,6 +32,10 @@ minio-data/
 *.swp
 *.swo
 
+# Node / JS
+node_modules/
+video/recorder/node_modules/
+
 # Logs & Testing
 *.log
 .pytest_cache/

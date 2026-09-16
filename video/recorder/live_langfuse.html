@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; }
+  body { background: #0b0f19; color: #f1f5f9; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; }
+  header { height: 64px; background: #111827; border-bottom: 1px solid #1f2937; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
+  .brand { display: flex; align-items: center; gap: 14px; font-size: 18px; font-weight: 700; }
+  .brand svg { width: 28px; height: 28px; fill: #38bdf8; }
+
+  .content { flex: 1; padding: 28px 48px; display: grid; grid-template-columns: 440px 1fr; gap: 28px; }
+  .panel-meta { background: #111827; border: 1px solid #1e293b; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+  .meta-title { font-size: 13px; font-weight: 700; color: #94a3b8; text-transform: uppercase; border-bottom: 1px solid #1e293b; padding-bottom: 8px; }
+  .field { display: flex; flex-direction: column; gap: 2px; }
+  .f-label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+  .f-val { font-size: 13px; color: #f1f5f9; font-family: monospace; }
+
+  .panel-wf { background: #111827; border: 1px solid #1e293b; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; }
+  .wf-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px; }
+  .wf-head h2 { font-size: 18px; font-weight: 700; }
+
+  .span-row { margin-bottom: 16px; }
+  .span-info { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; font-weight: 600; }
+  .bar-bg { width: 100%; height: 26px; background: #0f172a; border-radius: 6px; border: 1px solid #1e293b; position: relative; overflow: hidden; }
+  .bar-fill { height: 100%; position: absolute; border-radius: 5px; display: flex; align-items: center; padding-left: 12px; font-size: 11px; font-weight: 700; color: #fff; transition: width 1s ease; }
+  
+  .b1 { background: linear-gradient(90deg, #3b82f6, #60a5fa); left: 0%; width: 100%; }
+  .b2 { background: linear-gradient(90deg, #8b5cf6, #a78bfa); left: 3%; width: 22%; }
+  .b3 { background: linear-gradient(90deg, #ec4899, #f472b6); left: 26%; width: 52%; }
+  .b4 { background: linear-gradient(90deg, #10b981, #34d399); left: 79%; width: 12%; }
+  .b5 { background: linear-gradient(90deg, #f59e0b, #fbbf24); left: 92%; width: 8%; }
+
+  /* Token Cost Highlights */
+  .token-section { margin-top: 18px; border-top: 1px solid #1e293b; pt: 16px; padding-top: 16px; }
+  .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 10px; }
+  .t-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 14px; }
+  .t-num { font-size: 26px; font-weight: 800; margin: 4px 0; }
+  .badge-cost { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>Langfuse Tracing: Waterfall de Spans & Análise de Custos</span>
+    </div>
+    <div style="font-size:13px; color:#10b981; font-weight:600;">Trace ID: tr_icepol_8f492a • Status 200 OK • Observabilidade Local</div>
+  </header>
+
+  <div class="content">
+    <div class="panel-meta">
+      <div class="meta-title">Metadados da Sessão Auditada</div>
+      <div class="field">
+        <div class="f-label">Prompt do Usuário</div>
+        <div class="f-val" style="color:#38bdf8;">"Qual a exposição total e alavancagem média por setor?"</div>
+      </div>
+      <div class="field">
+        <div class="f-label">Modelo LLM</div>
+        <div class="f-val">deepseek-r1:1.5b (Ollama Local)</div>
+      </div>
+      <div class="field">
+        <div class="f-label">Motor OLAP</div>
+        <div class="f-val">DuckDB v1.1.3 In-Memory Columnar</div>
+      </div>
+      <div class="field">
+        <div class="f-label">Audit Sink</div>
+        <div class="f-val" style="color:#fbbf24;">MySQL 8.0 (Tabela: query_metrics)</div>
+      </div>
+      <div class="field">
+        <div class="f-label">Latência Total (Wall Time)</div>
+        <div class="f-val" style="color:#34d399; font-size:15px; font-weight:bold;">1.492,4 ms</div>
+      </div>
+      <div class="field">
+        <div class="f-label">Consumo de Tokens</div>
+        <div class="f-val" style="color:#f472b6; font-size:15px; font-weight:bold;">342 Tokens</div>
+      </div>
+    </div>
+
+    <div class="panel-wf">
+      <div class="wf-head">
+        <h2>Decomposição da Latência em Spans (Wall Time)</h2>
+        <span style="font-size:12px; color:#94a3b8;">100% dos spans instrumentados</span>
+      </div>
+
+      <div class="span-row">
+        <div class="span-info"><span style="color:#93c5fd;">ROOT: icepol_query_handler</span><span>1.492,4 ms (100%)</span></div>
+        <div class="bar-bg"><div class="bar-fill b1">Ciclo Global da Requisição</div></div>
+      </div>
+
+      <div class="span-row">
+        <div class="span-info"><span style="color:#c4b5fd;">SPAN 1: semantic_ontology_parsing</span><span>328,0 ms (22%)</span></div>
+        <div class="bar-bg"><div class="bar-fill b2">Validação de Dimensões e Fórmulas no YAML</div></div>
+      </div>
+
+      <div class="span-row">
+        <div class="span-info"><span style="color:#f472b6;">SPAN 2: deepseek_r1_sql_synthesis</span><span style="color:#f472b6; font-weight:bold;">776,0 ms (52%) — MAIS CUSTOSO EM TEMPO</span></div>
+        <div class="bar-bg"><div class="bar-fill b3">Raciocínio CoT &lt;think&gt; do DeepSeek-R1 (342 Tokens)</div></div>
+      </div>
+
+      <div class="span-row">
+        <div class="span-info"><span style="color:#6ee7b7;">SPAN 3: duckdb_columnar_query</span><span>180,0 ms (12%)</span></div>
+        <div class="bar-bg"><div class="bar-fill b4">Scan Vetorizado DuckDB sobre Iceberg S3</div></div>
+      </div>
+
+      <div class="span-row">
+        <div class="span-info"><span style="color:#fde047;">SPAN 4: audit_minio_mysql_sink</span><span>108,4 ms (7%)</span></div>
+        <div class="bar-bg"><div class="bar-fill b5">Persistência Assíncrona MinIO e MySQL</div></div>
+      </div>
+
+      <div class="token-section">
+        <div style="font-size:14px; font-weight:700; color:#fff; display:flex; justify-content:space-between;">
+          <span>O que foi mais custoso em tokens vs tempo?</span>
+          <span style="color:#38bdf8; font-size:12px;">Auditoria Fim-a-Fim</span>
+        </div>
+        
+        <div class="cards-grid">
+          <div class="t-card" style="border-color:#38bdf8;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:#94a3b8; font-weight:bold;">INPUT ONTO</span>
+              <span class="badge-cost" style="background:#0284c7; color:#fff;">MAIS TOKENS</span>
+            </div>
+            <div class="t-num" style="color:#38bdf8;">218</div>
+            <div style="font-size:11px; color:#64748b;">63.7% do total (YAML 7 tabelas)</div>
+          </div>
+
+          <div class="t-card" style="border-color:#ec4899;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:#94a3b8; font-weight:bold;">CoT &lt;think&gt;</span>
+              <span class="badge-cost" style="background:#be185d; color:#fff;">MAIS TEMPO</span>
+            </div>
+            <div class="t-num" style="color:#f472b6;">72 <span style="font-size:15px; color:#fbcfe8;">(776ms)</span></div>
+            <div style="font-size:11px; color:#64748b;">52.0% da latência da consulta</div>
+          </div>
+
+          <div class="t-card" style="border-color:#10b981;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:#94a3b8; font-weight:bold;">SQL OUTPUT</span>
+              <span class="badge-cost" style="background:#047857; color:#fff;">ULTRARRÁPIDO</span>
+            </div>
+            <div class="t-num" style="color:#34d399;">52 <span style="font-size:15px; color:#a7f3d0;">(180ms)</span></div>
+            <div style="font-size:11px; color:#64748b;">15.3% tokens • Scan colunar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

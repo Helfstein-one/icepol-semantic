@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Fira Code', Menlo, Monaco, Consolas, monospace; }
+  body { background: #080c14; color: #38bdf8; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; padding: 30px 40px; }
+  .term-window { flex: 1; background: #0f172a; border: 1px solid #334155; border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,0.85); display: flex; flex-direction: column; overflow: hidden; }
+  .title-bar { height: 44px; background: #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #334155; }
+  .traffic-lights { display: flex; gap: 8px; }
+  .circle { width: 12px; height: 12px; border-radius: 50%; }
+  .red { background: #ef4444; } .yellow { background: #f59e0b; } .green { background: #10b981; }
+  .term-body { flex: 1; padding: 32px 40px; font-size: 16px; line-height: 1.7; color: #f1f5f9; overflow-y: auto; }
+  .prompt { color: #10b981; font-weight: bold; }
+  .cmd { color: #f8fafc; font-weight: 600; }
+  .dim { color: #64748b; }
+  .success { color: #34d399; font-weight: 600; }
+  .highlight { color: #fbbf24; font-weight: bold; }
+  .info { color: #38bdf8; }
+  .cursor { display: inline-block; width: 10px; height: 19px; background: #38bdf8; vertical-align: middle; animation: blink 0.8s infinite; }
+  @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+</style>
+</head>
+<body>
+  <div class="term-window">
+    <div class="title-bar">
+      <div class="traffic-lights"><div class="circle red"></div><div class="circle yellow"></div><div class="circle green"></div></div>
+      <div style="font-size:13px; color:#94a3b8; font-weight:600;">terminal: ~/dev (zsh) — Instalação & Containers</div>
+      <div style="font-size:12px; color:#64748b;">1920x1080 • Podman & Iceberg</div>
+    </div>
+    <div class="term-body" id="term-content">
+      <!-- Dynamically filled by script -->
+    </div>
+  </div>
+
+  <script>
+    const term = document.getElementById('term-content');
+    const steps = [
+      { text: '<p><span class="prompt">➜  dev</span> <span class="cmd" id="typing-cmd-1"></span><span class="cursor" id="c1"></span></p>', delay: 100 },
+      { type: 'cmd1', str: 'git clone https://github.com/Helfstein-one/icepol-semantic.git', speed: 45 },
+      { text: '<p class="dim">Cloning into "icepol-semantic"...</p><p class="dim">remote: Enumerating objects: 412, done.</p><p class="success">remote: Total 412 (delta 234), reused 390 (delta 218)</p><p class="success">Receiving objects: 100% (412/412), 16.40 MiB | 24.12 MiB/s, done.</p><br>', delay: 800 },
+      { text: '<p><span class="prompt">➜  dev</span> <span class="cmd" id="typing-cmd-2"></span><span class="cursor" id="c2"></span></p>', delay: 300 },
+      { type: 'cmd2', str: 'cd icepol-semantic && make seed', speed: 50 },
+      { text: '<p class="info">🌱 [SEED] Gerando 7 tabelas físicas sintéticas de Crédito Corporativo...</p><p class="dim">  ✔ counterparts.parquet (1,000 tomadores de crédito, CNAE, Ratings)</p><p class="dim">  ✔ facilities.parquet (3,500 operações ativas de crédito)</p><p class="dim">  ✔ collaterals.parquet (4,200 garantias reais e recebíveis)</p><p class="dim">  ✔ proposals.parquet (2,800 deliberações de comitês)</p><p class="dim">  ✔ financial_statements.parquet (Dívida Líquida, EBITDA, Balanços)</p><p class="dim">  ✔ credit_limits.parquet (Limites globais aprovados e tomados)</p><p class="dim">  ✔ covenants.parquet (Cláusulas de desenquadramento financeiro)</p><p class="success">✨ 7 Tabelas registradas no Apache Polaris REST Catalog e MinIO S3!</p><br>', delay: 1000 },
+      { text: '<p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd" id="typing-cmd-3"></span><span class="cursor" id="c3"></span></p>', delay: 300 },
+      { type: 'cmd3', str: 'podman compose up -d', speed: 55 },
+      { text: '<p><span class="success">✔ Container minio-storage</span>     <span class="highlight">Running</span> (S3 API :9000, Console :9001)</p><p><span class="success">✔ Container polaris-catalog</span>   <span class="highlight">Running</span> (Apache Iceberg REST :8181)</p><p><span class="success">✔ Container mysql-db</span>          <span class="highlight">Running</span> (Auditoria & Métricas :3306)</p><p><span class="success">✔ Container postgres-langfuse</span> <span class="highlight">Running</span> (Metadata Storage :5432)</p><p><span class="success">✔ Container langfuse-server</span>   <span class="highlight">Running</span> (LLM Observability Dashboard :3001)</p><p><span class="success">✔ Container semantic-agent</span>    <span class="highlight">Running</span> (FastAPI Web Chat :8000)</p><br>', delay: 800 },
+      { text: '<p><span class="prompt">➜  icepol-semantic (main)</span> <span class="cmd">open http://localhost:8000</span><span class="cursor"></span></p>', delay: 500 }
+    ];
+
+    async function runTerminal() {
+      for (const s of steps) {
+        if (s.text) {
+          term.insertAdjacentHTML('beforeend', s.text);
+          await new Promise(r => setTimeout(r, s.delay || 300));
+        } else if (s.type === 'cmd1') {
+          const el = document.getElementById('typing-cmd-1');
+          for (let i = 0; i < s.str.length; i++) {
+            el.textContent += s.str[i];
+            await new Promise(r => setTimeout(r, s.speed));
+          }
+          document.getElementById('c1').remove();
+        } else if (s.type === 'cmd2') {
+          const el = document.getElementById('typing-cmd-2');
+          for (let i = 0; i < s.str.length; i++) {
+            el.textContent += s.str[i];
+            await new Promise(r => setTimeout(r, s.speed));
+          }
+          document.getElementById('c2').remove();
+        } else if (s.type === 'cmd3') {
+          const el = document.getElementById('typing-cmd-3');
+          for (let i = 0; i < s.str.length; i++) {
+            el.textContent += s.str[i];
+            await new Promise(r => setTimeout(r, s.speed));
+          }
+          document.getElementById('c3').remove();
+        }
+      }
+    }
+    window.startTerminal = runTerminal;
+  </script>
+</body>
+</html>
