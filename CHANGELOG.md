@@ -2,6 +2,42 @@
 
 Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 
+## [v1.2.0] - 2026-09-16
+### Adicionado
+- **Observabilidade Completa & Tracing (Langfuse v2)**:
+  - Servidor Langfuse (`langfuse/langfuse:2`) integrado via Docker na porta `:3001` com persistência em PostgreSQL 15 (`postgres:15-alpine`).
+  - Bucket MinIO S3 dedicado `/data/langfuse` para retenção persistente de eventos e payloads de LLM.
+  - Spans de ciclo de vida de requisição (`icepol_query_handler`), parsing de ontologia (`semantic_ontology_parsing`), inferência de raciocínio (`deepseek_r1_sql_synthesis`) e execução colunar (`duckdb_columnar_query`).
+- **Banco de Dados de Métricas e Auditoria (MySQL 8.0)**:
+  - Container MySQL 8.0 (`mysql-db`) na porta `:3306` com schema `icepol_metrics` e autenticação nativa estável.
+  - Tabela `query_metrics` registrando sessões, modelo utilizado, prompt em linguagem natural, SQL compilado, contagem de linhas retornadas, latências parciais e totais, e estimativa de tokens.
+- **Novo Modelo Gratuito de Raciocínio (DeepSeek-R1 1.5B)**:
+  - Download e integração via Ollama do `deepseek-r1:1.5b` (1.1 GB) com suporte a Chain-of-Thought determinístico.
+- **Painel de Telemetria e Traces no Frontend**:
+  - Novo botão e popover interativo `Métricas & Traces` no cabeçalho do Icepol com status ao vivo de Langfuse, MinIO e MySQL.
+- **Produção de 2 Vídeos Demonstrativos em Full HD 1080p (36s)**:
+  - `video/icepol_journey_complete.mp4`: Jornada completa do usuário (build de terminal, novo seletor de modelos, popover de observabilidade, query DuckDB e diagrama conceitual Mermaid com Crow's foot).
+  - `video/langfuse_metrics_decision_tree.mp4`: Dashboard de telemetria do Langfuse, decomposição de waterfall de spans e visualização interativa do grafo da árvore de decisão (DAG).
+  - Trilha sonora original sintetizada estilo eletrônica synthwave anos 80 (Depeche Mode).
+
+---
+
+## [v1.1.0] - 2026-09-15
+### Adicionado
+- **Diagramas Interativos Mermaid no Chat**:
+  - Renderização automática de diagramas Mermaid (`erDiagram`, `graph TD`, `sequenceDiagram`) em formato SVG de alta resolução no tema escuro.
+  - Aba dedicada `📐 Diagrama Mermaid` ao lado dos resultados analíticos do DuckDB.
+  - Sanitização inteligente de sintaxe Mermaid (`sanitizeMermaidCode`) e fallback resiliente.
+  - Correção estrita para notação *Crow's foot* (`||--o{`, `}|--|{`) evitando que atributos colunas virassem nós isolados.
+- **Melhorias de Interatividade no Chat**:
+  - Nova saudação de boas-vindas: *"Como posso ajudar com sua pesquisa hoje?"*.
+  - Seletor dinâmico de modelos LLM locais (listando `llama3.2:3b`, `deepseek-r1:1.5b`, `qwen2.5:1.5b`).
+  - Placeholder dinâmico no input: `Peça ao <modelo_selecionado>`.
+  - Botão `+` para anexo de arquivos e imagens com pré-visualização e remoção de tags.
+  - Botão de microfone funcional com transcrição de voz em tempo real via Web Speech API.
+
+---
+
 ## [v0.4.0] - 2026-09-14
 ### Adicionado
 - **Licenciamento Open Source**: Adicionado arquivo [`LICENSE`](file:///Users/mauriciohelfstein/dev/icepol-semantic/LICENSE) (MIT License).

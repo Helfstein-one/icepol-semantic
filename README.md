@@ -10,11 +10,13 @@
 1. [Imersão Teórica e Literatura: O que é e por que a Camada Semântica existe?](#-imersão-teórica-e-literatura-o-que-é-e-por-que-a-camada-semântica-existe)
 2. [A Evolução Histórica da Camada Semântica (De Inmon & Kimball ao GenAI)](#-a-evolução-histórica-da-camada-semântica-de-inmon--kimball-ao-genai)
 3. [O Pipeline de Compilação: Texto -> Intenção -> AST -> SQL Físico](#-o-pipeline-de-compilação-texto---intenção---ast---sql-físico)
-4. [Arquitetura da Solução Local](#-arquitetura-da-solução-local)
+4. [Arquitetura da Solução Local & Observabilidade](#-arquitetura-da-solução-local)
 5. [Modelagem Ontológica do Domínio (7 Tabelas Físicas de Crédito)](#-modelagem-ontológica-do-domínio-7-tabelas-físicas-de-crédito)
-6. [Como Executar e Utilizar](#-como-executar-e-utilizar)
-7. [Integração via Model Context Protocol (MCP)](#-integração-via-model-context-protocol-mcp)
-8. [Guia de Portabilidade para AWS Cloud & Arquitetura SVG](#-guia-de-portabilidade-para-aws-cloud--arquitetura-svg)
+6. [Observabilidade Corporativa (Langfuse, MinIO S3 & MySQL 8.0)](#-observabilidade-corporativa-langfuse-minio-s3--mysql-80)
+7. [Vídeos Demonstrativos & Mermaid Interativo](#-vídeos-demonstrativos--mermaid-interativo)
+8. [Como Executar e Utilizar](#-como-executar-e-utilizar)
+9. [Integração via Model Context Protocol (MCP)](#-integração-via-model-context-protocol-mcp)
+10. [Guia de Portabilidade para AWS Cloud & Arquitetura SVG](#-guia-de-portabilidade-para-aws-cloud--arquitetura-svg)
 
 ---
 
@@ -253,6 +255,66 @@ erDiagram
 
 ---
 
+## 🔍 Observabilidade Corporativa (Langfuse, MinIO S3 & MySQL 8.0)
+
+O Icepol integra uma pilha completa de observabilidade para rastreabilidade de ponta a ponta, auditoria regulatória e mitigação de alucinações em produção:
+
+```mermaid
+flowchart LR
+    User["🗣️ Usuário / Prompt"] --> Agent["🤖 Icepol Semantic Agent (:8000)"]
+    Agent --> Registry["📜 Ontologias YAML"]
+    Agent --> LLM["🧠 Ollama (DeepSeek-R1 / LLaMA 3.2)"]
+    Agent --> DuckDB["🦆 DuckDB Engine (Iceberg S3)"]
+    
+    subgraph Observability["📊 Pilha de Observabilidade & Auditoria"]
+        LF["⚡ Langfuse v2 (:3001)"]
+        MinIO["🪣 MinIO S3 (:9000/:9001)"]
+        MySQL["🐬 MySQL 8.0 (:3306)"]
+    end
+
+    Agent -.->|"Traces & Spans"| LF
+    Agent -.->|"Raw Payloads / Blobs"| MinIO
+    Agent -.->|"Métricas & Audit Logs"| MySQL
+```
+
+### Componentes de Telemetria:
+1. **Langfuse v2 (`:3001`)**:
+   - Rastreamento detalhado de cada chamada LLM com árvore de decisão (DAG) em tempo real.
+   - Decomposição de latência em spans (`semantic_ontology_parsing`, `deepseek_r1_sql_synthesis`, `duckdb_columnar_query`, `audit_sink`).
+   - Contagem precisa de tokens (prompt, completion e total).
+2. **MinIO S3 (`:9000` / Console `:9001`)**:
+   - Bucket dedicado `/data/langfuse` para retenção permanente dos eventos e payloads completos trocados com os modelos.
+3. **MySQL 8.0 (`:3306`)**:
+   - Banco de dados `icepol_metrics` com a tabela `query_metrics`:
+     - `session_id`, `model_name`, `prompt_text`, `sql_query`, `row_count`, `llm_latency_ms`, `duckdb_latency_ms`, `tokens_estimated`, `status`.
+4. **Painel Interativo no Frontend**:
+   - Botão **`Métricas & Traces`** no cabeçalho da interface web com indicadores de saúde ao vivo e atalhos rápidos para o Langfuse e o MinIO.
+
+---
+
+## 🎬 Vídeos Demonstrativos & Mermaid Interativo
+
+O projeto conta com vídeos demonstrativos de alta definição gravados com trilha sonora original estilo **synthwave anos 80 (Depeche Mode style)**:
+
+### 1. Vídeo da Jornada Completa do Usuário (`video/icepol_journey_complete.mp4`)
+* **Duração**: 36 segundos | **Resolução**: 1920x1080 Full HD (H.264 / AAC estéreo)
+* **Conteúdo**:
+  - Build do ambiente via terminal (`podman compose up -d`).
+  - Navegação na interface com novo logo do urso polar, botão de upload `+` e microfone de voz.
+  - Seleção dinâmica de modelo (`deepseek-r1:1.5b` / `llama3.2:3b` / `qwen2.5:1.5b`).
+  - Execução de busca semântica em linguagem natural contra os dados colunares DuckDB.
+  - Renderização instantânea do modelo conceitual relacional Mermaid com todas as 7 entidades interligadas via notação *Crow's foot* (`||--o{`, `}|--|{`).
+
+### 2. Vídeo do Langfuse: Métricas e Árvore de Decisão (`video/langfuse_metrics_decision_tree.mp4`)
+* **Duração**: 36 segundos | **Resolução**: 1920x1080 Full HD (H.264 / AAC estéreo)
+* **Conteúdo**:
+  - Visão geral do dashboard Langfuse com contagem de traces, latências e taxa de conformidade do schema.
+  - Deep-dive no trace da consulta com detalhamento visual da cascata de spans (*waterfall*).
+  - Árvore de decisão em grafo (DAG) evidenciando o caminho auditável desde o prompt até a execução e persistência no MySQL 8.
+  - Inspeção de payloads, ontologia e Chain-of-Thought gerado pelo DeepSeek-R1.
+
+---
+
 ## 🚀 Como Executar e Testar
 
 ### 1. Testando em Ambientes Containerizados (Docker ou Podman)
@@ -309,9 +371,11 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 
 #### 🖥️ Consoles Web de Acesso:
 - **Icepol Semantic Web UI (Chat Interativo):** [http://localhost:8000](http://localhost:8000)
+- **Langfuse LLM Observability Dashboard:** [http://localhost:3001](http://localhost:3001)
 - **MinIO Console (Storage S3):** [http://localhost:9001](http://localhost:9001) (`admin` / `password123`)
 - **Apache Polaris Iceberg Catalog:** [http://localhost:8181](http://localhost:8181)
-- **Ollama Engine (Host):** [http://localhost:11434](http://localhost:11434) (Modelo: `llama3.2:3b`)
+- **MySQL 8.0 Metrics DB:** `localhost:3306` (database `icepol_metrics`, user `icepol_user` / `icepol_pass`)
+- **Ollama Engine (Host):** [http://localhost:11434](http://localhost:11434) (Modelos: `deepseek-r1:1.5b`, `llama3.2:3b`, `qwen2.5:1.5b`)
 
 #### 🛑 Parar e Limpar Containers:
 ```bash
