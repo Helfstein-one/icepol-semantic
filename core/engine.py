@@ -107,8 +107,32 @@ class DuckDBIcebergEngine:
             rel = self.con.sql(sql_query)
         except Exception as err:
             err_str = str(err)
+            # Auto-healing para SHOW TABLES IN <schema> (DuckDB usa SHOW TABLES FROM <schema>)
+            if re.search(r'\bSHOW\s+TABLES\s+IN\b', sql_query, flags=re.IGNORECASE):
+                fixed_query = re.sub(
+                    r'\bSHOW\s+TABLES\s+IN\b',
+                    'SHOW TABLES FROM',
+                    sql_query,
+                    flags=re.IGNORECASE
+                )
+                try:
+                    rel = self.con.sql(fixed_query)
+                except Exception:
+                    raise err
+            # Auto-healing para SHOW COLUMNS FROM/IN <table> (DuckDB usa DESCRIBE <table>)
+            elif re.search(r'^\s*SHOW\s+COLUMNS\s+(?:FROM|IN)\b', sql_query, flags=re.IGNORECASE):
+                fixed_query = re.sub(
+                    r'^\s*SHOW\s+COLUMNS\s+(?:FROM|IN)\s+([a-zA-Z0-9_\.\"]+)',
+                    r'DESCRIBE \1',
+                    sql_query,
+                    flags=re.IGNORECASE
+                )
+                try:
+                    rel = self.con.sql(fixed_query)
+                except Exception:
+                    raise err
             # Auto-healing para erros comuns de metadados onde LLMs usam schema_name em vez de table_schema
-            if "schema_name" in err_str or ("schema_name" in sql_query and "information_schema" in sql_query.lower()):
+            elif "schema_name" in err_str or ("schema_name" in sql_query and "information_schema" in sql_query.lower()):
                 fixed_query = re.sub(
                     r'\binformation_schema\.tables\b',
                     '(SELECT *, table_schema AS schema_name FROM information_schema.tables)',
