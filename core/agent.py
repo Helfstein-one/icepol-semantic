@@ -938,12 +938,13 @@ def index_ui():
 
             function sanitizeMermaidCode(raw) {
                 if (!raw) return "";
+                const nl = String.fromCharCode(10);
                 let code = raw.trim();
                 code = code.replace(/^```(?:mermaid)?/i, "").replace(/```$/, "").trim();
 
                 // Check if ER diagram
                 if (/erDiagram/i.test(code)) {
-                    let lines = code.split("\n");
+                    let lines = code.split(nl);
                     let insideEntity = false;
                     let sanitizedLines = ["erDiagram"];
                     const knownTypes = new Set([
@@ -956,18 +957,18 @@ def index_ui():
                         let line = lines[i];
                         let trimmed = line.trim();
                         if (!trimmed) continue;
-                        if (/^\s*erDiagram/i.test(trimmed)) continue;
+                        if (/^[\\s]*erDiagram/i.test(trimmed)) continue;
 
                         // Comments
                         if (trimmed.startsWith("#") || trimmed.startsWith("//")) {
-                            sanitizedLines.push("    %% " + trimmed.replace(/^[#/]+\s*/, ""));
+                            sanitizedLines.push("    %% " + trimmed.replace(/^[#/]+[\\s]*/, ""));
                             continue;
                         }
 
                         // Entity start: e.g. PART OF "counterparts" { or counterparts {
                         if (trimmed.includes("{")) {
                             insideEntity = true;
-                            let entName = trimmed.replace(/PART\s+OF\s+/gi, "").replace(/["'{}]/g, "").trim().split(/\s+/)[0];
+                            let entName = trimmed.replace(/PART[\\s]+OF[\\s]+/gi, "").replace(/["'{}]/g, "").trim().split(/[\\s]+/)[0];
                             if (entName) {
                                 sanitizedLines.push(`    ${entName} {`);
                             }
@@ -983,13 +984,13 @@ def index_ui():
 
                         if (insideEntity) {
                             // Split line if multiple attributes (e.g. separated by commas, semicolons, or multiple '=' assignments)
-                            let subAttributes = trimmed.split(/\s+(?=[a-zA-Z0-9_]+\s*=)|[,;]+/);
+                            let subAttributes = trimmed.split(/[\\s]+(?=[a-zA-Z0-9_]+[\\s]*=)|[,;]+/);
                             for (let subAttr of subAttributes) {
                                 let item = subAttr.trim();
                                 if (!item) continue;
 
                                 // Clean quotes and symbols
-                                let clean = item.replace(/[=:'"]/g, " ").replace(/\s+/g, " ").trim();
+                                let clean = item.replace(/[=:'"]/g, " ").replace(/[\\s]+/g, " ").trim();
                                 let parts = clean.split(" ").filter(p => p.length > 0);
                                 if (parts.length === 0) continue;
 
@@ -1035,14 +1036,14 @@ def index_ui():
                             }
                         } else {
                             // Relationship line outside entity
-                            let cleanRel = trimmed.replace(/PART\s+OF\s+/gi, "").replace(/["']/g, "");
-                            cleanRel = cleanRel.replace(/\*--\*/g, "}|--|{")
+                            let cleanRel = trimmed.replace(/PART[\\s]+OF[\\s]+/gi, "").replace(/["']/g, "");
+                            cleanRel = cleanRel.replace(/\\*--\\*/g, "}|--|{")
                                                .replace(/<-->/g, "}|--|{")
                                                .replace(/-->/g, "||--o{")
                                                .replace(/<--/g, "}o--||")
-                                               .replace(/\s+--\s+/g, " ||--|| ");
+                                               .replace(/[\\s]+--[\\s]+/g, " ||--|| ");
 
-                            if (/(\|\|--[o|]\{|--|\|\|--\|\||\}\|--\|\{|\}\|--o\{)/.test(cleanRel)) {
+                            if (/(?:\\|\\|--[o|]\\{|--|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{)/.test(cleanRel)) {
                                 if (!cleanRel.includes(":")) {
                                     cleanRel += ' : "relaciona"';
                                 } else {
@@ -1055,32 +1056,33 @@ def index_ui():
                             }
                         }
                     }
-                    return sanitizedLines.join("\n");
+                    return sanitizedLines.join(nl);
                 }
 
                 return code;
             }
 
             function fallbackToGraph(code) {
-                const lines = code.split('\n');
+                const nl = String.fromCharCode(10);
+                const lines = code.split(nl);
                 const nodes = new Set();
                 const edges = [];
                 for (const l of lines) {
-                    const match = l.match(/([a-zA-Z0-9_]+)\s*(?:\|\|--[o|]\{|--|->|-->|\|\|--\|\||\}\|--\|\{|\}\|--o\{)\s*([a-zA-Z0-9_]+)(?:\s*:\s*"?([^"]*)"?)?/);
+                    const match = l.match(/([a-zA-Z0-9_]+)[\\s]*(?:\\|\\|--[o|]\\{|--|->|-->|\\|\\|--\\|\\||\\}\\|--\\|\\{|\\}\\|--o\\{)[\\s]*([a-zA-Z0-9_]+)(?:[\\s]*:[\\s]*"?([^"]*)"?)?/);
                     if (match) {
                         nodes.add(match[1]);
                         nodes.add(match[2]);
                         const label = match[3] ? `|"${match[3].trim()}"| ` : '';
                         edges.push(`    ${match[1]} --> ${label}${match[2]}`);
                     } else {
-                        const entMatch = l.match(/^\s*(?:entity\s+)?([a-zA-Z0-9_]+)\s*\{?/i);
+                        const entMatch = l.match(/^[\\s]*(?:entity[\\s]+)?([a-zA-Z0-9_]+)[\\s]*\\{?/i);
                         if (entMatch && !["erdiagram", "graph", "flowchart", "classdiagram"].includes(entMatch[1].toLowerCase())) {
                             nodes.add(entMatch[1]);
                         }
                     }
                 }
                 if (nodes.size > 0) {
-                    return "graph TD\n" + Array.from(nodes).map(n => `    ${n}["${n}"]`).join("\n") + (edges.length ? "\n" + edges.join("\n") : "");
+                    return ["graph TD", ...Array.from(nodes).map(n => `    ${n}["${n}"]`), ...(edges.length ? edges : [])].join(nl);
                 }
                 return null;
             }
