@@ -296,9 +296,9 @@ flowchart LR
 
 O projeto conta com vídeos demonstrativos de alta definição gravados com trilha sonora original estilo **synthwave anos 80 (Depeche Mode style)**:
 
-### 1. ⚡ Vídeo da Jornada 100% na UI de Chat (Cyberpunk Dark Synthwave)
-* **Arquivo**: [`video/icepol_chat_ui_journey_cyberpunk.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_cyberpunk.mp4)
-* **Trilha Sonora Original**: [`video/soundtrack_cyberpunk_synthwave_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_cyberpunk_synthwave_60s.wav) — Nova sugestão de áudio inspirada em **Cyberpunk / Dark Synthwave (Kavinsky, Perturbator e Daft Punk Tron)** com bateria 909 eletrônica pesada, baixo dente-de-serra saturado em Lá menor (126 BPM) e pads neon espaciais em estéreo.
+### 1. ☕ 🌟 Vídeo da Jornada 100% na UI de Chat (Lo-Fi Chill & Ambient Rhodes)
+* **Arquivo de Vídeo**: [`video/icepol_chat_ui_journey_lofi_chill.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_lofi_chill.mp4)
+* **Trilha Sonora Calmante (Relaxante / Anti-Fadiga)**: [`video/soundtrack_lofi_chill_ambient_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_lofi_chill_ambient_60s.wav) — Composição relaxante em 82 BPM, com piano elétrico vintage Fender Rhodes tocando tétrades de jazz suave (`Dmaj9`, `Bm9`, `Gmaj7`, `Asus4`), baixo aveludado e bateria orgânica suave (rimshots de madeira e bumbo abafado sem frequências estridentes).
 * **Duração**: 60 segundos | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
 * **Foco Total na Experiência do Chat**:
   1. **UI Inicial do Chat**: Apresentação da tela inicial com logo do urso polar, saudação, chips de sugestões, microfone e upload.
@@ -309,6 +309,10 @@ O projeto conta com vídeos demonstrativos de alta definição gravados com tril
   6. **Dashboard de Métricas do Langfuse**: Monitoramento de traces (1.482), P95 SLA (1.88s) e integridade dos sinks.
   7. **Waterfall de Spans**: Detalhamento visual da latência de cada etapa da execução.
   8. **Distribuição de Gastos de Tokens**: Gráfico analítico evidenciando o consumo em Input Ontológico (218 tokens), Raciocínio CoT (72 tokens) e SQL Output (52 tokens).
+
+### 2. ⚡ Vídeo da Jornada Alternativo (Cyberpunk Dark Synthwave)
+* **Arquivo**: [`video/icepol_chat_ui_journey_cyberpunk.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_chat_ui_journey_cyberpunk.mp4)
+* **Trilha Sonora**: [`video/soundtrack_cyberpunk_synthwave_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_cyberpunk_synthwave_60s.wav) (126 BPM, sintetizador enérgico estilo anos 80).
 
 ### 2. 🌟 Vídeo Master: Jornada Completa (GitHub, Clone, Chat & Langfuse)
 * **Arquivo**: [`video/icepol_user_journey_langfuse_tokens.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_langfuse_tokens.mp4)
