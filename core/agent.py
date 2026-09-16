@@ -123,10 +123,7 @@ def index_ui():
                         <circle cx="28.5" cy="14.8" r="0.8" fill="#7dd3fc"/>
                     </svg>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xl font-bold tracking-tight text-white font-mono group-hover:text-sky-200 transition-colors">icepol</span>
-                    <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 group-hover:bg-sky-500/20 group-hover:border-sky-400/30 transition-colors">semantic</span>
-                </div>
+                <span class="text-xl font-bold tracking-tight text-white font-mono group-hover:text-sky-200 transition-colors">icepol</span>
             </div>
             <div class="flex items-center space-x-3 text-xs">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
