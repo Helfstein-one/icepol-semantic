@@ -371,6 +371,15 @@ O projeto conta com vídeos demonstrativos e **gravação real da tela** (*scree
   - **Bateria Eletrônica LinnDrum**: Bumbo rápido four-on-the-floor, caixa com estalo gated, chimbais rápidos em semicolcheias e open hi-hats nos contratempos.
 * **Duração**: **60 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
 
+### 2. 🎹 🌟 Opção Hipnótica Synth-Pop: 'Sweet Dreams' (Eurythmics)
+* **Arquivo de Vídeo**: [`video/icepol_user_journey_sweet_dreams.mp4`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/icepol_user_journey_sweet_dreams.mp4)
+* **Trilha Sonora Original**: [`video/soundtrack_sweet_dreams_60s.wav`](file:///Users/mauriciohelfstein/dev/icepol-semantic/video/soundtrack_sweet_dreams_60s.wav) — Composição synthpop analógica em **125 BPM** (Dó menor / C minor), inspirada no clássico atemporal do Eurythmics (Annie Lennox & Dave Stewart, 1983):
+  - **Arpejo Hipnótico de Sintetizador Analógico**: O lendário riff de sequenciador de 2 compassos no Roland SH-101 (`Cm` &rarr; `Ab` &rarr; `G`) com saturação quente de fita e pulso ressonante.
+  - **Bateria Industrial Gated**: Bumbo encorpado em 44Hz, caixa com estalo gated anos 80 e pratos metálicos em semicolcheias.
+  - **Camadas de Cordas Analógicas Solina**: Sustentação harmônica envolvente em Dó menor.
+  - **Linha Vocal Sintetizada**: A melodia inconfundível de *"Sweet dreams are made of this / Who am I to disagree..."* com stabs de metais no bridge.
+* **Duração**: **60 segundos** | **Resolução**: 1920x1080 Full HD (H.264 / AAC 44.1kHz estéreo)
+
 ### 📋 Roteiro da Gravação da Tela (Passo a Passo da Jornada):
 1. **Navegação Real no Repositório GitHub** (0s - 13s): Acesso à página oficial `Helfstein-one/icepol-semantic`, clique no botão `<> Code` exibindo o popover de clone HTTPS, clique no botão de cópia e rolagem suave por todo o README inspecionando o diagrama arquitetural e o isolamento de tabelas físicas.
 2. **Terminal em Ação** (13s - 23s): Digitação em tempo real dos comandos `git clone`, entrada no diretório, execução do `make seed` (gerando os 7 Parquets analíticos de crédito) e subida da pilha completa via `podman compose up -d`.
