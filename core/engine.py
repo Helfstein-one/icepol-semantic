@@ -149,6 +149,33 @@ class DuckDBIcebergEngine:
                     rel = self.con.sql(fixed_query)
                 except Exception:
                     raise err
+            # Auto-healing para colunas ambíguas em JOINs (ex: counterpart_id)
+            elif "Ambiguous reference to column name" in err_str:
+                m = re.search(r'Ambiguous reference to column name "([^"]+)" \(use: "([^"]+)"', err_str)
+                if m:
+                    amb_col = m.group(1)
+                    suggestion = m.group(2)
+                    fixed_query = re.sub(r'(?<![a-zA-Z0-9_\.])\b' + re.escape(amb_col) + r'\b', suggestion, sql_query)
+                    try:
+                        rel = self.con.sql(fixed_query)
+                    except Exception as err2:
+                        curr_q = fixed_query
+                        success = False
+                        for _ in range(3):
+                            m2 = re.search(r'Ambiguous reference to column name "([^"]+)" \(use: "([^"]+)"', str(err2))
+                            if not m2:
+                                break
+                            curr_q = re.sub(r'(?<![a-zA-Z0-9_\.])\b' + re.escape(m2.group(1)) + r'\b', m2.group(2), curr_q)
+                            try:
+                                rel = self.con.sql(curr_q)
+                                success = True
+                                break
+                            except Exception as next_err:
+                                err2 = next_err
+                        if not success and rel is None:
+                            raise err
+                else:
+                    raise err
             else:
                 raise err
 

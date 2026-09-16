@@ -1564,7 +1564,7 @@ async def chat_completions(req: ChatCompletionRequest):
         "Regras fundamentais:\n"
         "1. Responda com a query SQL dentro de um bloco ```sql ... ``` se a solicitação puder ser convertida em consulta analítica.\n"
         "2. Sempre use as tabelas qualificadas com o schema (ex: `corporate_credit.facilities`, `corporate_credit.counterparts`).\n"
-        "3. Ao combinar métricas de uma entidade com dimensões de outra, utilize JOIN explícito usando as relações indicadas em 'Joins' (ex: `JOIN corporate_credit.counterparts c ON f.counterpart_id = c.counterpart_id`).\n"
+        "3. Ao combinar métricas de uma entidade com dimensões de outra, utilize JOIN explícito usando as relações indicadas em 'Joins' (ex: `JOIN corporate_credit.counterparts c ON f.counterpart_id = c.counterpart_id`). QUALIFIQUE SEMPRE todas as colunas com o alias da tabela (ex: `c.counterpart_id`, `c.sector`, `f.vl_outstanding_balance`) para evitar colunas ambíguas no DuckDB.\n"
         "4. Se o usuário anexou arquivos (como CSVs ou relatórios), correlacione os dados fornecidos com o modelo analítico.\n"
         "5. Para listar tabelas ou consultar metadados no DuckDB, utilize `SHOW TABLES FROM corporate_credit;` (atenção: DuckDB utiliza FROM, não utilize IN) ou `SELECT table_name, table_schema FROM information_schema.tables WHERE table_schema = 'corporate_credit';` (a coluna padrão SQL de schema é `table_schema`, não `schema_name`).\n"
         "6. Se for apenas conversa genérica, pesquisa conceitual ou saudação, responda normalmente em português.\n"
@@ -1603,7 +1603,8 @@ async def chat_completions(req: ChatCompletionRequest):
 
     # 3. Query Ollama / llama.cpp server
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        timeout_config = httpx.Timeout(180.0, connect=15.0)
+        async with httpx.AsyncClient(timeout=timeout_config) as client:
             resp = await client.post(
                 f"{LLAMA_SERVER_URL}/v1/chat/completions",
                 json={
@@ -1615,6 +1616,7 @@ async def chat_completions(req: ChatCompletionRequest):
             )
             # Fallback to default LLM_MODEL if target_model failed
             if resp.status_code != 200 and target_model != LLM_MODEL:
+                print(f"[LLM Retry] Falha no modelo {target_model} (HTTP {resp.status_code}), tentando {LLM_MODEL}...", flush=True)
                 resp = await client.post(
                     f"{LLAMA_SERVER_URL}/v1/chat/completions",
                     json={
@@ -1625,10 +1627,12 @@ async def chat_completions(req: ChatCompletionRequest):
                     }
                 )
             if resp.status_code != 200:
-                raise HTTPException(status_code=resp.status_code, detail=resp.text)
+                raise HTTPException(status_code=resp.status_code, detail=f"Ollama retornou HTTP {resp.status_code}: {resp.text}")
             llm_result = resp.json()
     except Exception as e:
         total_time_ms = round((time.perf_counter() - start_time) * 1000, 1)
+        err_msg = str(e).strip() or f"{type(e).__name__} (tempo limite de processamento excedido pelo modelo local)"
+        print(f"[LLM Fallback] Erro ao consultar {target_model}: {err_msg}", flush=True)
         # Fallback se LLM não estiver acessível
         return {
             "id": "chatcmpl-fallback",
@@ -1640,7 +1644,7 @@ async def chat_completions(req: ChatCompletionRequest):
                 "message": {
                     "role": "assistant",
                     "model": target_model,
-                    "content": f"[Middleware Fallback - LLM Offline] Contexto Semântico:\n{semantic_context}\n\nErro ao conectar ao LLM ({target_model}): {str(e)}",
+                    "content": f"⚠️ **Aviso de Conexão com o Modelo ({target_model}):** {err_msg}\n\nO modelo local demorou mais que o esperado ou esteve temporariamente ocupado. Tente novamente ou selecione um modelo mais rápido como `qwen2.5:1.5b` ou `llama3.2:1b` no seletor.",
                     "sql": None,
                     "data": None,
                     "execution_time_ms": total_time_ms,
