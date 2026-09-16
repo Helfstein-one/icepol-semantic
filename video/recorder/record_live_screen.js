@@ -302,37 +302,51 @@ async function cursorClick(page, x, y) {
 
   // 1. Move to Login Button and click
   console.log("Clicking Sign in to Project button in Langfuse Login overlay...");
-  await cursorClick(page, 960, 610);
+  const loginBtn = await page.$('#login-btn');
+  if (loginBtn) {
+    const lbox = await loginBtn.boundingBox();
+    if (lbox) {
+      await cursorMoveTo(page, lbox.x + lbox.width / 2, lbox.y + lbox.height / 2);
+      await page.waitForTimeout(300);
+      await cursorClick(page, lbox.x + lbox.width / 2, lbox.y + lbox.height / 2);
+    }
+  } else {
+    await cursorClick(page, 960, 665);
+  }
+  // Ensure doLogin executes and removes overlay
+  await page.evaluate(() => window.doLogin && window.doLogin());
   // Wait for login animation to fade overlay out
   await page.waitForTimeout(1600);
 
   // 2. Highlight Decision Tree / DAG nodes
   console.log("Tracing across Decision Tree DAG nodes...");
-  await cursorMoveTo(page, 720, 150); // Node 1: Ingestion
+  await cursorMoveTo(page, 672, 183); // Node 1: Ingestion
   await page.waitForTimeout(1200);
-  await cursorMoveTo(page, 920, 150); // Node 2: Semantic Parser
+  await cursorMoveTo(page, 922, 183); // Node 2: Semantic Parser
   await page.waitForTimeout(1200);
-  await cursorMoveTo(page, 1140, 150); // Node 3: DeepSeek-R1 (CoT)
+  await cursorMoveTo(page, 1193, 183); // Node 3: DeepSeek-R1 (CoT)
   await page.waitForTimeout(1800);
-  await cursorMoveTo(page, 1360, 150); // Node 4: DuckDB Columnar
+  await cursorMoveTo(page, 1464, 183); // Node 4: DuckDB Columnar
   await page.waitForTimeout(1200);
-  await cursorMoveTo(page, 1560, 150); // Node 5: PostgreSQL 15 Audit
+  await cursorMoveTo(page, 1715, 183); // Node 5: PostgreSQL 15 Audit
   await page.waitForTimeout(1400);
 
   // 3. Move cursor to Spans Waterfall
   console.log("Inspecting Spans Waterfall...");
-  await cursorMoveTo(page, 850, 370); // DeepSeek-R1 (Highlighting 776ms CoT)
+  await cursorMoveTo(page, 800, 315); // ROOT: icepol_query_handler
+  await page.waitForTimeout(1200);
+  await cursorMoveTo(page, 850, 441); // DeepSeek-R1 (Highlighting 776ms CoT)
   await page.waitForTimeout(2000);
-  await cursorMoveTo(page, 900, 430); // DuckDB 180ms
+  await cursorMoveTo(page, 900, 504); // DuckDB 180ms
   await page.waitForTimeout(1200);
 
   // 4. Move cursor to Token Cost cards
   console.log("Inspecting Token Cost Cards...");
-  await cursorMoveTo(page, 720, 560); // Input Onto (218 Tokens - Most costly in tokens)
+  await cursorMoveTo(page, 750, 715); // Input Onto (218 Tokens - Most costly in tokens)
   await page.waitForTimeout(2000);
-  await cursorMoveTo(page, 1000, 560); // CoT (776ms - Most costly in wall time)
+  await cursorMoveTo(page, 1190, 715); // CoT (776ms - Most costly in wall time)
   await page.waitForTimeout(2200);
-  await cursorMoveTo(page, 1300, 560); // SQL output
+  await cursorMoveTo(page, 1630, 715); // SQL output
   await page.waitForTimeout(2000);
 
   console.log("Finishing recording session...");

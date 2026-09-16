@@ -204,15 +204,21 @@
   <script>
     function doLogin() {
       const btn = document.getElementById('login-btn');
-      btn.innerText = 'Signing in...';
-      btn.style.background = '#059669';
-      setTimeout(() => {
-        const overlay = document.getElementById('langfuse-login-overlay');
+      if (btn) {
+        btn.innerText = 'Signing in...';
+        btn.style.background = '#059669';
+      }
+      const overlay = document.getElementById('langfuse-login-overlay');
+      if (overlay) {
         overlay.style.opacity = '0';
         overlay.style.pointerEvents = 'none';
-        setTimeout(() => overlay.style.visibility = 'hidden', 600);
-      }, 500);
+        setTimeout(() => {
+          overlay.style.visibility = 'hidden';
+          overlay.style.display = 'none';
+        }, 500);
+      }
     }
+    window.doLogin = doLogin;
   </script>
 </body>
 </html>
