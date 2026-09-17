@@ -305,16 +305,16 @@ A latência total fim-a-fim da consulta (*wall time* de **1.492,4 ms**) é decom
 
 ```mermaid
 gantt
-    title Waterfall de Spans da Consulta Semântica (Total: 1.492,4 ms)
+    title Waterfall de Spans da Consulta Semântica (Total 1492ms)
     dateFormat X
-    axisFormat %s ms
+    axisFormat %s
     section Ciclo Global
-    ROOT: icepol_query_handler           :active, 0, 1492
+    ROOT - icepol_query_handler        :active, 0, 1492
     section Spans Internos
-    SPAN 1: semantic_ontology_parsing    :done, 30, 358
-    SPAN 2: deepseek_r1_sql_synthesis    :crit, active, 358, 1134
-    SPAN 3: duckdb_columnar_query        :done, 1134, 1314
-    SPAN 4: audit_minio_postgres_sink    :done, 1314, 1422
+    SPAN 1 - semantic_ontology_parsing :done, 30, 358
+    SPAN 2 - deepseek_r1_sql_synthesis :crit, 358, 1134
+    SPAN 3 - duckdb_columnar_query     :done, 1134, 1314
+    SPAN 4 - audit_minio_postgres_sink :done, 1314, 1422
 ```
 
 | Span de Execução | Componente | Latência | % do Total | Ação Realizada |
